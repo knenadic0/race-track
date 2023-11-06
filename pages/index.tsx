@@ -1,29 +1,12 @@
 import type { NextPage } from "next";
 import Head from "next/head";
 import { useAuthState } from "react-firebase-hooks/auth";
-import { getAuth, GoogleAuthProvider, signInWithPopup } from "firebase/auth";
+import { getAuth } from "firebase/auth";
 import { app } from "../services/firebase";
-import { useRouter } from "next/router";
 
-const Login: NextPage = () => {
-  const provider = new GoogleAuthProvider();
+const Home: NextPage = () => {
   const auth = getAuth(app);
-  const router = useRouter();
-
-  const signInWithGoogle = () => {
-    signInWithPopup(auth, provider)
-      .then((result) => {
-        const credential = GoogleAuthProvider.credentialFromResult(result);
-        if (credential) {
-          const token = credential.accessToken;
-          const user = result.user;
-          router.push("/");
-        }
-      })
-      .catch((error) => {
-        console.error(error);
-      });
-  };
+  const [user] = useAuthState(auth);
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center py-2">
@@ -36,11 +19,12 @@ const Login: NextPage = () => {
         <div className="flex items-center justify-center bg-white rounded shadow-lg">
           <div className="bg-race-flag bg-cover bg-no-repeat bg-bt-100 p-8 sm:w-80">
             <h1 className="text-4xl font-bold mb-6">RaceTrack</h1>
+            <p>You are already logged in as {user && user.displayName}.</p>
             <button
-              onClick={signInWithGoogle}
-              className="bg-rt-blue text-white px-4 py-2 rounded-md hover:bg-rt-dark-blue"
+              onClick={() => auth.signOut()}
+              className="bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-600"
             >
-              Sign in with Google
+              Sign Out
             </button>
           </div>
         </div>
@@ -49,4 +33,4 @@ const Login: NextPage = () => {
   );
 };
 
-export default Login;
+export default Home;

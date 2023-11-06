@@ -13,8 +13,7 @@ module.exports = {
       xl: "1440px",
     },
     fontFamily: {
-      sans: ["Graphik", "sans-serif"],
-      serif: ["Merriweather", "serif"],
+      sans: ["NTR", "sans-serif"],
     },
     extend: {
       spacing: {
