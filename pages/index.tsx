@@ -3,10 +3,16 @@ import Head from "next/head";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { getAuth } from "firebase/auth";
 import { app } from "../services/firebase";
+import Cookies from "js-cookie";
 
 const Home: NextPage = () => {
   const auth = getAuth(app);
   const [user] = useAuthState(auth);
+
+  const logOut = () => {
+    auth.signOut();
+    Cookies.remove("user");
+  };
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center py-2">
@@ -21,7 +27,7 @@ const Home: NextPage = () => {
             <h1 className="text-4xl font-bold mb-6">RaceTrack</h1>
             <p>You are already logged in as {user && user.displayName}.</p>
             <button
-              onClick={() => auth.signOut()}
+              onClick={logOut}
               className="bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-600"
             >
               Sign Out

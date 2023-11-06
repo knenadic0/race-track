@@ -1,9 +1,9 @@
 import type { NextPage } from "next";
 import Head from "next/head";
-import { useAuthState } from "react-firebase-hooks/auth";
 import { getAuth, GoogleAuthProvider, signInWithPopup } from "firebase/auth";
 import { app } from "../services/firebase";
 import { useRouter } from "next/router";
+import Cookies from "js-cookie";
 
 const Login: NextPage = () => {
   const provider = new GoogleAuthProvider();
@@ -15,8 +15,7 @@ const Login: NextPage = () => {
       .then((result) => {
         const credential = GoogleAuthProvider.credentialFromResult(result);
         if (credential) {
-          const token = credential.accessToken;
-          const user = result.user;
+          Cookies.set("user", JSON.stringify(credential));
           router.push("/");
         }
       })

@@ -10,9 +10,10 @@
     "@headlessui/tailwindcss": "^0.1.2",
     "@tanstack/react-table": "^8.7.9",
     "firebase": "^9.23.0",
+    "js-cookie": "^3.0.5",
     "next": "latest",
+    "next-auth": "^0.0.0-manual.cfb42ae7",
     "react": "18.2.0",
-    "react-charts": "^3.0.0-beta.54",
     "react-dom": "18.2.0",
     "react-firebase-hooks": "^5.1.1",
     "react-hot-toast": "^2.4.0",
@@ -20,6 +21,7 @@
     "react-router-dom": "^6.18.0"
   },
   "devDependencies": {
+    "@types/js-cookie": "^3.0.5",
     "@types/node": "18.11.3",
     "@types/react": "18.0.21",
     "@types/react-dom": "18.0.6",
