@@ -5,7 +5,11 @@
 @tailwind utilities;
 
 @layer base {
-  body {
-    @apply bg-slate-200;
-  }
+	body {
+		@apply bg-slate-200;
+	}
+
+	main.full-h-layout {
+		min-height: calc(100vh - 8rem);
+	}
 }
