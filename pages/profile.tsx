@@ -1,15 +1,17 @@
 import Head from "next/head";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { getAuth } from "firebase/auth";
-import { app } from "../services/firebase";
+import { app, firestore } from "../services/firebase";
 import { useRouter } from "next/router";
 import Cookies from "js-cookie";
 import { NextPageWithLayout } from "./_app";
-import { ReactElement, useState } from "react";
+import { ReactElement, useState, useEffect } from "react";
 import Layout from "../components/layout";
 import { Puff } from "react-loader-spinner";
 import tailwindTheme from "../services/tailwind";
 import { FiSave, FiLogOut } from "react-icons/fi";
+import { doc, getDoc, setDoc } from "firebase/firestore";
+import toast from "react-hot-toast";
 
 const Profile: NextPageWithLayout = () => {
 	const auth = getAuth(app);
@@ -17,11 +19,11 @@ const Profile: NextPageWithLayout = () => {
 	const router = useRouter();
 
 	const waveColor = tailwindTheme.theme?.colors
-		? tailwindTheme.theme?.colors["rt-blue"].toString()
+		? tailwindTheme.theme.colors["rt-blue"].toString()
 		: "#4fa94d";
 
 	const [userData, setUserData] = useState({
-		displayName: "",
+		fullName: "",
 		birthDate: "",
 		gender: "",
 	});
@@ -42,7 +44,43 @@ const Profile: NextPageWithLayout = () => {
 		}));
 	};
 
-	const saveChanges = () => {};
+	useEffect(() => {
+		if (user) {
+			const userDocRef = doc(firestore, "users", user.uid);
+			getDoc(userDocRef)
+				.then((docSnapshot) => {
+					if (docSnapshot.exists()) {
+						const data = docSnapshot.data();
+						setUserData({
+							fullName: data.fullName,
+							birthDate: data.birthDate,
+							gender: data.gender,
+						});
+					} else {
+						setUserData((prevData) => ({
+							...prevData,
+							fullName: user.displayName! ? user.displayName : "",
+						}));
+					}
+				})
+				.catch((error) => {
+					console.error("Error fetching user data: ", error);
+				});
+		}
+	}, [user]);
+
+	const saveChanges = async (e: React.MouseEvent<HTMLElement>) => {
+		e.preventDefault();
+
+		if (user) {
+			const userDocRef = doc(firestore, "users", user.uid);
+			toast.promise(setDoc(userDocRef, userData, { merge: true }), {
+				loading: "Saving changes...",
+				success: "Changes saved.",
+				error: "An error occurred.",
+			});
+		}
+	};
 
 	return (
 		<div className="flex  flex-col items-center justify-center py-2">
@@ -52,46 +90,44 @@ const Profile: NextPageWithLayout = () => {
 			</Head>
 
 			<div className="mt-16 flex flex-1 flex-col items-center justify-center px-5 text-center">
-				{!user ? (
-					<div>
+				{!user || userData.fullName === "" ? (
+					<div className="absolute top-1/3">
 						<Puff
 							height="60"
 							width="60"
 							radius={1}
 							color={waveColor}
 							ariaLabel="puff-loading"
-							wrapperStyle={{}}
-							wrapperClass=""
 							visible={true}
 						/>
 					</div>
 				) : (
 					<div className="flex w-128 flex-col rounded bg-white p-6 text-left text-lg shadow-xl">
 						<form>
-							<h1 className="mt-3 mb-5 text-center text-3xl font-bold">
+							<h1 className="mt-3 mb-6 text-center text-2xl font-bold">
 								Manage profile
 							</h1>
 							<hr />
-							<div className="my-6 grid grid-cols-3">
+							<div className="my-8 grid grid-cols-3">
 								<label
-									htmlFor="gender"
-									className="flex items-center font-semibold"
+									htmlFor="fullName"
+									className="flex items-center"
 								>
-									Display Name:
+									Full Name:
 								</label>
 								<input
 									type="text"
-									id="gender"
-									name="gender"
-									// value={userData.displayName}
-									// onChange={handleInputChange}
+									id="fullName"
+									name="fullName"
+									value={userData.fullName}
+									onChange={handleInputChange}
 									className="col-span-2 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300  focus:ring-2 focus:ring-inset focus:ring-rt-blue"
 								/>
 							</div>
-							<div className="mb-4 grid grid-cols-3">
+							<div className="mb-8 grid grid-cols-3">
 								<label
 									htmlFor="birthDate"
-									className="flex items-center font-semibold"
+									className="flex items-center"
 								>
 									Birth Date:
 								</label>
@@ -99,21 +135,23 @@ const Profile: NextPageWithLayout = () => {
 									type="date"
 									id="birthDate"
 									name="birthDate"
-									// value={userData.birthDate}
-									// onChange={handleInputChange}
+									value={userData.birthDate}
+									max={new Date().toISOString().split("T")[0]}
+									onChange={handleInputChange}
 									className="col-span-2 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300  focus:ring-2 focus:ring-inset focus:ring-rt-blue"
 								/>
 							</div>
-							<fieldset className="mb-4 grid h-10 grid-cols-3">
-								<p className="flex items-center font-semibold">
-									Gender:
-								</p>
+							<fieldset className="grid h-10 grid-cols-3">
+								<p className="flex items-center">Gender:</p>
 								<div className="flex space-x-8">
 									<div className="flex items-center gap-x-2">
 										<input
 											id="male"
 											name="gender"
 											type="radio"
+											value="male"
+											onChange={handleInputChange}
+											checked={userData.gender === "male"}
 											className="h-4 w-4 border-gray-300 text-rt-blue focus:ring-rt-blue"
 										/>
 										<label
@@ -128,6 +166,11 @@ const Profile: NextPageWithLayout = () => {
 											id="female"
 											name="gender"
 											type="radio"
+											value="female"
+											onChange={handleInputChange}
+											checked={
+												userData.gender === "female"
+											}
 											className="h-4 w-4 border-gray-300 text-rt-blue focus:ring-rt-blue"
 										/>
 										<label
@@ -139,7 +182,7 @@ const Profile: NextPageWithLayout = () => {
 									</div>
 								</div>
 							</fieldset>
-							<div className="mt-10 flex justify-center gap-x-5">
+							<div className="mt-12 flex justify-center gap-x-5">
 								<button
 									onClick={saveChanges}
 									className="flex w-max items-center gap-x-3 rounded bg-blue-500 py-2 pl-5 pr-6 text-white hover:bg-blue-600 focus:outline-none"
