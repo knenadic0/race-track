@@ -1,0 +1,19 @@
+{
+  "processors": ["stylelint-processor-styled-components"],
+  "extends": [
+    "stylelint-config-standard",
+    "stylelint-config-styled-components"
+  ],
+  "rules": {
+    "indentation": 4,
+    "declaration-block-single-line-max-declarations": 5,
+    "value-keyword-case": ["lower", { "ignoreKeywords": ["dummyValue"] }],
+    "no-descending-specificity": null,
+    "shorthand-property-no-redundant-values": null,
+    "color-function-notation": null,
+    "alpha-value-notation": null,
+    "selector-class-pattern": null,
+    "string-quotes": "single",
+    "font-family-no-missing-generic-family-keyword": null
+  }
+}

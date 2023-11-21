@@ -1,10 +1,10 @@
-import Head from "next/head";
-import { getAuth, GoogleAuthProvider, signInWithPopup } from "firebase/auth";
-import { app } from "../services/firebase";
-import { useRouter } from "next/router";
-import Cookies from "js-cookie";
-import { FaGoogle } from "react-icons/fa";
-import { NextPageWithLayout } from "./_app";
+import Head from 'next/head';
+import { getAuth, GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
+import { app } from '../services/firebase';
+import { useRouter } from 'next/router';
+import Cookies from 'js-cookie';
+import { FaGoogle } from 'react-icons/fa';
+import { NextPageWithLayout } from './_app';
 
 const Login: NextPageWithLayout = () => {
 	const provider = new GoogleAuthProvider();
@@ -14,11 +14,10 @@ const Login: NextPageWithLayout = () => {
 	const signInWithGoogle = () => {
 		signInWithPopup(auth, provider)
 			.then((result) => {
-				const credential =
-					GoogleAuthProvider.credentialFromResult(result);
+				const credential = GoogleAuthProvider.credentialFromResult(result);
 				if (credential) {
-					Cookies.set("user", JSON.stringify(credential));
-					router.push("/");
+					Cookies.set('user', JSON.stringify(credential));
+					router.push('/');
 				}
 			})
 			.catch((error) => {
@@ -42,9 +41,7 @@ const Login: NextPageWithLayout = () => {
 							className="mx-auto flex items-center gap-x-3 rounded-md bg-rt-blue px-4 py-2 text-white hover:bg-rt-dark-blue"
 						>
 							<FaGoogle />
-							<span className="border-l-2 pl-3">
-								Sign in with Google
-							</span>
+							<span className="border-l-2 pl-3">Sign in with Google</span>
 						</button>
 					</div>
 				</div>
