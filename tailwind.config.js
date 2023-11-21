@@ -29,6 +29,9 @@ module.exports = {
 			backgroundPosition: {
 				'bt-100': 'center top 100px',
 			},
+			borderWidth: {
+				3: '3px',
+			},
 		},
 	},
 	plugins: [require('@headlessui/tailwindcss'), require('@tailwindcss/forms')],

@@ -79,7 +79,7 @@ const Profile: NextPageWithLayout = () => {
 	};
 
 	return (
-		<div className="flex  flex-col items-center justify-center py-2">
+		<div className="flex flex-col items-center justify-center py-2">
 			<Head>
 				<title>RaceTrack</title>
 				<link rel="icon" href="/favicon.ico" />

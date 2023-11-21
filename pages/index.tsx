@@ -20,13 +20,13 @@ const Home: NextPageWithLayout = () => {
 	};
 
 	return (
-		<div className="flex min-h-screen flex-col items-center justify-center py-2">
+		<div className="flex flex-col items-center justify-center py-2">
 			<Head>
 				<title>RaceTrack</title>
 				<link rel="icon" href="/favicon.ico" />
 			</Head>
 
-			<div className="flex w-full flex-1 flex-col items-center justify-center px-5 text-center">
+			<div className="mt-16 flex w-full flex-1 flex-col items-center justify-center px-5 text-center">
 				<div className="flex items-center justify-center rounded bg-white shadow-lg">
 					<div className="bg-race-flag bg-cover bg-bt-100 bg-no-repeat p-8 sm:w-80">
 						<h1 className="mb-6 text-4xl font-bold">RaceTrack</h1>
