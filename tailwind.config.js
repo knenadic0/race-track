@@ -23,13 +23,14 @@ module.exports = {
 			borderRadius: {
 				'4xl': '2rem',
 			},
-			backgroundImage: (theme) => ({
+			backgroundImage: {
 				'race-flag': "url('/assets/images/race-flag-1.png')",
-			}),
+			},
 			backgroundPosition: {
 				'bt-100': 'center top 100px',
 			},
 			borderWidth: {
+				1: '1px',
 				3: '3px',
 			},
 		},

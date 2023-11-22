@@ -91,11 +91,11 @@ const Profile: NextPageWithLayout = () => {
 						<Puff height="60" width="60" radius={1} color={waveColor} ariaLabel="puff-loading" visible={true} />
 					</div>
 				) : (
-					<div className="flex w-128 flex-col rounded bg-white p-6 text-left text-lg shadow-xl">
+					<div className="flex flex-col rounded bg-white p-6 text-left text-lg shadow-xl md:w-128">
 						<form>
 							<h1 className="mt-3 mb-6 text-center text-2xl font-bold">Manage profile</h1>
 							<hr />
-							<div className="my-8 grid grid-cols-3">
+							<div className="my-8 grid grid-cols-1 sm:grid-cols-3">
 								<label htmlFor="fullName" className="flex items-center">
 									Full Name:
 								</label>
@@ -108,7 +108,7 @@ const Profile: NextPageWithLayout = () => {
 									className="col-span-2 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300  focus:ring-2 focus:ring-inset focus:ring-rt-blue"
 								/>
 							</div>
-							<div className="mb-8 grid grid-cols-3">
+							<div className="mb-8 grid grid-cols-1 sm:grid-cols-3">
 								<label htmlFor="birthDate" className="flex items-center">
 									Birth Date:
 								</label>
@@ -122,7 +122,7 @@ const Profile: NextPageWithLayout = () => {
 									className="col-span-2 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300  focus:ring-2 focus:ring-inset focus:ring-rt-blue"
 								/>
 							</div>
-							<fieldset className="grid h-10 grid-cols-3">
+							<fieldset className="grid h-10 grid-cols-1 sm:grid-cols-3">
 								<p className="flex items-center">Gender:</p>
 								<div className="flex space-x-8">
 									<div className="flex items-center gap-x-2">
@@ -155,17 +155,17 @@ const Profile: NextPageWithLayout = () => {
 									</div>
 								</div>
 							</fieldset>
-							<div className="mt-12 flex justify-center gap-x-5">
+							<div className="mt-12 flex justify-center gap-x-2 sm:gap-x-5">
 								<button
 									onClick={saveChanges}
-									className="flex w-max items-center gap-x-3 rounded bg-blue-500 py-2 pl-5 pr-6 text-white hover:bg-blue-600 focus:outline-none"
+									className="flex w-max items-center gap-x-3 rounded bg-blue-500 py-2 pl-5 pr-6 text-sm text-white hover:bg-blue-600 focus:outline-none sm:text-base"
 								>
 									<FiSave />
 									<span>Save</span>
 								</button>
 								<button
 									onClick={logOut}
-									className="flex w-max items-center gap-x-3 rounded-md bg-red-500 py-2 pl-5 pr-6 text-white hover:bg-red-600"
+									className="flex w-max items-center gap-x-3 rounded-md bg-red-500 py-2 pl-5 pr-6 text-sm text-white hover:bg-red-600 sm:text-base"
 								>
 									<FiLogOut />
 									<span>Sign out</span>
