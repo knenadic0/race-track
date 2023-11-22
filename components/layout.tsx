@@ -2,7 +2,6 @@ import React, { ReactNode } from 'react';
 import Footer from './footer';
 import Header from './header';
 import { Toaster } from 'react-hot-toast';
-import tailwindTheme from '../services/tailwind';
 
 interface LayoutProps {
 	children: ReactNode;
