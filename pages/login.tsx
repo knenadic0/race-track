@@ -28,7 +28,7 @@ const Login: NextPageWithLayout = () => {
 	return (
 		<div className="flex min-h-screen flex-col items-center justify-center py-2">
 			<Head>
-				<title>RaceTrack</title>
+				<title>Login | RaceTrack</title>
 				<link rel="icon" href="/favicon.ico" />
 			</Head>
 

@@ -28,6 +28,7 @@ module.exports = {
 			},
 			backgroundPosition: {
 				'bt-100': 'center top 100px',
+				'bt-180': 'center top 180px',
 			},
 			borderWidth: {
 				1: '1px',
