@@ -8,19 +8,18 @@ import { NextPageWithLayout } from './_app';
 import { ReactElement, useState, useEffect } from 'react';
 import Layout from '../components/layout';
 import { Puff } from 'react-loader-spinner';
-import tailwindTheme from '../services/tailwind';
 import { FiSave, FiLogOut } from 'react-icons/fi';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
 import toast from 'react-hot-toast';
+import IUser from '../types/IUser';
+import { waveColor } from '../helpers/constants';
 
 const Profile: NextPageWithLayout = () => {
 	const auth = getAuth(app);
 	const [user] = useAuthState(auth);
 	const router = useRouter();
 
-	const waveColor = tailwindTheme.theme?.colors ? tailwindTheme.theme.colors['rt-blue'].toString() : '#4fa94d';
-
-	const [userData, setUserData] = useState({
+	const [userData, setUserData] = useState<IUser>({
 		fullName: '',
 		birthDate: '',
 		gender: '',

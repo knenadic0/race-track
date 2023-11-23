@@ -4,6 +4,7 @@ import { HiBars3, HiOutlineUserCircle, HiXMark } from 'react-icons/hi2';
 import classNames from 'classnames';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import Image from 'next/image';
 
 const navigationLinks = [
 	{ name: 'Races', href: '/', current: false, main: true },
@@ -48,7 +49,7 @@ const Header = () => {
 							</div>
 							<div className="flex h-full flex-1 items-center justify-start">
 								<div className="flex flex-shrink-0 items-center">
-									<img className="h-8 w-auto" src="/assets/images/logo.jpg" alt="Race flag" />
+									<Image src="/assets/images/logo.jpg" alt="Race flag" height={32} width={32} />
 								</div>
 								<div className="hidden h-full sm:ml-6 sm:block">
 									<div className="flex h-full space-x-4">

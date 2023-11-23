@@ -1,42 +1,103 @@
 import Head from 'next/head';
-import { useAuthState } from 'react-firebase-hooks/auth';
-import { getAuth } from 'firebase/auth';
-import { app } from '../services/firebase';
-import { useRouter } from 'next/router';
-import Cookies from 'js-cookie';
 import { NextPageWithLayout } from './_app';
-import { ReactElement } from 'react';
+import { ReactElement, useState, useEffect } from 'react';
+import { collection, getDocs } from 'firebase/firestore';
+import { app, firestore } from '../services/firebase';
 import Layout from '../components/layout';
+import { CompactTable } from '@table-library/react-table-library/compact';
+import { useTheme } from '@table-library/react-table-library/theme';
+import { getTheme } from '@table-library/react-table-library/baseline';
+import { usePagination } from '@table-library/react-table-library/pagination';
+import IRace, { RaceNode } from '../types/IRace';
+import * as TYPES from '@table-library/react-table-library/types/table';
+import { getAuth } from 'firebase/auth';
+import { Puff } from 'react-loader-spinner';
+import { waveColor } from '../helpers/constants';
 
 const Home: NextPageWithLayout = () => {
-	const auth = getAuth(app);
-	const [user] = useAuthState(auth);
-	const router = useRouter();
+	// const [races, setRaces] = useState<IRace[]>([]);
+	let races: IRace[] = [];
+	const [data, setData] = useState<TYPES.Data<RaceNode>>({
+		pageInfo: null,
+		nodes: [],
+	});
+	getAuth(app);
 
-	const logOut = () => {
-		auth.signOut();
-		Cookies.remove('user');
-		router.push('/login');
-	};
+	useEffect(() => {
+		const fetchRaces = async () => {
+			const racesCollection = collection(firestore, 'races');
+			const racesSnapshot = await getDocs(racesCollection);
+
+			races = racesSnapshot.docs.map((doc) => ({
+				id: doc.id,
+				title: doc.data().title,
+				dateTime: doc.data().dateTime,
+			}));
+
+			setData({
+				nodes: races.map((race) => ({
+					...race,
+					id: race.id,
+					nodes: null,
+				})),
+			});
+		};
+
+		fetchRaces();
+	}, []);
+
+	const theme = useTheme(getTheme());
+	const pagination = usePagination(data, {
+		state: {
+			page: 0,
+			size: 10,
+		},
+	});
+
+	const COLUMNS = [
+		{ label: 'Title', renderCell: (item: RaceNode) => item.title },
+		{
+			label: 'Date',
+			renderCell: (item: RaceNode) => item.dateTime.toDate().toLocaleDateString('hr-HR'),
+		},
+	];
 
 	return (
-		<div className="flex flex-col items-center justify-center py-2">
+		<div className="flex flex-col items-center justify-center py-5">
 			<Head>
 				<title>RaceTrack</title>
 				<link rel="icon" href="/favicon.ico" />
 			</Head>
+			{!data.nodes.length ? (
+				<div className="absolute top-1/3">
+					<Puff height="60" width="60" radius={1} color={waveColor} ariaLabel="puff-loading" visible={true} />
+				</div>
+			) : (
+				<div className="mx-auto w-full max-w-7xl bg-white px-4 sm:px-6 lg:px-8">
+					<CompactTable columns={COLUMNS} data={data} theme={theme} pagination={pagination} />
 
-			<div className="mt-16 flex w-full flex-1 flex-col items-center justify-center px-5 text-center">
-				<div className="flex items-center justify-center rounded bg-white shadow-lg">
-					<div className="bg-race-flag bg-cover bg-bt-100 bg-no-repeat p-8 sm:w-80">
-						<h1 className="mb-6 text-4xl font-bold">RaceTrack</h1>
-						<p>You are already logged in as {user && user.displayName}.</p>
-						<button onClick={logOut} className="rounded-md bg-red-500 px-4 py-2 text-white hover:bg-red-600">
-							Sign Out
-						</button>
+					<br />
+					<div style={{ display: 'flex', justifyContent: 'space-between' }}>
+						<span>Total Pages: {pagination.state.getTotalPages(data.nodes)}</span>
+
+						<span>
+							Page:{' '}
+							{pagination.state.getPages(data.nodes).map((_: RaceNode, index: number) => (
+								<button
+									key={index}
+									type="button"
+									style={{
+										fontWeight: pagination.state.page === index ? 'bold' : 'normal',
+									}}
+									onClick={() => pagination.fns.onSetPage(index)}
+								>
+									{index + 1}
+								</button>
+							))}
+						</span>
 					</div>
 				</div>
-			</div>
+			)}
 		</div>
 	);
 };
