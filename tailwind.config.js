@@ -1,6 +1,11 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
-	content: ['./pages/**/*.{js,ts,jsx,tsx}', './components/**/*.{js,ts,jsx,tsx}', './app/**/*.{js,ts,jsx,tsx}'],
+	content: [
+		'./pages/**/*.{js,ts,jsx,tsx}',
+		'./components/**/*.{js,ts,jsx,tsx}',
+		'./app/**/*.{js,ts,jsx,tsx}',
+		'./node_modules/flowbite/**/*.js',
+	],
 	theme: {
 		screens: {
 			sm: '480px',
@@ -36,5 +41,5 @@ module.exports = {
 			},
 		},
 	},
-	plugins: [require('@headlessui/tailwindcss'), require('@tailwindcss/forms')],
+	plugins: [require('@headlessui/tailwindcss'), require('@tailwindcss/forms'), require('flowbite/plugin')],
 };

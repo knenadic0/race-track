@@ -97,10 +97,7 @@ const Header = () => {
 													<Menu.Item key={item.name}>
 														<Link
 															href={item.href}
-															className={classNames(
-																item.current ? 'bg-gray-100' : '',
-																'block px-4 py-2 text-gray-700',
-															)}
+															className={classNames(item.current ? 'bg-gray-100' : '', 'block px-4 py-2 ')}
 														>
 															{item.name}
 														</Link>

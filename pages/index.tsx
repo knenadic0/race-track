@@ -13,6 +13,7 @@ import * as TYPES from '@table-library/react-table-library/types/table';
 import { getAuth } from 'firebase/auth';
 import { Puff } from 'react-loader-spinner';
 import { waveColor } from '../helpers/constants';
+import dateFormat from 'dateformat';
 
 const Home: NextPageWithLayout = () => {
 	// const [races, setRaces] = useState<IRace[]>([]);
@@ -25,14 +26,27 @@ const Home: NextPageWithLayout = () => {
 
 	useEffect(() => {
 		const fetchRaces = async () => {
-			const racesCollection = collection(firestore, 'races');
-			const racesSnapshot = await getDocs(racesCollection);
+			const racesSnapshot = await getDocs(collection(firestore, 'races'));
 
-			races = racesSnapshot.docs.map((doc) => ({
-				id: doc.id,
-				title: doc.data().title,
-				dateTime: doc.data().dateTime,
-			}));
+			races = await Promise.all(
+				racesSnapshot.docs.map(async (raceDoc) => {
+					const raceDisciplinesSnapshot = await getDocs(collection(raceDoc.ref, 'disciplines'));
+					const raceAppliersSnapshot = await getDocs(collection(raceDoc.ref, 'applied'));
+
+					return {
+						id: raceDoc.id,
+						title: raceDoc.data().title,
+						dateTime: raceDoc.data().dateTime,
+						applyUntil: raceDoc.data().applyUntil,
+						disciplines: raceDisciplinesSnapshot.docs.map((discipline) => ({
+							id: discipline.id,
+							title: discipline.data().title,
+							raceLength: discipline.data()['length'],
+						})),
+						applied: raceAppliersSnapshot.size,
+					};
+				}),
+			);
 
 			setData({
 				nodes: races.map((race) => ({
@@ -46,7 +60,14 @@ const Home: NextPageWithLayout = () => {
 		fetchRaces();
 	}, []);
 
-	const theme = useTheme(getTheme());
+	const theme = useTheme([
+		getTheme(),
+		{
+			Table: `
+			--data-table-library_grid-template-columns:  40% 18% repeat(3, minmax(0, 1fr));
+		  `,
+		},
+	]);
 	const pagination = usePagination(data, {
 		state: {
 			page: 0,
@@ -57,8 +78,25 @@ const Home: NextPageWithLayout = () => {
 	const COLUMNS = [
 		{ label: 'Title', renderCell: (item: RaceNode) => item.title },
 		{
-			label: 'Date',
-			renderCell: (item: RaceNode) => item.dateTime.toDate().toLocaleDateString('hr-HR'),
+			label: 'Date and time',
+			renderCell: (item: RaceNode) => dateFormat(item.dateTime.toDate(), 'dd.mm.yyyy. HH:MM'),
+		},
+		{
+			label: 'Disciplines',
+			renderCell: (item: RaceNode) => item.disciplines.length,
+		},
+		{
+			label: 'Applied',
+			renderCell: (item: RaceNode) => item.applied,
+		},
+		{
+			label: 'Applying',
+			renderCell: (item: RaceNode) =>
+				new Date() <= item.applyUntil.toDate() ? (
+					<span className="rounded bg-green-200 px-2.5 py-0.5 text-sm text-green-900">Open</span>
+				) : (
+					<span className="rounded bg-red-200 px-2.5 py-0.5 text-sm text-red-900">Closed</span>
+				),
 		},
 	];
 
@@ -74,7 +112,7 @@ const Home: NextPageWithLayout = () => {
 				</div>
 			) : (
 				<div className="mx-auto w-full max-w-7xl bg-white px-4 sm:px-6 lg:px-8">
-					<CompactTable columns={COLUMNS} data={data} theme={theme} pagination={pagination} />
+					<CompactTable columns={COLUMNS} data={data} theme={theme} pagination={pagination} layout={{ custom: true }} />
 
 					<br />
 					<div style={{ display: 'flex', justifyContent: 'space-between' }}>
