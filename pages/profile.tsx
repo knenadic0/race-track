@@ -6,7 +6,7 @@ import { useRouter } from 'next/router';
 import Cookies from 'js-cookie';
 import { NextPageWithLayout } from './_app';
 import { ReactElement, useState, useEffect } from 'react';
-import Layout from '../components/layout';
+import Layout from '../components/Layout';
 import { Puff } from 'react-loader-spinner';
 import { FiSave, FiLogOut } from 'react-icons/fi';
 import { doc, getDoc, setDoc } from 'firebase/firestore';

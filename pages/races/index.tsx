@@ -1,22 +1,22 @@
 import Head from 'next/head';
-import { NextPageWithLayout } from './_app';
+import Link from 'next/link';
+import { NextPageWithLayout } from '../_app';
 import { ReactElement, useState, useEffect } from 'react';
-import { collection, getDocs } from 'firebase/firestore';
-import { app, firestore } from '../services/firebase';
-import Layout from '../components/layout';
+import { collection, getDocs, orderBy, query, where } from 'firebase/firestore';
+import { app, firestore } from '../../services/firebase';
+import Layout from '../../components/Layout';
 import { CompactTable } from '@table-library/react-table-library/compact';
 import { useTheme } from '@table-library/react-table-library/theme';
 import { getTheme } from '@table-library/react-table-library/baseline';
 import { usePagination } from '@table-library/react-table-library/pagination';
-import IRace, { RaceNode } from '../types/IRace';
+import IRace, { RaceNode } from '../../types/IRace';
 import * as TYPES from '@table-library/react-table-library/types/table';
 import { getAuth } from 'firebase/auth';
 import { Puff } from 'react-loader-spinner';
-import { waveColor } from '../helpers/constants';
+import { waveColor } from '../../helpers/constants';
 import dateFormat from 'dateformat';
 
-const Home: NextPageWithLayout = () => {
-	// const [races, setRaces] = useState<IRace[]>([]);
+const Races: NextPageWithLayout = () => {
 	let races: IRace[] = [];
 	const [data, setData] = useState<TYPES.Data<RaceNode>>({
 		pageInfo: null,
@@ -25,8 +25,9 @@ const Home: NextPageWithLayout = () => {
 	getAuth(app);
 
 	useEffect(() => {
-		const fetchRaces = async () => {
-			const racesSnapshot = await getDocs(collection(firestore, 'races'));
+		const fetchData = async () => {
+			const racesQuery = query(collection(firestore, 'races'), where('dateTime', '>', new Date()), orderBy('dateTime', 'asc'));
+			const racesSnapshot = await getDocs(racesQuery);
 
 			races = await Promise.all(
 				racesSnapshot.docs.map(async (raceDoc) => {
@@ -43,6 +44,7 @@ const Home: NextPageWithLayout = () => {
 							title: discipline.data().title,
 							raceLength: discipline.data()['length'],
 						})),
+						description: raceDoc.data().description,
 						applied: raceAppliersSnapshot.size,
 					};
 				}),
@@ -51,13 +53,14 @@ const Home: NextPageWithLayout = () => {
 			setData({
 				nodes: races.map((race) => ({
 					...race,
-					id: race.id,
 					nodes: null,
 				})),
 			});
 		};
 
-		fetchRaces();
+		if (!data.nodes.length) {
+			fetchData();
+		}
 	}, []);
 
 	const theme = useTheme([
@@ -76,7 +79,10 @@ const Home: NextPageWithLayout = () => {
 	});
 
 	const COLUMNS = [
-		{ label: 'Title', renderCell: (item: RaceNode) => item.title },
+		{
+			label: 'Title',
+			renderCell: (item: RaceNode) => <Link href={`/races/${item.id}`}>{item.title}</Link>,
+		},
 		{
 			label: 'Date and time',
 			renderCell: (item: RaceNode) => dateFormat(item.dateTime.toDate(), 'dd.mm.yyyy. HH:MM'),
@@ -111,7 +117,7 @@ const Home: NextPageWithLayout = () => {
 					<Puff height="60" width="60" radius={1} color={waveColor} ariaLabel="puff-loading" visible={true} />
 				</div>
 			) : (
-				<div className="mx-auto w-full max-w-7xl bg-white px-4 sm:px-6 lg:px-8">
+				<div className="mx-auto w-full max-w-7xl rounded bg-white px-4 shadow-xl sm:px-6 lg:px-8">
 					<CompactTable columns={COLUMNS} data={data} theme={theme} pagination={pagination} layout={{ custom: true }} />
 
 					<br />
@@ -140,8 +146,8 @@ const Home: NextPageWithLayout = () => {
 	);
 };
 
-Home.getLayout = function getLayout(page: ReactElement) {
+Races.getLayout = function getLayout(page: ReactElement) {
 	return <Layout>{page}</Layout>;
 };
 
-export default Home;
+export default Races;

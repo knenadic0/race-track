@@ -8,7 +8,12 @@ export default interface IRace {
 	dateTime: Timestamp;
 	applyUntil: Timestamp;
 	disciplines: IDiscipline[];
+	description: string;
 	applied: number;
 }
 
 export type RaceNode = TYPES.TableNode & IRace;
+
+export interface IRaceProp {
+	raceData?: IRace;
+}

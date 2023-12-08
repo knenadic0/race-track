@@ -3,9 +3,12 @@ import type { NextRequest } from 'next/server';
 
 const authenticationMiddleware = async (req: NextRequest) => {
 	const user = req.cookies.get('user');
+	if (req.nextUrl.pathname === '/') {
+		return NextResponse.redirect(new URL('/races', req.url));
+	}
 
 	if (user && req.nextUrl.pathname.includes('/login')) {
-		return NextResponse.redirect(new URL('/', req.url));
+		return NextResponse.redirect(new URL('/races', req.url));
 	} else if (user || req.nextUrl.pathname.includes('/login')) {
 		return NextResponse.next();
 	} else {

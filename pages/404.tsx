@@ -2,7 +2,7 @@ import Head from 'next/head';
 import { NextPageWithLayout } from './_app';
 import { ReactElement } from 'react';
 import Link from 'next/link';
-import Layout from '../components/layout';
+import Layout from '../components/Layout';
 
 const Error: NextPageWithLayout = () => {
 	return (

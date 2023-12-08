@@ -7,7 +7,7 @@ import { usePathname } from 'next/navigation';
 import Image from 'next/image';
 
 const navigationLinks = [
-	{ name: 'Races', href: '/', current: false, main: true },
+	{ name: 'Races', href: '/races', current: false, main: true },
 	{ name: 'Results', href: '/results', current: false, main: true },
 	{ name: 'Championship', href: '/championship', current: false, main: true },
 	{ name: 'Your profile', href: '/profile', current: false, main: false },
@@ -19,14 +19,16 @@ const Header = () => {
 	const [navigation, setNavigation] = useState(navigationLinks);
 
 	useEffect(() => {
-		setNavigation(
-			navigationLinks.map((item) => {
-				return {
-					...item,
-					current: pathname === item.href,
-				};
-			}),
-		);
+		if (pathname) {
+			setNavigation(
+				navigationLinks.map((item) => {
+					return {
+						...item,
+						current: pathname.startsWith(item.href),
+					};
+				}),
+			);
+		}
 	}, [pathname]);
 
 	return (
@@ -49,7 +51,9 @@ const Header = () => {
 							</div>
 							<div className="flex h-full flex-1 items-center justify-start">
 								<div className="flex flex-shrink-0 items-center">
-									<Image src="/assets/images/logo.jpg" alt="Race flag" height={32} width={32} />
+									<Link href="/races">
+										<Image src="/assets/images/logo.jpg" alt="Race flag" height={32} width={32} />
+									</Link>
 								</div>
 								<div className="hidden h-full sm:ml-6 sm:block">
 									<div className="flex h-full space-x-4">
