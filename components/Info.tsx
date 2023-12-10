@@ -24,8 +24,8 @@ const Info = ({ raceData }: IRaceProp) => {
 						<>
 							<p className="mb-1 font-bold">Disciplines:</p>
 							<ul className="list-inside list-disc">
-								{raceData.disciplines.map((discipline) => (
-									<li className="list-item">
+								{raceData.disciplines.map((discipline, idx) => (
+									<li className="list-item" key={idx}>
 										{discipline.title} ({discipline.raceLength} km)
 									</li>
 								))}

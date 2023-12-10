@@ -12,11 +12,13 @@ import IRace from '../../types/IRace';
 import { Tab } from '@headlessui/react';
 import classNames from 'classnames';
 import Info from '../../components/Info';
+import Error from '../../components/Error';
 
 const Race: NextPageWithLayout = () => {
 	getAuth(app);
 	const router = useRouter();
 	const [raceData, setRaceData] = useState<IRace>();
+	const [error, setError] = useState<boolean>(false);
 	const tabs = { Info: <Info raceData={raceData} />, Apply: null, Applied: null };
 
 	useEffect(() => {
@@ -45,6 +47,7 @@ const Race: NextPageWithLayout = () => {
 					});
 				} else {
 					console.error('No race found with given id: ', router.query.id);
+					setError(true);
 				}
 			}
 		};
@@ -60,11 +63,21 @@ const Race: NextPageWithLayout = () => {
 				<title>RaceTrack</title>
 				<link rel="icon" href="/favicon.ico" />
 			</Head>
-			{!raceData ? (
+			{!raceData && !error && (
 				<div className="absolute top-1/3">
 					<Puff height="60" width="60" radius={1} color={waveColor} ariaLabel="puff-loading" visible={true} />
 				</div>
-			) : (
+			)}
+			{error && (
+				<Error
+					title="Race not found"
+					statusMessage="Not found"
+					message="Sorry, we couldn’t find the race you’re looking for."
+					redirectTitle="Races"
+					redirectUrl="/races"
+				/>
+			)}
+			{raceData && !error && (
 				<>
 					<div className="mx-auto mb-5 w-full max-w-7xl rounded bg-white p-4 shadow-xl sm:p-6 lg:p-8">
 						<h1 className="text-xl font-bold">{raceData.title}</h1>
