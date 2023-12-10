@@ -1,5 +1,5 @@
-import React, { Fragment, useEffect, useState } from 'react';
-import { Disclosure, Menu, Transition } from '@headlessui/react';
+import React, { useEffect, useState } from 'react';
+import { Disclosure } from '@headlessui/react';
 import { HiBars3, HiOutlineUserCircle, HiXMark } from 'react-icons/hi2';
 import classNames from 'classnames';
 import Link from 'next/link';
@@ -11,7 +11,6 @@ const navigationLinks = [
 	{ name: 'Results', href: '/results', current: false, main: true },
 	{ name: 'Championship', href: '/championship', current: false, main: true },
 	{ name: 'Your profile', href: '/profile', current: false, main: false },
-	{ name: 'Sign out', href: '/signout', current: false, main: false },
 ];
 
 const Header = () => {
@@ -38,7 +37,6 @@ const Header = () => {
 					<div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
 						<div className="relative flex h-16 items-center justify-between">
 							<div className="absolute inset-y-0 right-0 flex items-center sm:hidden">
-								{/* Mobile menu button*/}
 								<Disclosure.Button className="relative inline-flex items-center justify-center rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white">
 									<span className="absolute -inset-0.5" />
 									<span className="sr-only">Open main menu</span>
@@ -76,45 +74,28 @@ const Header = () => {
 								</div>
 							</div>
 							<div className="hidden items-center sm:static sm:inset-auto sm:ml-6 sm:flex sm:pr-0">
-								{/* Profile dropdown */}
-								<Menu as="div" className="relative ml-3">
-									<div>
-										<Menu.Button className="relative flex rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800">
-											<span className="absolute -inset-1.5" />
-											<span className="sr-only">Open user menu</span>
-											<HiOutlineUserCircle className="h-8 w-8" />
-										</Menu.Button>
-									</div>
-									<Transition
-										as={Fragment}
-										enter="transition ease-out duration-100"
-										enterFrom="transform opacity-0 scale-95"
-										enterTo="transform opacity-100 scale-100"
-										leave="transition ease-in duration-75"
-										leaveFrom="transform opacity-100 scale-100"
-										leaveTo="transform opacity-0 scale-95"
-									>
-										<Menu.Items className="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
-											{navigation
-												.filter((x) => !x.main)
-												.map((item) => (
-													<Menu.Item key={item.name}>
-														<Link
-															href={item.href}
-															className={classNames(item.current ? 'bg-gray-100' : '', 'block px-4 py-2 ')}
-														>
-															{item.name}
-														</Link>
-													</Menu.Item>
-												))}
-										</Menu.Items>
-									</Transition>
-								</Menu>
+								{navigation
+									.filter((x) => !x.main)
+									.map((item) => (
+										<div key={item.name}>
+											<Link
+												className={classNames(
+													'relative flex rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800',
+												)}
+												href={item.href}
+											>
+												<span className="absolute -inset-1.5" />
+												<HiOutlineUserCircle
+													className={classNames('h-8 w-8', item.current ? 'stroke-rt-blue' : 'black')}
+												/>
+											</Link>
+										</div>
+									))}
 							</div>
 						</div>
 					</div>
 
-					<Disclosure.Panel className="absolute w-full bg-white shadow-xl sm:hidden">
+					<Disclosure.Panel className="absolute z-40 w-full bg-white shadow-xl sm:hidden">
 						<div className="pb-1">
 							<hr />
 							{navigation
@@ -156,7 +137,6 @@ const Header = () => {
 			)}
 		</Disclosure>
 	);
-	// <header className="flex h-16 items-center justify-center bg-white text-lg"></header>;
 };
 
 export default Header;

@@ -78,13 +78,13 @@ const Profile: NextPageWithLayout = () => {
 	};
 
 	return (
-		<div className="flex flex-col items-center justify-center py-2">
+		<div className="flex flex-col items-center justify-center py-5">
 			<Head>
 				<title>Profile | RaceTrack</title>
 				<link rel="icon" href="/favicon.ico" />
 			</Head>
 
-			<div className="mt-16 flex flex-1 flex-col items-center justify-center px-5 text-center">
+			<div className="flex flex-1 flex-col items-center justify-center px-5 text-center sm:my-8">
 				{!user || userData.fullName === '' ? (
 					<div className="absolute top-1/3">
 						<Puff height="60" width="60" radius={1} color={waveColor} ariaLabel="puff-loading" visible={true} />
