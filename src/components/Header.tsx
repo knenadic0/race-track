@@ -37,7 +37,7 @@ const Header = () => {
 					<div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
 						<div className="relative flex h-16 items-center justify-between">
 							<div className="absolute inset-y-0 right-0 flex items-center sm:hidden">
-								<Disclosure.Button className="relative inline-flex items-center justify-center rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white">
+								<Disclosure.Button className="relative inline-flex items-center justify-center rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-rt-white">
 									<span className="absolute -inset-0.5" />
 									<span className="sr-only">Open main menu</span>
 									{open ? (
@@ -62,7 +62,7 @@ const Header = () => {
 													key={item.name}
 													href={item.href}
 													className={classNames(
-														item.current ? 'border-b-rt-blue' : ' border-b-white hover:border-b-gray-400',
+														item.current ? 'border-b-rt-blue' : ' border-b-rt-white hover:border-b-rt-gray',
 														'flex items-center border-b-3 px-3 py-2 font-bold',
 													)}
 													aria-current={item.current ? 'page' : undefined}
@@ -80,13 +80,13 @@ const Header = () => {
 										<div key={item.name}>
 											<Link
 												className={classNames(
-													'relative flex rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800',
+													'relative flex rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-rt-white focus:ring-offset-2 focus:ring-offset-rt-black',
 												)}
 												href={item.href}
 											>
 												<span className="absolute -inset-1.5" />
 												<HiOutlineUserCircle
-													className={classNames('h-8 w-8', item.current ? 'stroke-rt-blue' : 'black')}
+													className={classNames('h-8 w-8', item.current ? 'stroke-rt-blue' : 'stroke-rt-black')}
 												/>
 											</Link>
 										</div>
@@ -106,7 +106,7 @@ const Header = () => {
 										as={Link}
 										href={item.href}
 										className={classNames(
-											item.current ? 'border-l-rt-blue bg-blue-50' : 'border-l-white',
+											item.current ? 'border-l-rt-blue bg-rt-light-blue' : 'border-l-rt-white',
 											'block border-l-4 px-4 py-3 text-base font-medium',
 										)}
 										aria-current={item.current ? 'page' : undefined}
@@ -123,7 +123,7 @@ const Header = () => {
 										as={Link}
 										href={item.href}
 										className={classNames(
-											item.current ? 'border-l-rt-blue bg-blue-50' : 'border-l-white',
+											item.current ? 'border-l-rt-blue bg-rt-light-blue' : 'border-l-rt-white',
 											'block border-l-4 px-4 py-3 text-base font-medium',
 										)}
 										aria-current={item.current ? 'page' : undefined}

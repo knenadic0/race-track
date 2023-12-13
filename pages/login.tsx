@@ -38,7 +38,7 @@ const Login: NextPageWithLayout = () => {
 						<h1 className="mb-6 text-2xl font-bold sm:text-3xl">RaceTrack</h1>
 						<button
 							onClick={signInWithGoogle}
-							className="mx-auto flex items-center gap-x-3 rounded-md bg-rt-blue px-4 py-2 text-white hover:bg-rt-dark-blue"
+							className="mx-auto flex items-center gap-x-3 rounded-md bg-rt-blue px-4 py-2 text-rt-white hover:bg-rt-dark-blue"
 						>
 							<FaGoogle />
 							<span className="border-l-2 pl-3">Sign in with Google</span>

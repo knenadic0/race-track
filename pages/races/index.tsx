@@ -12,9 +12,8 @@ import { usePagination } from '@table-library/react-table-library/pagination';
 import { Race, RaceNode } from '@datatypes/Race';
 import * as TYPES from '@table-library/react-table-library/types/table';
 import { getAuth } from 'firebase/auth';
-import { Puff } from 'react-loader-spinner';
-import { waveColor } from '@constants/tailwind';
 import dateFormat from 'dateformat';
+import Loader from '@components/Loader';
 
 const Races: NextPageWithLayout = () => {
 	let races: Race[] = [];
@@ -98,7 +97,7 @@ const Races: NextPageWithLayout = () => {
 		{
 			label: 'Applying',
 			renderCell: (item: RaceNode) =>
-				new Date() <= item.applyUntil.toDate() ? (
+				new Date() == item.applyUntil.toDate() ? (
 					<span className="rounded bg-green-200 px-2.5 py-0.5 text-sm text-green-900">Open</span>
 				) : (
 					<span className="rounded bg-red-200 px-2.5 py-0.5 text-sm text-red-900">Closed</span>
@@ -113,11 +112,9 @@ const Races: NextPageWithLayout = () => {
 				<link rel="icon" href="/favicon.ico" />
 			</Head>
 			{!data.nodes.length ? (
-				<div className="absolute top-1/3">
-					<Puff height="60" width="60" radius={1} color={waveColor} ariaLabel="puff-loading" visible={true} />
-				</div>
+				<Loader />
 			) : (
-				<div className="mx-auto w-full max-w-7xl rounded bg-white px-4 shadow-xl sm:px-6 lg:px-8">
+				<div className="mx-auto w-full max-w-7xl rounded bg-rt-white px-4 shadow-xl sm:px-6 lg:px-8">
 					<CompactTable columns={COLUMNS} data={data} theme={theme} pagination={pagination} layout={{ custom: true }} />
 
 					<br />

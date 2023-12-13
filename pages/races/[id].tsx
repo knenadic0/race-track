@@ -6,13 +6,12 @@ import { getDoc, doc, getDocs, collection, query, orderBy } from 'firebase/fires
 import { app, firestore } from '@adapters/firebase';
 import Layout from '@components/Layout';
 import { getAuth } from 'firebase/auth';
-import { Puff } from 'react-loader-spinner';
-import { waveColor } from '@constants/tailwind';
 import { Race } from '@datatypes/Race';
 import { Tab } from '@headlessui/react';
 import classNames from 'classnames';
 import Info from '@components/Info';
 import Error from '@components/Error';
+import Loader from '@components/Loader';
 
 const Race: NextPageWithLayout = () => {
 	getAuth(app);
@@ -63,11 +62,7 @@ const Race: NextPageWithLayout = () => {
 				<title>RaceTrack</title>
 				<link rel="icon" href="/favicon.ico" />
 			</Head>
-			{!raceData && !error && (
-				<div className="absolute top-1/3">
-					<Puff height="60" width="60" radius={1} color={waveColor} ariaLabel="puff-loading" visible={true} />
-				</div>
-			)}
+			{!raceData && !error && <Loader />}
 			{error && (
 				<Error
 					title="Race not found"
@@ -79,19 +74,19 @@ const Race: NextPageWithLayout = () => {
 			)}
 			{raceData && !error && (
 				<>
-					<div className="mx-auto mb-5 w-full max-w-7xl rounded bg-white p-4 shadow-xl sm:p-6 lg:p-8">
+					<div className="mx-auto mb-5 w-full max-w-7xl rounded bg-rt-white p-4 shadow-xl sm:p-6 lg:p-8">
 						<h1 className="text-xl font-bold">{raceData.title}</h1>
 					</div>
-					<div className="mx-auto w-full max-w-7xl rounded bg-white p-4 shadow-xl sm:p-6 sm:pt-4 lg:p-8 lg:pt-4">
+					<div className="mx-auto w-full max-w-7xl rounded bg-rt-white p-4 shadow-xl sm:p-6 sm:pt-4 lg:p-8 lg:pt-4">
 						<Tab.Group>
-							<Tab.List className="flex space-x-3 border-b-2 border-gray-200 text-center font-medium">
+							<Tab.List className="flex space-x-3 border-b-2 border-rt-light-gray text-center font-medium">
 								{Object.keys(tabs).map((category) => (
 									<Tab
 										key={category}
 										className={({ selected }) =>
 											classNames(
-												'-mb-px inline-block border-b-3 px-3 py-3 focus-visible:outline-slate-300',
-												selected ? 'border-rt-blue' : 'border-transparent hover:border-gray-400',
+												'focus-visible:outline-slate-300 -mb-px inline-block border-b-3 px-3 py-3',
+												selected ? 'border-rt-blue' : 'border-transparent hover:border-rt-gray',
 											)
 										}
 									>
@@ -101,7 +96,7 @@ const Race: NextPageWithLayout = () => {
 							</Tab.List>
 							<Tab.Panels className="mt-2">
 								{Object.values(tabs).map((component, idx) => (
-									<Tab.Panel key={idx} className="rounded-xl bg-white py-4">
+									<Tab.Panel key={idx} className="rounded-xl bg-rt-white py-4">
 										<div>{component}</div>
 									</Tab.Panel>
 								))}

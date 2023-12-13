@@ -7,12 +7,11 @@ import Cookies from 'js-cookie';
 import { NextPageWithLayout } from './_app';
 import { ReactElement, useState, useEffect } from 'react';
 import Layout from '@components/Layout';
-import { Puff } from 'react-loader-spinner';
 import { FiSave, FiLogOut } from 'react-icons/fi';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
 import toast from 'react-hot-toast';
 import { User } from '@datatypes/User';
-import { waveColor } from '@constants/tailwind';
+import Loader from '@components/Loader';
 
 const Profile: NextPageWithLayout = () => {
 	const auth = getAuth(app);
@@ -86,11 +85,9 @@ const Profile: NextPageWithLayout = () => {
 
 			<div className="flex flex-1 flex-col items-center justify-center px-5 text-center sm:my-8">
 				{!user || userData.fullName === '' ? (
-					<div className="absolute top-1/3">
-						<Puff height="60" width="60" radius={1} color={waveColor} ariaLabel="puff-loading" visible={true} />
-					</div>
+					<Loader />
 				) : (
-					<div className="flex flex-col rounded bg-white p-6 text-left text-lg shadow-xl md:w-128">
+					<div className="flex flex-col rounded bg-rt-white p-6 text-left text-lg shadow-xl md:w-128">
 						<form>
 							<h1 className="mt-3 mb-6 text-center text-2xl font-bold">Manage profile</h1>
 							<hr />
@@ -104,7 +101,7 @@ const Profile: NextPageWithLayout = () => {
 									name="fullName"
 									value={userData.fullName}
 									onChange={handleInputChange}
-									className="col-span-2 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300  focus:ring-2 focus:ring-inset focus:ring-rt-blue"
+									className="col-span-2 block w-full rounded-md border-0 py-1.5 shadow-sm ring-1 ring-inset ring-rt-gray focus:ring-2 focus:ring-inset focus:ring-rt-blue"
 								/>
 							</div>
 							<div className="mb-8 grid grid-cols-1 sm:grid-cols-3">
@@ -118,7 +115,7 @@ const Profile: NextPageWithLayout = () => {
 									value={userData.birthDate}
 									max={new Date().toISOString().split('T')[0]}
 									onChange={handleInputChange}
-									className="col-span-2 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300  focus:ring-2 focus:ring-inset focus:ring-rt-blue"
+									className="col-span-2 block w-full rounded-md border-0 py-1.5 shadow-sm ring-1 ring-inset ring-rt-gray focus:ring-2 focus:ring-inset focus:ring-rt-blue"
 								/>
 							</div>
 							<fieldset className="grid h-10 grid-cols-1 sm:grid-cols-3">
@@ -132,9 +129,9 @@ const Profile: NextPageWithLayout = () => {
 											value="male"
 											onChange={handleInputChange}
 											checked={userData.gender === 'male'}
-											className="h-4 w-4 border-gray-300 text-rt-blue focus:ring-rt-blue"
+											className="h-4 w-4 border-rt-gray text-rt-blue focus:ring-rt-blue"
 										/>
-										<label htmlFor="male" className="block text-gray-900">
+										<label htmlFor="male" className="block">
 											Male
 										</label>
 									</div>
@@ -146,9 +143,9 @@ const Profile: NextPageWithLayout = () => {
 											value="female"
 											onChange={handleInputChange}
 											checked={userData.gender === 'female'}
-											className="h-4 w-4 border-gray-300 text-rt-blue focus:ring-rt-blue"
+											className="w-4border-rt-gray h-4 text-rt-blue focus:ring-rt-blue"
 										/>
-										<label htmlFor="female" className="block text-gray-900">
+										<label htmlFor="female" className="block">
 											Female
 										</label>
 									</div>
@@ -157,14 +154,14 @@ const Profile: NextPageWithLayout = () => {
 							<div className="mt-12 flex justify-center gap-x-2 sm:gap-x-5">
 								<button
 									onClick={saveChanges}
-									className="flex w-max items-center gap-x-3 rounded bg-blue-500 py-2 pl-5 pr-6 text-sm text-white hover:bg-blue-600 focus:outline-none sm:text-base"
+									className="flex w-max items-center gap-x-3 rounded bg-rt-blue py-2 pl-5 pr-6 text-sm text-rt-white hover:bg-rt-blue focus:outline-none sm:text-base"
 								>
 									<FiSave />
 									<span>Save</span>
 								</button>
 								<button
 									onClick={logOut}
-									className="flex w-max items-center gap-x-3 rounded-md bg-red-500 py-2 pl-5 pr-6 text-sm text-white hover:bg-red-600 sm:text-base"
+									className="flex w-max items-center gap-x-3 rounded-md bg-rt-red py-2 pl-5 pr-6 text-sm text-rt-white hover:bg-rt-dark-red sm:text-base"
 								>
 									<FiLogOut />
 									<span>Sign out</span>

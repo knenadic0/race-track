@@ -6,7 +6,7 @@
 
 @layer base {
 	body {
-		@apply bg-slate-200;
+		@apply bg-rt-slate;
 	}
 
 	main.full-h-layout {
