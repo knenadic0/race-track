@@ -1,25 +1,25 @@
 import Head from 'next/head';
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { getAuth } from 'firebase/auth';
-import { app, firestore } from '../services/firebase';
+import { app, firestore } from '@adapters/firebase';
 import { useRouter } from 'next/router';
 import Cookies from 'js-cookie';
 import { NextPageWithLayout } from './_app';
 import { ReactElement, useState, useEffect } from 'react';
-import Layout from '../components/Layout';
+import Layout from '@components/Layout';
 import { Puff } from 'react-loader-spinner';
 import { FiSave, FiLogOut } from 'react-icons/fi';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
 import toast from 'react-hot-toast';
-import IUser from '../types/IUser';
-import { waveColor } from '../helpers/constants';
+import { User } from '@datatypes/User';
+import { waveColor } from '@constants/tailwind';
 
 const Profile: NextPageWithLayout = () => {
 	const auth = getAuth(app);
 	const [user] = useAuthState(auth);
 	const router = useRouter();
 
-	const [userData, setUserData] = useState<IUser>({
+	const [userData, setUserData] = useState<User>({
 		fullName: '',
 		birthDate: '',
 		gender: '',

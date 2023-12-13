@@ -1,16 +1,16 @@
 import { Timestamp } from 'firebase/firestore';
 import * as TYPES from '@table-library/react-table-library/types/table';
-import IUser from './IUser';
-import IRace from './IRace';
+import { User } from './User';
+import { Race } from './Race';
 
-export default interface IResult {
+export type Result = {
 	id: string;
 	userId: string;
-	user: IUser;
+	user: User;
 	raceId: string;
-	race: IRace;
+	race: Race;
 	started: Timestamp;
 	finished: Timestamp | null;
-}
+};
 
-export type ResultNode = TYPES.TableNode & IResult;
+export type ResultNode = TYPES.TableNode & Result;

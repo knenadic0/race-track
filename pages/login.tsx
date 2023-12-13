@@ -1,6 +1,6 @@
 import Head from 'next/head';
 import { getAuth, GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
-import { app } from '../services/firebase';
+import { app } from '@adapters/firebase';
 import { useRouter } from 'next/router';
 import Cookies from 'js-cookie';
 import { FaGoogle } from 'react-icons/fa';

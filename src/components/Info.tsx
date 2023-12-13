@@ -1,7 +1,7 @@
-import { IRaceProp } from '../types/IRace';
+import { RaceProp } from '@datatypes/Race';
 import dateFormat from 'dateformat';
 
-const Info = ({ raceData }: IRaceProp) => {
+const Info = ({ raceData }: RaceProp) => {
 	if (!raceData) {
 		return null;
 	}

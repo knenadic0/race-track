@@ -1,5 +1,5 @@
-export default interface IUser {
+export type User = {
 	fullName: string;
 	birthDate: string;
 	gender: string;
-}
+};

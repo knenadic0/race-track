@@ -3,21 +3,21 @@ import { useRouter } from 'next/router';
 import { NextPageWithLayout } from '../_app';
 import { ReactElement, useState, useEffect } from 'react';
 import { getDoc, doc, getDocs, collection, query, orderBy } from 'firebase/firestore';
-import { app, firestore } from '../../services/firebase';
-import Layout from '../../components/Layout';
+import { app, firestore } from '@adapters/firebase';
+import Layout from '@components/Layout';
 import { getAuth } from 'firebase/auth';
 import { Puff } from 'react-loader-spinner';
-import { waveColor } from '../../helpers/constants';
-import IRace from '../../types/IRace';
+import { waveColor } from '@constants/tailwind';
+import { Race } from '@datatypes/Race';
 import { Tab } from '@headlessui/react';
 import classNames from 'classnames';
-import Info from '../../components/Info';
-import Error from '../../components/Error';
+import Info from '@components/Info';
+import Error from '@components/Error';
 
 const Race: NextPageWithLayout = () => {
 	getAuth(app);
 	const router = useRouter();
-	const [raceData, setRaceData] = useState<IRace>();
+	const [raceData, setRaceData] = useState<Race>();
 	const [error, setError] = useState<boolean>(false);
 	const tabs = { Info: <Info raceData={raceData} />, Apply: null, Applied: null };
 

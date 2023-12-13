@@ -3,21 +3,21 @@ import Link from 'next/link';
 import { NextPageWithLayout } from '../_app';
 import { ReactElement, useState, useEffect } from 'react';
 import { collection, getDocs, orderBy, query, where } from 'firebase/firestore';
-import { app, firestore } from '../../services/firebase';
-import Layout from '../../components/Layout';
+import { app, firestore } from '@adapters/firebase';
+import Layout from '@components/Layout';
 import { CompactTable } from '@table-library/react-table-library/compact';
 import { useTheme } from '@table-library/react-table-library/theme';
 import { getTheme } from '@table-library/react-table-library/baseline';
 import { usePagination } from '@table-library/react-table-library/pagination';
-import IRace, { RaceNode } from '../../types/IRace';
+import { Race, RaceNode } from '@datatypes/Race';
 import * as TYPES from '@table-library/react-table-library/types/table';
 import { getAuth } from 'firebase/auth';
 import { Puff } from 'react-loader-spinner';
-import { waveColor } from '../../helpers/constants';
+import { waveColor } from '@constants/tailwind';
 import dateFormat from 'dateformat';
 
 const Races: NextPageWithLayout = () => {
-	let races: IRace[] = [];
+	let races: Race[] = [];
 	const [data, setData] = useState<TYPES.Data<RaceNode>>({
 		pageInfo: null,
 		nodes: [],

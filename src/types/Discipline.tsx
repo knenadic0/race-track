@@ -1,5 +1,5 @@
-export default interface IDiscipline {
+export type Discipline = {
 	id: string;
 	title: string;
 	raceLength: number;
-}
+};
