@@ -1,4 +1,3 @@
-import Head from 'next/head';
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { getAuth } from 'firebase/auth';
 import { app, firestore } from '@adapters/firebase';
@@ -78,11 +77,6 @@ const Profile: NextPageWithLayout = () => {
 
 	return (
 		<div className="flex flex-col items-center justify-center py-5">
-			<Head>
-				<title>Profile | RaceTrack</title>
-				<link rel="icon" href="/favicon.ico" />
-			</Head>
-
 			<div className="flex flex-1 flex-col items-center justify-center px-5 text-center sm:my-8">
 				{!user || userData.fullName === '' ? (
 					<Loader />
@@ -176,7 +170,10 @@ const Profile: NextPageWithLayout = () => {
 };
 
 Profile.getLayout = function getLayout(page: ReactElement) {
-	return <Layout>{page}</Layout>;
+	const metaData = {
+		title: 'Profile',
+	};
+	return <Layout metaData={metaData}>{page}</Layout>;
 };
 
 export default Profile;

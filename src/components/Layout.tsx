@@ -2,14 +2,17 @@ import React, { ReactNode } from 'react';
 import Footer from './Footer';
 import Header from './Header';
 import { Toaster } from 'react-hot-toast';
+import Metatags, { MetaTagsProps } from './Metatags';
 
-interface LayoutProps {
+type LayoutProps = {
 	children: ReactNode;
-}
+	metaData: MetaTagsProps;
+};
 
-const Layout: React.FC<LayoutProps> = ({ children }) => {
+const Layout = ({ children, metaData }: LayoutProps) => {
 	return (
 		<>
+			<Metatags {...metaData} />
 			<div>
 				<Toaster
 					position="bottom-right"

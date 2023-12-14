@@ -1,4 +1,3 @@
-import Head from 'next/head';
 import { useRouter } from 'next/router';
 import { NextPageWithLayout } from '../_app';
 import { ReactElement, useState, useEffect } from 'react';
@@ -58,15 +57,10 @@ const Race: NextPageWithLayout = () => {
 
 	return (
 		<div className="flex flex-col items-center justify-center py-5">
-			<Head>
-				<title>RaceTrack</title>
-				<link rel="icon" href="/favicon.ico" />
-			</Head>
 			{!raceData && !error && <Loader />}
 			{error && (
 				<Error
 					title="Race not found"
-					statusMessage="Not found"
 					message="Sorry, we couldn’t find the race you’re looking for."
 					redirectTitle="Races"
 					redirectUrl="/races"
@@ -111,7 +105,10 @@ const Race: NextPageWithLayout = () => {
 };
 
 Race.getLayout = function getLayout(page: ReactElement) {
-	return <Layout>{page}</Layout>;
+	const metaData = {
+		title: 'Races',
+	};
+	return <Layout metaData={metaData}>{page}</Layout>;
 };
 
 export default Race;

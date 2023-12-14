@@ -4,11 +4,14 @@ import Layout from '@components/Layout';
 import Error from '@components/Error';
 
 const NotFound: NextPageWithLayout = () => {
-	return <Error title="Page not found" statusMessage="Not found" message="Sorry, we couldn’t find the page you’re looking for." />;
+	return <Error title="Page not found" message="Sorry, we couldn’t find the page you’re looking for." />;
 };
 
 NotFound.getLayout = function getLayout(page: ReactElement) {
-	return <Layout>{page}</Layout>;
+	const metaData = {
+		title: 'Not found',
+	};
+	return <Layout metaData={metaData}>{page}</Layout>;
 };
 
 export default NotFound;

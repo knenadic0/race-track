@@ -1,4 +1,3 @@
-import Head from 'next/head';
 import Link from 'next/link';
 import { NextPageWithLayout } from '../_app';
 import { ReactElement, useState, useEffect } from 'react';
@@ -107,10 +106,6 @@ const Races: NextPageWithLayout = () => {
 
 	return (
 		<div className="flex flex-col items-center justify-center py-5">
-			<Head>
-				<title>RaceTrack</title>
-				<link rel="icon" href="/favicon.ico" />
-			</Head>
 			{!data.nodes.length ? (
 				<Loader />
 			) : (
@@ -144,7 +139,10 @@ const Races: NextPageWithLayout = () => {
 };
 
 Races.getLayout = function getLayout(page: ReactElement) {
-	return <Layout>{page}</Layout>;
+	const metaData = {
+		title: 'Races',
+	};
+	return <Layout metaData={metaData}>{page}</Layout>;
 };
 
 export default Races;
