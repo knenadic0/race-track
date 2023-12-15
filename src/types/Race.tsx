@@ -13,7 +13,3 @@ export type Race = {
 };
 
 export type RaceNode = TYPES.TableNode & Race;
-
-export type RaceProp = {
-	raceData?: Race;
-};

@@ -11,6 +11,7 @@ import { doc, getDoc, setDoc } from 'firebase/firestore';
 import toast from 'react-hot-toast';
 import { User } from '@datatypes/User';
 import Loader from '@components/Loader';
+import Button, { ButtonColor } from '@components/Button';
 
 const Profile: NextPageWithLayout = () => {
 	const auth = getAuth(app);
@@ -146,20 +147,12 @@ const Profile: NextPageWithLayout = () => {
 								</div>
 							</fieldset>
 							<div className="mt-12 flex justify-center gap-x-2 sm:gap-x-5">
-								<button
-									onClick={saveChanges}
-									className="flex w-max items-center gap-x-3 rounded bg-rt-blue py-2 pl-5 pr-6 text-sm text-rt-white hover:bg-rt-blue focus:outline-none sm:text-base"
-								>
+								<Button onClick={saveChanges} color={ButtonColor.Blue} text="Save">
 									<FiSave />
-									<span>Save</span>
-								</button>
-								<button
-									onClick={logOut}
-									className="flex w-max items-center gap-x-3 rounded-md bg-rt-red py-2 pl-5 pr-6 text-sm text-rt-white hover:bg-rt-dark-red sm:text-base"
-								>
+								</Button>
+								<Button onClick={logOut} color={ButtonColor.Red} text="Sign out">
 									<FiLogOut />
-									<span>Sign out</span>
-								</button>
+								</Button>
 							</div>
 						</form>
 					</div>

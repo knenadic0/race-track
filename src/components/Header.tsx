@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Disclosure } from '@headlessui/react';
 import { HiBars3, HiOutlineUserCircle, HiXMark } from 'react-icons/hi2';
 import classNames from 'classnames';

@@ -1,5 +1,9 @@
-import { RaceProp } from '@datatypes/Race';
+import { Race } from '@datatypes/Race';
 import dateFormat from 'dateformat';
+
+export type RaceProp = {
+	raceData?: Race;
+};
 
 const Info = ({ raceData }: RaceProp) => {
 	if (!raceData) {
