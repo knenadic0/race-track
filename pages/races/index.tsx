@@ -105,11 +105,11 @@ const Races: NextPageWithLayout = () => {
 	];
 
 	return (
-		<div className="flex flex-col items-center justify-center py-5">
+		<div className="main-container">
 			{!data.nodes.length ? (
 				<Loader />
 			) : (
-				<div className="mx-auto w-full max-w-7xl rounded bg-rt-white px-4 shadow-xl sm:px-6 lg:px-8">
+				<div className="card card-big flex-col">
 					<CompactTable columns={COLUMNS} data={data} theme={theme} pagination={pagination} layout={{ custom: true }} />
 
 					<br />

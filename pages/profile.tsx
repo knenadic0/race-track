@@ -77,12 +77,12 @@ const Profile: NextPageWithLayout = () => {
 	};
 
 	return (
-		<div className="flex flex-col items-center justify-center py-5">
+		<div className="main-container">
 			<div className="flex flex-1 flex-col items-center justify-center px-5 text-center sm:my-8">
 				{!user || userData.fullName === '' ? (
 					<Loader />
 				) : (
-					<div className="flex flex-col rounded bg-rt-white p-6 text-left text-lg shadow-xl md:w-128">
+					<div className="card card-small p-6 text-left text-lg ">
 						<form>
 							<h1 className="mt-3 mb-6 text-center text-2xl font-bold">Manage profile</h1>
 							<hr />

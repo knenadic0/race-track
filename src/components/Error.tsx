@@ -9,8 +9,8 @@ type ErrorProps = {
 
 const Error = ({ title, message, redirectUrl = '/', redirectTitle = 'Home' }: ErrorProps) => {
 	return (
-		<div className="mx-6 flex flex-col items-center justify-center py-2">
-			<div className="mt-16 flex flex-1 flex-col items-center justify-center bg-white text-center shadow-lg md:w-128">
+		<div className="main-container">
+			<div className="card card-small sm:mt-16">
 				<div className="h-80 w-full bg-race-flag bg-cover bg-bt-180 bg-no-repeat p-4">
 					<h1 className="mt-4 text-2xl font-bold tracking-tight sm:text-3xl">{title}</h1>
 					<p className="mt-6 text-base">{message}</p>

@@ -13,3 +13,23 @@
 		min-height: calc(100vh - 8rem);
 	}
 }
+
+@layer components {
+	.card {
+		@apply flex rounded bg-rt-white shadow-xl;
+
+		&-small {
+			@apply text-center md:w-128;
+		}
+
+		&-big {
+			@apply mx-auto mb-5 w-full max-w-7xl p-4 sm:p-6 lg:p-8;
+		}
+	}
+}
+
+@layer utilities {
+	.main-container {
+		@apply flex flex-col items-center justify-center py-5;
+	}
+}

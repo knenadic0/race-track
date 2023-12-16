@@ -56,7 +56,7 @@ const Race: NextPageWithLayout = () => {
 	}, [router.query]);
 
 	return (
-		<div className="flex flex-col items-center justify-center py-5">
+		<div className="main-container">
 			{!raceData && !error && <Loader />}
 			{error && (
 				<Error
@@ -68,10 +68,10 @@ const Race: NextPageWithLayout = () => {
 			)}
 			{raceData && !error && (
 				<>
-					<div className="mx-auto mb-5 w-full max-w-7xl rounded bg-rt-white p-4 shadow-xl sm:p-6 lg:p-8">
+					<div className="card card-big mb-5 ">
 						<h1 className="text-xl font-bold">{raceData.title}</h1>
 					</div>
-					<div className="mx-auto w-full max-w-7xl rounded bg-rt-white p-4 shadow-xl sm:p-6 sm:pt-4 lg:p-8 lg:pt-4">
+					<div className="card card-big flex-col sm:pt-4 lg:pt-4">
 						<Tab.Group>
 							<Tab.List className="flex space-x-3 border-b-2 border-rt-light-gray text-center font-medium">
 								{Object.keys(tabs).map((category) => (

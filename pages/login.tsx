@@ -28,9 +28,9 @@ const Login: NextPageWithLayout = () => {
 	return (
 		<>
 			<Metatags title="Login" />
-			<div className="flex min-h-screen flex-col items-center justify-center py-2">
+			<div className="main-container min-h-screen">
 				<div className="flex w-full flex-1 flex-col items-center justify-center px-5 text-center">
-					<div className="flex items-center justify-center rounded bg-white shadow-xl">
+					<div className="card card-small items-center justify-center md:w-min">
 						<div className="bg-race-flag bg-cover bg-bt-100 bg-no-repeat px-4 py-6 sm:w-80 sm:p-8">
 							<h1 className="mb-6 text-2xl font-bold sm:text-3xl">RaceTrack</h1>
 							<button
