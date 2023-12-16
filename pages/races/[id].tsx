@@ -6,14 +6,16 @@ import { app, firestore } from '@adapters/firebase';
 import Layout from '@components/Layout';
 import { getAuth } from 'firebase/auth';
 import { Race } from '@datatypes/Race';
+import { FiEdit } from 'react-icons/fi';
 import { Tab } from '@headlessui/react';
 import classNames from 'classnames';
 import Info from '@components/Info';
 import Error from '@components/Error';
 import Loader from '@components/Loader';
+import Button, { ButtonColor } from '@components/Button';
 
 const Race: NextPageWithLayout = () => {
-	getAuth(app);
+	const auth = getAuth(app);
 	const router = useRouter();
 	const [raceData, setRaceData] = useState<Race>();
 	const [error, setError] = useState<boolean>(false);
@@ -42,6 +44,7 @@ const Race: NextPageWithLayout = () => {
 						})),
 						description: data.description,
 						applied: data.applied,
+						createdBy: data.createdBy,
 					});
 				} else {
 					console.error('No race found with given id: ', router.query.id);
@@ -68,8 +71,13 @@ const Race: NextPageWithLayout = () => {
 			)}
 			{raceData && !error && (
 				<>
-					<div className="card card-big mb-5 ">
-						<h1 className="text-xl font-bold">{raceData.title}</h1>
+					<div className="card card-big justify-between lg:px-8 lg:py-7">
+						<h1 className="flex items-center text-xl font-bold">{raceData.title}</h1>
+						{raceData.createdBy.id === auth.currentUser?.uid && (
+							<Button href={`/races/manage/${raceData.id}`} color={ButtonColor.Blue} text="Edit race">
+								<FiEdit />
+							</Button>
+						)}
 					</div>
 					<div className="card card-big flex-col sm:pt-4 lg:pt-4">
 						<Tab.Group>

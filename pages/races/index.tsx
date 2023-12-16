@@ -5,6 +5,7 @@ import { collection, getDocs, orderBy, query, where } from 'firebase/firestore';
 import { app, firestore } from '@adapters/firebase';
 import Layout from '@components/Layout';
 import { CompactTable } from '@table-library/react-table-library/compact';
+import { FiPlusCircle } from 'react-icons/fi';
 import { useTheme } from '@table-library/react-table-library/theme';
 import { getTheme } from '@table-library/react-table-library/baseline';
 import { usePagination } from '@table-library/react-table-library/pagination';
@@ -13,6 +14,8 @@ import * as TYPES from '@table-library/react-table-library/types/table';
 import { getAuth } from 'firebase/auth';
 import dateFormat from 'dateformat';
 import Loader from '@components/Loader';
+import Pill, { PillColor } from '@components/Pill';
+import Button, { ButtonColor } from '@components/Button';
 
 const Races: NextPageWithLayout = () => {
 	let races: Race[] = [];
@@ -44,6 +47,7 @@ const Races: NextPageWithLayout = () => {
 						})),
 						description: raceDoc.data().description,
 						applied: raceAppliersSnapshot.size,
+						createdBy: raceDoc.data().createdBy,
 					};
 				}),
 			);
@@ -97,9 +101,9 @@ const Races: NextPageWithLayout = () => {
 			label: 'Applying',
 			renderCell: (item: RaceNode) =>
 				new Date() == item.applyUntil.toDate() ? (
-					<span className="rounded bg-green-200 px-2.5 py-0.5 text-sm text-green-900">Open</span>
+					<Pill color={PillColor.Green} text="Open" />
 				) : (
-					<span className="rounded bg-red-200 px-2.5 py-0.5 text-sm text-red-900">Closed</span>
+					<Pill color={PillColor.Red} text="Closed" />
 				),
 		},
 	];
@@ -109,30 +113,38 @@ const Races: NextPageWithLayout = () => {
 			{!data.nodes.length ? (
 				<Loader />
 			) : (
-				<div className="card card-big flex-col">
-					<CompactTable columns={COLUMNS} data={data} theme={theme} pagination={pagination} layout={{ custom: true }} />
-
-					<br />
-					<div style={{ display: 'flex', justifyContent: 'space-between' }}>
-						<span>Total Pages: {pagination.state.getTotalPages(data.nodes)}</span>
-
-						<span>
-							Page:{' '}
-							{pagination.state.getPages(data.nodes).map((_: RaceNode, index: number) => (
-								<button
-									key={index}
-									type="button"
-									style={{
-										fontWeight: pagination.state.page === index ? 'bold' : 'normal',
-									}}
-									onClick={() => pagination.fns.onSetPage(index)}
-								>
-									{index + 1}
-								</button>
-							))}
-						</span>
+				<>
+					<div className="card card-big justify-between lg:px-8 lg:py-7">
+						<h1 className="flex items-center text-xl font-bold">Upcoming races</h1>
+						<Button color={ButtonColor.Blue} text="Add race" href="/races/manage">
+							<FiPlusCircle />
+						</Button>
 					</div>
-				</div>
+					<div className="card card-big flex-col">
+						<CompactTable columns={COLUMNS} data={data} theme={theme} pagination={pagination} layout={{ custom: true }} />
+
+						<br />
+						<div style={{ display: 'flex', justifyContent: 'space-between' }}>
+							<span>Total Pages: {pagination.state.getTotalPages(data.nodes)}</span>
+
+							<span>
+								Page:{' '}
+								{pagination.state.getPages(data.nodes).map((_: RaceNode, index: number) => (
+									<button
+										key={index}
+										type="button"
+										style={{
+											fontWeight: pagination.state.page === index ? 'bold' : 'normal',
+										}}
+										onClick={() => pagination.fns.onSetPage(index)}
+									>
+										{index + 1}
+									</button>
+								))}
+							</span>
+						</div>
+					</div>
+				</>
 			)}
 		</div>
 	);

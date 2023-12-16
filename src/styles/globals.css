@@ -23,13 +23,25 @@
 		}
 
 		&-big {
-			@apply mx-auto mb-5 w-full max-w-7xl p-4 sm:p-6 lg:p-8;
+			@apply mx-auto w-full max-w-7xl p-4 sm:p-6 lg:p-8;
 		}
 	}
 }
 
 @layer utilities {
 	.main-container {
-		@apply flex flex-col items-center justify-center py-5;
+		@apply flex flex-col items-center justify-center gap-y-5 py-5;
+	}
+
+	.input-container {
+		@apply grid grid-cols-1 gap-x-4 sm:grid-cols-3;
+
+		.label-container {
+			@apply flex items-center sm:justify-end;
+		}
+	}
+
+	.rt-input {
+		@apply col-span-2 block w-full rounded-md border-0 py-1.5 shadow-sm ring-1 ring-inset ring-rt-gray focus:ring-2 focus:ring-inset focus:ring-rt-blue;
 	}
 }

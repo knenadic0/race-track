@@ -86,23 +86,23 @@ const Profile: NextPageWithLayout = () => {
 						<form>
 							<h1 className="mt-3 mb-6 text-center text-2xl font-bold">Manage profile</h1>
 							<hr />
-							<div className="my-8 grid grid-cols-1 sm:grid-cols-3">
-								<label htmlFor="fullName" className="flex items-center">
-									Full Name:
-								</label>
+							<div className="input-container my-8">
+								<div className="label-container">
+									<label htmlFor="fullName">Full Name:</label>
+								</div>
 								<input
 									type="text"
 									id="fullName"
 									name="fullName"
 									value={userData.fullName}
 									onChange={handleInputChange}
-									className="col-span-2 block w-full rounded-md border-0 py-1.5 shadow-sm ring-1 ring-inset ring-rt-gray focus:ring-2 focus:ring-inset focus:ring-rt-blue"
+									className="rt-input"
 								/>
 							</div>
-							<div className="mb-8 grid grid-cols-1 sm:grid-cols-3">
-								<label htmlFor="birthDate" className="flex items-center">
-									Birth Date:
-								</label>
+							<div className="input-container mb-8">
+								<div className="label-container">
+									<label htmlFor="birthDate">Birth Date:</label>
+								</div>
 								<input
 									type="date"
 									id="birthDate"
@@ -110,11 +110,11 @@ const Profile: NextPageWithLayout = () => {
 									value={userData.birthDate}
 									max={new Date().toISOString().split('T')[0]}
 									onChange={handleInputChange}
-									className="col-span-2 block w-full rounded-md border-0 py-1.5 shadow-sm ring-1 ring-inset ring-rt-gray focus:ring-2 focus:ring-inset focus:ring-rt-blue"
+									className="rt-input"
 								/>
 							</div>
-							<fieldset className="grid h-10 grid-cols-1 sm:grid-cols-3">
-								<p className="flex items-center">Gender:</p>
+							<fieldset className="input-container h-10">
+								<div className="label-container">Gender:</div>
 								<div className="flex space-x-8">
 									<div className="flex items-center gap-x-2">
 										<input

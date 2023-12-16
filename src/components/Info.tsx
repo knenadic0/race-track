@@ -15,7 +15,7 @@ const Info = ({ raceData }: RaceProp) => {
 			<div className="grid grid-cols-1 gap-x-4 md:grid-cols-2">
 				<div className="mb-4 md:mb-0">
 					<p className="mb-1">
-						<span className="font-bold">Starting date and time:</span>{' '}
+						<span className="font-bold">Starting date & time:</span>{' '}
 						{dateFormat(raceData.dateTime.toDate(), 'dd.mm.yyyy. HH:MM (dddd)')}
 					</p>
 					<p>
