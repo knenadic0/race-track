@@ -11,6 +11,6 @@ export type Race = {
 	description: string;
 	applied: number;
 	createdBy: DocumentReference;
-}
+};
 
 export type RaceNode = TYPES.TableNode & Race;

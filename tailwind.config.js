@@ -49,6 +49,9 @@ module.exports = {
 				1: '1px',
 				3: '3px',
 			},
+			gridTemplateColumns: {
+				wide: '157px repeat(2, minmax(0, 1fr))',
+			},
 		},
 	},
 	plugins: [require('@headlessui/tailwindcss'), require('@tailwindcss/forms'), require('flowbite/plugin')],

@@ -10,6 +10,7 @@ const Metatags = ({ title }: MetaTagsProps) => {
 		<Head>
 			<title>{pageTitle}</title>
 			<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no" />
+			<meta charSet="utf-8" />
 		</Head>
 	);
 };
