@@ -39,7 +39,7 @@ const ManageRace: NextPageWithLayout = () => {
 					);
 					const data = docSnapshot.data();
 					setRaceData({
-						id: router.query['id']!.toString(),
+						id: router.query['id'].toString(),
 						title: data.title,
 						dateTime: data.dateTime,
 						applyUntil: data.applyUntil,
@@ -64,6 +64,14 @@ const ManageRace: NextPageWithLayout = () => {
 		}
 	}, [router.isReady]);
 
+	const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+		const { name, value } = e.target;
+		setRaceData((prevData) => ({
+			...prevData,
+			[name]: value,
+		}));
+	};
+
 	return (
 		<div className="main-container">
 			{!raceData && !notFound && !isNew && <Loader />}
@@ -78,7 +86,7 @@ const ManageRace: NextPageWithLayout = () => {
 			{!notFound && router.isReady && (isNew || (!isNew && raceData)) && (
 				<>
 					<div className="card card-big">
-						<h1 className="text-xl font-bold">{isNew ? 'Add race' : `Edit ${raceData!.title}`}</h1>
+						<h1 className="text-xl font-bold">{isNew ? 'Add race' : `Edit ${raceData?.title}`}</h1>
 					</div>
 					<div className="card card-big items-center">
 						<form className="w-full">
@@ -90,7 +98,7 @@ const ManageRace: NextPageWithLayout = () => {
 									type="text"
 									id="title"
 									{...register('title', { required: true, maxLength: 100 })}
-									// value={userData.fullName}
+									// value={raceData?.title}
 									// onChange={handleInputChange}
 									className="rt-input md:w-96"
 								/>
@@ -103,7 +111,7 @@ const ManageRace: NextPageWithLayout = () => {
 									type="datetime-local"
 									id="dateTime"
 									{...register('dateTime', { required: true })}
-									// value={userData.birthDate}
+									// value={raceData?.dateTime.toDate().toISOString()}
 									// onChange={handleInputChange}
 									className="rt-input md:w-96"
 								/>

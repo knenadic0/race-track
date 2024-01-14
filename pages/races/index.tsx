@@ -100,7 +100,7 @@ const Races: NextPageWithLayout = () => {
 		{
 			label: 'Applying',
 			renderCell: (item: RaceNode) =>
-				new Date() == item.applyUntil.toDate() ? (
+				new Date() <= item.applyUntil.toDate() ? (
 					<Pill color={PillColor.Green} text="Open" />
 				) : (
 					<Pill color={PillColor.Red} text="Closed" />
