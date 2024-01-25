@@ -1,81 +1,52 @@
 import { useRouter } from 'next/router';
 import { NextPageWithLayout } from '../../_app';
 import { ReactElement, useState, useEffect } from 'react';
-import { getDoc, doc, getDocs, collection, query, orderBy } from 'firebase/firestore';
 import { getAuth } from 'firebase/auth';
 import { useForm } from 'react-hook-form';
 import { FiSave, FiTrash2 } from 'react-icons/fi';
-import { app, firestore } from '@adapters/firebase';
+import { app } from '@adapters/firebase';
 import { Race } from '@datatypes/Race';
 import Layout from '@components/Layout';
 import Error from '@components/Error';
-import Loader from '@components/Loader';
+import Loader, { LoaderContainer } from '@components/Loader';
 import Button, { ButtonColor } from '@components/Button';
 import RichTextEditor from '@components/RichTextEditor';
+import { useGetRace } from '@adapters/firestore';
 
 const ManageRace: NextPageWithLayout = () => {
 	getAuth(app);
 	const router = useRouter();
-	const [raceData, setRaceData] = useState<Race>();
-	const [notFound, setNotFound] = useState<boolean>(false);
-	const [isNew, setIsNew] = useState<boolean>(true);
+	const [raceData, setRaceData] = useState<Race | undefined>();
+	const isNew = !router.query['id'];
 	const {
 		register,
 		handleSubmit,
 		formState: { errors },
 	} = useForm();
 
+	const { raceData: race, error: notFound, isLoading } = useGetRace(router.query['id']);
 	useEffect(() => {
-		setIsNew(!router.query['id']);
-
-		const fetchData = async () => {
-			if (router.query['id']) {
-				const raceDoc = doc(firestore, 'races', router.query['id'].toString());
-				const docSnapshot = await getDoc(raceDoc);
-
-				if (docSnapshot.exists()) {
-					const raceDisciplinesSnapshot = await getDocs(
-						query(collection(docSnapshot.ref, 'disciplines'), orderBy('length', 'asc')),
-					);
-					const data = docSnapshot.data();
-					setRaceData({
-						id: router.query['id'].toString(),
-						title: data.title,
-						dateTime: data.dateTime,
-						applyUntil: data.applyUntil,
-						disciplines: raceDisciplinesSnapshot.docs.map((discipline) => ({
-							id: discipline.id,
-							title: discipline.data().title,
-							raceLength: discipline.data()['length'],
-						})),
-						description: data.description,
-						applied: data.applied,
-						createdBy: data.createdBy,
-					});
-				} else {
-					console.error('No race found with given id: ', router.query['id']);
-					setNotFound(true);
-				}
-			}
-		};
-
-		if (!raceData) {
-			fetchData();
-		}
-	}, [router.isReady]);
+		setRaceData(race);
+	}, [race]);
 
 	const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
 		const { name, value } = e.target;
-		setRaceData((prevData) => ({
-			...prevData,
-			[name]: value,
-		}));
+		setRaceData((prevState) => {
+			if (!prevState) {
+				return { [name]: value } as unknown as Race;
+			}
+
+			return {
+				...prevState,
+				[name]: value,
+			};
+		});
 	};
 
 	return (
 		<div className="main-container">
-			{!raceData && !notFound && !isNew && <Loader />}
-			{notFound && (
+			{isLoading && <Loader container={LoaderContainer.Page} />}
+			{!isNew && notFound && (
 				<Error
 					title="Race not found"
 					message="Sorry, we couldn’t find the race you’re looking for."
@@ -83,10 +54,10 @@ const ManageRace: NextPageWithLayout = () => {
 					redirectUrl="/races"
 				/>
 			)}
-			{!notFound && router.isReady && (isNew || (!isNew && raceData)) && (
+			{!notFound && !isLoading && (
 				<>
-					<div className="card card-big">
-						<h1 className="text-xl font-bold">{isNew ? 'Add race' : `Edit ${raceData?.title}`}</h1>
+					<div className="card card-big justify-between lg:px-8 lg:py-7">
+						<h1 className="flex h-10 items-center text-xl font-bold">{isNew ? 'Add race' : `Edit ${raceData?.title}`}</h1>
 					</div>
 					<div className="card card-big items-center">
 						<form className="w-full">

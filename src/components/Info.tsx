@@ -1,16 +1,15 @@
 import { Race } from '@datatypes/Race';
 import dateFormat from 'dateformat';
+import Loader, { LoaderContainer } from './Loader';
 
 export type RaceProp = {
 	raceData?: Race;
 };
 
 const Info = ({ raceData }: RaceProp) => {
-	if (!raceData) {
-		return null;
-	}
-
-	return (
+	return !raceData ? (
+		<Loader container={LoaderContainer.Component} />
+	) : (
 		<>
 			<div className="grid grid-cols-1 gap-x-4 md:grid-cols-2">
 				<div className="mb-4 md:mb-0">

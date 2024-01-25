@@ -9,7 +9,6 @@ import { Tab } from '@headlessui/react';
 import classNames from 'classnames';
 import Info from '@components/Info';
 import Error from '@components/Error';
-import Loader from '@components/Loader';
 import Button, { ButtonColor } from '@components/Button';
 import { useGetRace } from '@adapters/firestore';
 
@@ -21,7 +20,6 @@ const Race: NextPageWithLayout = () => {
 
 	return (
 		<div className="main-container">
-			{!raceData && !error && <Loader />}
 			{error && (
 				<Error
 					title="Race not found"
@@ -30,11 +28,11 @@ const Race: NextPageWithLayout = () => {
 					redirectUrl="/races"
 				/>
 			)}
-			{raceData && !error && (
+			{!error && (
 				<>
 					<div className="card card-big justify-between lg:px-8 lg:py-7">
-						<h1 className="flex items-center text-xl font-bold">{raceData.title}</h1>
-						{raceData.createdBy.id === auth.currentUser?.uid && (
+						<h1 className="flex h-10 items-center text-xl font-bold">{raceData && raceData.title}</h1>
+						{raceData && raceData.createdBy.id === auth.currentUser?.uid && (
 							<Button href={`/races/manage/${raceData.id}`} color={ButtonColor.Blue} text="Edit race">
 								<FiEdit />
 							</Button>

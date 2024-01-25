@@ -9,7 +9,7 @@ import Layout from '@components/Layout';
 import { FiSave, FiLogOut } from 'react-icons/fi';
 import toast from 'react-hot-toast';
 import { User } from '@datatypes/User';
-import Loader from '@components/Loader';
+import Loader, { LoaderContainer } from '@components/Loader';
 import Button, { ButtonColor } from '@components/Button';
 import { useGetUser, useSetUser } from '@adapters/firestore';
 
@@ -38,7 +38,7 @@ const Profile: NextPageWithLayout = () => {
 		}));
 	};
 
-	const { userInfo, error } = useGetUser(user?.uid);
+	const { userInfo, error, isLoading } = useGetUser(user?.uid);
 
 	useEffect(() => {
 		if (userInfo) {
@@ -48,13 +48,13 @@ const Profile: NextPageWithLayout = () => {
 				gender: userInfo.gender,
 			});
 		}
-		if (!userInfo && error) {
+		if (!userInfo && error && !isLoading) {
 			setUserData((prevData) => ({
 				...prevData,
 				fullName: user?.displayName || '',
 			}));
 		}
-	}, [userInfo, error]);
+	}, [userInfo, error, isLoading]);
 
 	const saveChanges = async (e: React.MouseEvent<HTMLElement>) => {
 		e.preventDefault();
@@ -71,8 +71,8 @@ const Profile: NextPageWithLayout = () => {
 	return (
 		<div className="main-container">
 			<div className="flex flex-1 flex-col items-center justify-center px-5 text-center sm:my-8">
-				{!user ? (
-					<Loader />
+				{isLoading || !user ? (
+					<Loader container={LoaderContainer.Page} />
 				) : (
 					<div className="card card-small p-6 text-left text-lg ">
 						<form>

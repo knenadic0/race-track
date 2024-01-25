@@ -12,7 +12,7 @@ import { RaceNode } from '@datatypes/Race';
 import * as TYPES from '@table-library/react-table-library/types/table';
 import { getAuth } from 'firebase/auth';
 import dateFormat from 'dateformat';
-import Loader from '@components/Loader';
+import Loader, { LoaderContainer } from '@components/Loader';
 import Pill, { PillColor } from '@components/Pill';
 import Button, { ButtonColor } from '@components/Button';
 import { useGetRaces } from '@adapters/firestore';
@@ -81,19 +81,18 @@ const Races: NextPageWithLayout = () => {
 
 	return (
 		<div className="main-container">
-			{!data.nodes.length ? (
-				<Loader />
-			) : (
-				<>
-					<div className="card card-big justify-between lg:px-8 lg:py-7">
-						<h1 className="flex items-center text-xl font-bold">Upcoming races</h1>
-						<Button color={ButtonColor.Blue} text="Add race" href="/races/manage">
-							<FiPlusCircle />
-						</Button>
-					</div>
-					<div className="card card-big flex-col">
+			<div className="card card-big justify-between lg:px-8 lg:py-7">
+				<h1 className="flex items-center text-xl font-bold">Upcoming races</h1>
+				<Button color={ButtonColor.Blue} text="Add race" href="/races/manage">
+					<FiPlusCircle />
+				</Button>
+			</div>
+			<div className="card card-big flex-col">
+				{!data.nodes.length ? (
+					<Loader container={LoaderContainer.Component} />
+				) : (
+					<>
 						<CompactTable columns={COLUMNS} data={data} theme={theme} pagination={pagination} layout={{ custom: true }} />
-
 						<br />
 						<div style={{ display: 'flex', justifyContent: 'space-between' }}>
 							<span>Total Pages: {pagination.state.getTotalPages(data.nodes)}</span>
@@ -114,9 +113,9 @@ const Races: NextPageWithLayout = () => {
 								))}
 							</span>
 						</div>
-					</div>
-				</>
-			)}
+					</>
+				)}
+			</div>
 		</div>
 	);
 };

@@ -13,6 +13,11 @@ const Layout = ({ children, metaData }: LayoutProps) => {
 	return (
 		<>
 			<Metatags {...metaData} />
+			<style global jsx>{`
+				body {
+					overflow-y: scroll;
+				}
+			`}</style>
 			<div>
 				<Toaster
 					position="bottom-right"
