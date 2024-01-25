@@ -1,69 +1,40 @@
 import Link from 'next/link';
 import { NextPageWithLayout } from '../_app';
 import { ReactElement, useState, useEffect } from 'react';
-import { collection, getDocs, orderBy, query, where } from 'firebase/firestore';
-import { app, firestore } from '@adapters/firebase';
+import { app } from '@adapters/firebase';
 import Layout from '@components/Layout';
 import { CompactTable } from '@table-library/react-table-library/compact';
 import { FiPlusCircle } from 'react-icons/fi';
 import { useTheme } from '@table-library/react-table-library/theme';
 import { getTheme } from '@table-library/react-table-library/baseline';
 import { usePagination } from '@table-library/react-table-library/pagination';
-import { Race, RaceNode } from '@datatypes/Race';
+import { RaceNode } from '@datatypes/Race';
 import * as TYPES from '@table-library/react-table-library/types/table';
 import { getAuth } from 'firebase/auth';
 import dateFormat from 'dateformat';
 import Loader from '@components/Loader';
 import Pill, { PillColor } from '@components/Pill';
 import Button, { ButtonColor } from '@components/Button';
+import { useGetRaces } from '@adapters/firestore';
 
 const Races: NextPageWithLayout = () => {
-	let races: Race[] = [];
 	const [data, setData] = useState<TYPES.Data<RaceNode>>({
 		pageInfo: null,
 		nodes: [],
 	});
 	getAuth(app);
+	const { races } = useGetRaces();
 
 	useEffect(() => {
-		const fetchData = async () => {
-			const racesQuery = query(collection(firestore, 'races'), where('dateTime', '>', new Date()), orderBy('dateTime', 'asc'));
-			const racesSnapshot = await getDocs(racesQuery);
-
-			races = await Promise.all(
-				racesSnapshot.docs.map(async (raceDoc) => {
-					const raceDisciplinesSnapshot = await getDocs(collection(raceDoc.ref, 'disciplines'));
-					const raceAppliersSnapshot = await getDocs(collection(raceDoc.ref, 'applied'));
-
-					return {
-						id: raceDoc.id,
-						title: raceDoc.data().title,
-						dateTime: raceDoc.data().dateTime,
-						applyUntil: raceDoc.data().applyUntil,
-						disciplines: raceDisciplinesSnapshot.docs.map((discipline) => ({
-							id: discipline.id,
-							title: discipline.data().title,
-							raceLength: discipline.data()['length'],
-						})),
-						description: raceDoc.data().description,
-						applied: raceAppliersSnapshot.size,
-						createdBy: raceDoc.data().createdBy,
-					};
-				}),
-			);
-
+		if (races) {
 			setData({
 				nodes: races.map((race) => ({
 					...race,
 					nodes: null,
 				})),
 			});
-		};
-
-		if (!data.nodes.length) {
-			fetchData();
 		}
-	}, []);
+	}, [races]);
 
 	const theme = useTheme([
 		getTheme(),
@@ -91,7 +62,7 @@ const Races: NextPageWithLayout = () => {
 		},
 		{
 			label: 'Disciplines',
-			renderCell: (item: RaceNode) => item.disciplines.length,
+			renderCell: (item: RaceNode) => item.disciplines?.length || 0,
 		},
 		{
 			label: 'Applied',

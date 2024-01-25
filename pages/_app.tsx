@@ -17,7 +17,7 @@ export default function MyApp({ Component, pageProps }: AppPropsWithLayout) {
 	const getLayout = Component.getLayout ?? ((page) => page);
 	return getLayout(
 		<>
-			<NextNProgress height={4} startPosition={0.2} color={rtBlue} />
+			<NextNProgress height={4} startPosition={0.2} color={rtBlue} stopDelayMs={1} options={{ showSpinner: false }} />
 			<Component {...pageProps} />
 		</>,
 	);

@@ -1,11 +1,9 @@
 import { useRouter } from 'next/router';
 import { NextPageWithLayout } from '../_app';
-import { ReactElement, useState, useEffect } from 'react';
-import { getDoc, doc, getDocs, collection, query, orderBy } from 'firebase/firestore';
-import { app, firestore } from '@adapters/firebase';
+import { ReactElement } from 'react';
+import { app } from '@adapters/firebase';
 import Layout from '@components/Layout';
 import { getAuth } from 'firebase/auth';
-import { Race } from '@datatypes/Race';
 import { FiEdit } from 'react-icons/fi';
 import { Tab } from '@headlessui/react';
 import classNames from 'classnames';
@@ -13,50 +11,13 @@ import Info from '@components/Info';
 import Error from '@components/Error';
 import Loader from '@components/Loader';
 import Button, { ButtonColor } from '@components/Button';
+import { useGetRace } from '@adapters/firestore';
 
 const Race: NextPageWithLayout = () => {
 	const auth = getAuth(app);
 	const router = useRouter();
-	const [raceData, setRaceData] = useState<Race>();
-	const [error, setError] = useState<boolean>(false);
+	const { raceData, error } = useGetRace(router.query['id']);
 	const tabs = { Info: <Info raceData={raceData} />, Apply: null, Applied: null };
-
-	useEffect(() => {
-		const fetchData = async () => {
-			if (router.query.id) {
-				const raceDoc = doc(firestore, 'races', router.query.id.toString());
-				const docSnapshot = await getDoc(raceDoc);
-
-				if (docSnapshot.exists()) {
-					const raceDisciplinesSnapshot = await getDocs(
-						query(collection(docSnapshot.ref, 'disciplines'), orderBy('length', 'asc')),
-					);
-					const data = docSnapshot.data();
-					setRaceData({
-						id: router.query.id!.toString(),
-						title: data.title,
-						dateTime: data.dateTime,
-						applyUntil: data.applyUntil,
-						disciplines: raceDisciplinesSnapshot.docs.map((discipline) => ({
-							id: discipline.id,
-							title: discipline.data().title,
-							raceLength: discipline.data()['length'],
-						})),
-						description: data.description,
-						applied: data.applied,
-						createdBy: data.createdBy,
-					});
-				} else {
-					console.error('No race found with given id: ', router.query.id);
-					setError(true);
-				}
-			}
-		};
-
-		if (!raceData) {
-			fetchData();
-		}
-	}, [router.query]);
 
 	return (
 		<div className="main-container">
@@ -105,7 +66,6 @@ const Race: NextPageWithLayout = () => {
 							</Tab.Panels>
 						</Tab.Group>
 					</div>
-					{/* <div className="mx-auto w-full max-w-7xl rounded bg-white p-4 shadow-xl sm:p-6 lg:p-8"> */}
 				</>
 			)}
 		</div>

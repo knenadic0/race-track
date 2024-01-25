@@ -1,17 +1,17 @@
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { getAuth } from 'firebase/auth';
-import { app, firestore } from '@adapters/firebase';
+import { app } from '@adapters/firebase';
 import { useRouter } from 'next/router';
 import Cookies from 'js-cookie';
 import { NextPageWithLayout } from './_app';
 import { ReactElement, useState, useEffect } from 'react';
 import Layout from '@components/Layout';
 import { FiSave, FiLogOut } from 'react-icons/fi';
-import { doc, getDoc, setDoc } from 'firebase/firestore';
 import toast from 'react-hot-toast';
 import { User } from '@datatypes/User';
 import Loader from '@components/Loader';
 import Button, { ButtonColor } from '@components/Button';
+import { useGetUser, useSetUser } from '@adapters/firestore';
 
 const Profile: NextPageWithLayout = () => {
 	const auth = getAuth(app);
@@ -38,37 +38,29 @@ const Profile: NextPageWithLayout = () => {
 		}));
 	};
 
+	const { userInfo, error } = useGetUser(user?.uid);
+
 	useEffect(() => {
-		if (user) {
-			const userDocRef = doc(firestore, 'users', user.uid);
-			getDoc(userDocRef)
-				.then((docSnapshot) => {
-					if (docSnapshot.exists()) {
-						const data = docSnapshot.data();
-						setUserData({
-							fullName: data.fullName,
-							birthDate: data.birthDate,
-							gender: data.gender,
-						});
-					} else {
-						setUserData((prevData) => ({
-							...prevData,
-							fullName: user.displayName! ? user.displayName : '',
-						}));
-					}
-				})
-				.catch((error) => {
-					console.error('Error fetching user data: ', error);
-				});
+		if (userInfo) {
+			setUserData({
+				birthDate: userInfo.birthDate,
+				fullName: userInfo.fullName,
+				gender: userInfo.gender,
+			});
 		}
-	}, [user]);
+		if (!userInfo && error) {
+			setUserData((prevData) => ({
+				...prevData,
+				fullName: user?.displayName || '',
+			}));
+		}
+	}, [userInfo, error]);
 
 	const saveChanges = async (e: React.MouseEvent<HTMLElement>) => {
 		e.preventDefault();
 
 		if (user) {
-			const userDocRef = doc(firestore, 'users', user.uid);
-			toast.promise(setDoc(userDocRef, userData, { merge: true }), {
+			toast.promise(useSetUser(user.uid, userData), {
 				loading: 'Saving changes...',
 				success: 'Changes saved.',
 				error: 'An error occurred.',
@@ -79,7 +71,7 @@ const Profile: NextPageWithLayout = () => {
 	return (
 		<div className="main-container">
 			<div className="flex flex-1 flex-col items-center justify-center px-5 text-center sm:my-8">
-				{!user || userData.fullName === '' ? (
+				{!user ? (
 					<Loader />
 				) : (
 					<div className="card card-small p-6 text-left text-lg ">

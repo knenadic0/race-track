@@ -7,7 +7,7 @@ export type Race = {
 	title: string;
 	dateTime: Timestamp;
 	applyUntil: Timestamp;
-	disciplines: Discipline[];
+	disciplines?: Discipline[];
 	description: string;
 	applied: number;
 	createdBy: DocumentReference;

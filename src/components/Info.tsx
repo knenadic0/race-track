@@ -30,7 +30,7 @@ const Info = ({ raceData }: RaceProp) => {
 							<ul className="list-inside list-disc">
 								{raceData.disciplines.map((discipline, idx) => (
 									<li className="list-item" key={idx}>
-										{discipline.title} ({discipline.raceLength} km)
+										{discipline.title} ({discipline.length} km)
 									</li>
 								))}
 							</ul>
