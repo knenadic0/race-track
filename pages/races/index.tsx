@@ -1,14 +1,14 @@
 import Link from 'next/link';
 import { NextPageWithLayout } from '../_app';
 import { ReactElement, useState, useEffect } from 'react';
-import { app, firestore } from '@adapters/firebase';
+import { app } from '@adapters/firebase';
 import Layout from '@components/Layout';
 import { CompactTable } from '@table-library/react-table-library/compact';
 import { FiPlusCircle } from 'react-icons/fi';
 import { useTheme } from '@table-library/react-table-library/theme';
 import { getTheme } from '@table-library/react-table-library/baseline';
 import { usePagination } from '@table-library/react-table-library/pagination';
-import { Race, RaceNode } from '@datatypes/Race';
+import { RaceNode } from '@datatypes/Race';
 import * as TYPES from '@table-library/react-table-library/types/table';
 import { getAuth } from 'firebase/auth';
 import dateFormat from 'dateformat';
@@ -16,18 +16,14 @@ import Loader from '@components/Loader';
 import Pill, { PillColor } from '@components/Pill';
 import Button, { ButtonColor } from '@components/Button';
 import { useGetRaces } from '@adapters/firestore';
-import { getCollection } from '@tatsuokaniwa/swr-firestore/server';
-import { Timestamp, collection, getDocs } from 'firebase/firestore';
-import { adminApp, adminFirestore, initializeFirebaseAdmin } from '@adapters/firebaseAdmin';
-import { QuerySnapshot } from 'firebase-admin/firestore';
 
-const Races: NextPageWithLayout = ({ races }: { races: Race[] }) => {
+const Races: NextPageWithLayout = () => {
 	const [data, setData] = useState<TYPES.Data<RaceNode>>({
 		pageInfo: null,
 		nodes: [],
 	});
-	// getAuth(app);
-	// const { races } = useGetRaces();
+	getAuth(app);
+	const { races } = useGetRaces();
 
 	useEffect(() => {
 		if (races) {
@@ -123,18 +119,6 @@ const Races: NextPageWithLayout = ({ races }: { races: Race[] }) => {
 			)}
 		</div>
 	);
-};
-
-export const getServerSideProps = async () => {
-	// const results = (await adminFirestore.collection('races').get()).docs.map((race) => ({
-	// 	...race.data(),
-	// }));
-	const results = await getCollection({ path: 'races' });
-	return {
-		props: {
-			races: JSON.parse(JSON.stringify(results.data)),
-		},
-	};
 };
 
 Races.getLayout = function getLayout(page: ReactElement) {
