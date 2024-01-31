@@ -6,6 +6,7 @@ import { MouseEventHandler, PropsWithChildren } from 'react';
 export enum ButtonColor {
 	Blue,
 	Red,
+	Disabled,
 }
 
 export type ButtonProps = {
@@ -29,6 +30,11 @@ const Button = ({ text, onClick, href, children, color }: PropsWithChildren<Butt
 		case ButtonColor.Red:
 			colorClass = 'bg-rt-red hover:bg-rt-dark-red';
 			break;
+		case ButtonColor.Disabled:
+			colorClass = 'bg-rt-gray cursor-not-allowed';
+			href = undefined;
+			onClick = undefined;
+			break;
 	}
 
 	const className = classNames(
@@ -40,11 +46,16 @@ const Button = ({ text, onClick, href, children, color }: PropsWithChildren<Butt
 			{children}
 			<span>{text}</span>
 		</button>
-	) : (
-		<Link href={href!} className={className}>
+	) : href ? (
+		<Link href={href} className={className}>
 			{children}
 			<span>{text}</span>
 		</Link>
+	) : (
+		<button className={className}>
+			{children}
+			<span>{text}</span>
+		</button>
 	);
 };
 

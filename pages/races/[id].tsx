@@ -32,11 +32,18 @@ const Race: NextPageWithLayout = () => {
 				<>
 					<div className="card card-big justify-between lg:px-8 lg:py-7">
 						<h1 className="flex h-10 items-center text-xl font-bold">{raceData && raceData.title}</h1>
-						{raceData && raceData.createdBy.id === auth.currentUser?.uid && (
-							<Button href={`/races/manage/${raceData.id}`} color={ButtonColor.Blue} text="Edit race">
-								<FiEdit />
-							</Button>
-						)}
+						{raceData &&
+							raceData.createdBy.id === auth.currentUser?.uid &&
+							// (new Date() <= raceData.applyUntil.toDate() && raceData.applied === 0 ? (
+							(new Date() <= raceData.applyUntil.toDate() ? (
+								<Button href={`/races/manage/${raceData.id}`} color={ButtonColor.Blue} text="Edit race">
+									<FiEdit />
+								</Button>
+							) : (
+								<Button color={ButtonColor.Disabled} text="Edit race">
+									<FiEdit />
+								</Button>
+							))}
 					</div>
 					<div className="card card-big flex-col sm:pt-4 lg:pt-4">
 						<Tab.Group>
