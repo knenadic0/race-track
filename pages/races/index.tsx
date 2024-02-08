@@ -3,11 +3,7 @@ import { NextPageWithLayout } from '../_app';
 import { ReactElement, useState, useEffect } from 'react';
 import { app } from '@adapters/firebase';
 import Layout from '@components/Layout';
-import { CompactTable } from '@table-library/react-table-library/compact';
 import { FiPlusCircle } from 'react-icons/fi';
-import { useTheme } from '@table-library/react-table-library/theme';
-import { getTheme } from '@table-library/react-table-library/baseline';
-import { usePagination } from '@table-library/react-table-library/pagination';
 import { RaceNode } from '@datatypes/Race';
 import * as TYPES from '@table-library/react-table-library/types/table';
 import { getAuth } from 'firebase/auth';
@@ -16,6 +12,7 @@ import Loader, { LoaderContainer } from '@components/Loader';
 import Pill, { PillColor } from '@components/Pill';
 import Button, { ButtonColor } from '@components/Button';
 import { useGetRaces } from '@adapters/firestore';
+import PaginatedTable from '@components/Paging';
 
 const Races: NextPageWithLayout = () => {
 	const [data, setData] = useState<TYPES.Data<RaceNode>>({
@@ -36,22 +33,7 @@ const Races: NextPageWithLayout = () => {
 		}
 	}, [races]);
 
-	const theme = useTheme([
-		getTheme(),
-		{
-			Table: `
-			--data-table-library_grid-template-columns:  40% 18% repeat(3, minmax(0, 1fr));
-		  `,
-		},
-	]);
-	const pagination = usePagination(data, {
-		state: {
-			page: 0,
-			size: 10,
-		},
-	});
-
-	const COLUMNS = [
+	const columns = [
 		{
 			label: 'Title',
 			renderCell: (item: RaceNode) => <Link href={`/races/${item.id}`}>{item.title}</Link>,
@@ -91,29 +73,7 @@ const Races: NextPageWithLayout = () => {
 				{!data.nodes.length ? (
 					<Loader container={LoaderContainer.Component} />
 				) : (
-					<>
-						<CompactTable columns={COLUMNS} data={data} theme={theme} pagination={pagination} layout={{ custom: true }} />
-						<br />
-						<div style={{ display: 'flex', justifyContent: 'space-between' }}>
-							<span>Total Pages: {pagination.state.getTotalPages(data.nodes)}</span>
-
-							<span>
-								Page:{' '}
-								{pagination.state.getPages(data.nodes).map((_: RaceNode, index: number) => (
-									<button
-										key={index}
-										type="button"
-										style={{
-											fontWeight: pagination.state.page === index ? 'bold' : 'normal',
-										}}
-										onClick={() => pagination.fns.onSetPage(index)}
-									>
-										{index + 1}
-									</button>
-								))}
-							</span>
-						</div>
-					</>
+					<PaginatedTable columns={columns} data={data} pageSize={10} templateColumns="40% 18% repeat(3, minmax(0, 1fr))" />
 				)}
 			</div>
 		</div>

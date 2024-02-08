@@ -20,8 +20,8 @@ const ManageRace: NextPageWithLayout = () => {
 	const isNew = !router.query['id'];
 	const {
 		register,
-		handleSubmit,
-		formState: { errors },
+		// handleSubmit,
+		// formState: { errors },
 	} = useForm();
 
 	const { raceData: race, error: notFound, isLoading } = useGetRace(router.query['id']);
@@ -29,6 +29,7 @@ const ManageRace: NextPageWithLayout = () => {
 		setRaceData(race);
 	}, [race]);
 
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
 		const { name, value } = e.target;
 		setRaceData((prevState) => {
