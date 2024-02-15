@@ -12,6 +12,7 @@ import Loader, { LoaderContainer } from '@components/Loader';
 import Button, { ButtonColor } from '@components/Button';
 import RichTextEditor from '@components/RichTextEditor';
 import { useGetRace } from '@adapters/firestore';
+import Card from '@components/Card';
 
 const ManageRace: NextPageWithLayout = () => {
 	getAuth(app);
@@ -57,10 +58,10 @@ const ManageRace: NextPageWithLayout = () => {
 			)}
 			{!notFound && !isLoading && (
 				<>
-					<div className="card card-big justify-between lg:px-8 lg:py-7">
+					<Card size="big" className="justify-between lg:px-8 lg:py-7">
 						<h1 className="flex h-10 items-center text-xl font-bold">{isNew ? 'Add race' : `Edit ${raceData?.title}`}</h1>
-					</div>
-					<div className="card card-big items-center">
+					</Card>
+					<Card size="big" className="items-center">
 						<form className="w-full">
 							<div className="input-container input-container-wide mb-8">
 								<div className="label-container">
@@ -118,7 +119,7 @@ const ManageRace: NextPageWithLayout = () => {
 								)}
 							</div>
 						</form>
-					</div>
+					</Card>
 				</>
 			)}
 		</div>

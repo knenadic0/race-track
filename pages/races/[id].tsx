@@ -11,6 +11,7 @@ import Info from '@components/Info';
 import Error from '@components/Error';
 import Button, { ButtonColor } from '@components/Button';
 import { useGetRace } from '@adapters/firestore';
+import Card from '@components/Card';
 
 const Race: NextPageWithLayout = () => {
 	const auth = getAuth(app);
@@ -30,7 +31,7 @@ const Race: NextPageWithLayout = () => {
 			)}
 			{!error && (
 				<>
-					<div className="card card-big justify-between lg:px-8 lg:py-7">
+					<Card size="big" className="justify-between lg:px-8 lg:py-7">
 						<h1 className="flex h-10 items-center text-xl font-bold">{raceData && raceData.title}</h1>
 						{raceData &&
 							raceData.createdBy.id === auth.currentUser?.uid &&
@@ -44,8 +45,8 @@ const Race: NextPageWithLayout = () => {
 									<FiEdit />
 								</Button>
 							))}
-					</div>
-					<div className="card card-big flex-col sm:pt-4 lg:pt-4">
+					</Card>
+					<Card size="big" className="flex-col sm:pt-4 lg:pt-4">
 						<Tab.Group>
 							<Tab.List className="flex space-x-3 border-b-2 border-rt-light-gray text-center font-medium">
 								{Object.keys(tabs).map((category) => (
@@ -70,7 +71,7 @@ const Race: NextPageWithLayout = () => {
 								))}
 							</Tab.Panels>
 						</Tab.Group>
-					</div>
+					</Card>
 				</>
 			)}
 		</div>

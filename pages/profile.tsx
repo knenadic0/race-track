@@ -12,6 +12,7 @@ import { User } from '@datatypes/User';
 import Loader, { LoaderContainer } from '@components/Loader';
 import Button, { ButtonColor } from '@components/Button';
 import { useGetUser, useSetUser } from '@adapters/firestore';
+import Card from '@components/Card';
 
 const Profile: NextPageWithLayout = () => {
 	const auth = getAuth(app);
@@ -74,7 +75,7 @@ const Profile: NextPageWithLayout = () => {
 				{isLoading || !user ? (
 					<Loader container={LoaderContainer.Page} />
 				) : (
-					<div className="card card-small p-6 text-left text-lg ">
+					<Card size="small" className="p-6 text-left text-lg ">
 						<form>
 							<h1 className="mt-3 mb-6 text-center text-2xl font-bold">Manage profile</h1>
 							<hr />
@@ -147,7 +148,7 @@ const Profile: NextPageWithLayout = () => {
 								</Button>
 							</div>
 						</form>
-					</div>
+					</Card>
 				)}
 			</div>
 		</div>

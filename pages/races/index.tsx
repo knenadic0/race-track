@@ -9,10 +9,11 @@ import * as TYPES from '@table-library/react-table-library/types/table';
 import { getAuth } from 'firebase/auth';
 import dateFormat from 'dateformat';
 import Loader, { LoaderContainer } from '@components/Loader';
-import Pill, { PillColor } from '@components/Pill';
+import Pill from '@components/Pill';
 import Button, { ButtonColor } from '@components/Button';
 import { useGetRaces } from '@adapters/firestore';
 import PaginatedTable from '@components/Paging';
+import Card from '@components/Card';
 
 const Races: NextPageWithLayout = () => {
 	const [data, setData] = useState<TYPES.Data<RaceNode>>({
@@ -53,29 +54,25 @@ const Races: NextPageWithLayout = () => {
 		{
 			label: 'Applying',
 			renderCell: (item: RaceNode) =>
-				new Date() <= item.applyUntil.toDate() ? (
-					<Pill color={PillColor.Green} text="Open" />
-				) : (
-					<Pill color={PillColor.Red} text="Closed" />
-				),
+				new Date() <= item.applyUntil.toDate() ? <Pill color="green" text="Open" /> : <Pill color="red" text="Closed" />,
 		},
 	];
 
 	return (
 		<div className="main-container">
-			<div className="card card-big justify-between lg:px-8 lg:py-7">
+			<Card size="big" className="justify-between lg:px-8 lg:py-7">
 				<h1 className="flex items-center text-xl font-bold">Upcoming races</h1>
 				<Button color={ButtonColor.Blue} text="Add race" href="/races/manage">
 					<FiPlusCircle />
 				</Button>
-			</div>
-			<div className="card card-big flex-col">
+			</Card>
+			<Card size="big" className="flex-col">
 				{!data.nodes.length ? (
 					<Loader container={LoaderContainer.Component} />
 				) : (
 					<PaginatedTable columns={columns} data={data} pageSize={10} templateColumns="40% 18% repeat(3, minmax(0, 1fr))" />
 				)}
-			</div>
+			</Card>
 		</div>
 	);
 };
