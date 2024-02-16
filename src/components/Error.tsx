@@ -18,7 +18,7 @@ const Error = ({ title, message, redirectUrl = '/', redirectTitle = 'Home' }: Er
 					<div className="mt-6">
 						<Link
 							href={redirectUrl}
-							className="mx-auto flex w-min items-center gap-x-3 rounded-md bg-rt-blue px-4 py-2 text-white hover:bg-rt-dark-blue"
+							className="mx-auto flex w-min items-center gap-x-3 rounded-md bg-rt-blue px-4 py-2 text-rt-white hover:bg-rt-dark-blue"
 						>
 							{redirectTitle}
 						</Link>

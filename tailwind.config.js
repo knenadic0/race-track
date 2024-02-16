@@ -6,6 +6,7 @@ module.exports = {
 		'./pages/**/*.{js,ts,jsx,tsx}',
 		'./src/components/**/*.{js,ts,jsx,tsx}',
 		'./app/**/*.{js,ts,jsx,tsx}',
+		'./src/styles/*',
 		'node_modules/flowbite-react/lib/esm/**/*.js',
 	],
 	theme: {
