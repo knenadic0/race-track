@@ -42,7 +42,7 @@ const Button = ({ text, onClick, href, children, color }: PropsWithChildren<Butt
 		colorClass,
 	);
 	return onClick ? (
-		<button onClick={onClick} className={className}>
+		<button onClick={onClick} type="button" className={className}>
 			{children}
 			<span>{text}</span>
 		</button>
@@ -52,7 +52,7 @@ const Button = ({ text, onClick, href, children, color }: PropsWithChildren<Butt
 			<span>{text}</span>
 		</Link>
 	) : (
-		<button className={className}>
+		<button className={className} type="button">
 			{children}
 			<span>{text}</span>
 		</button>

@@ -7,7 +7,11 @@ export type CardProps = {
 };
 
 const Card = ({ size, children, className }: PropsWithChildren<PropsWithStyle<CardProps>>) => {
-	return <div className={classNames('card', 'card-' + size, className)}>{children}</div>;
+	const sizeVariants = {
+		big: 'card-big',
+		small: 'card-small',
+	};
+	return <div className={classNames('card', sizeVariants[size], className)}>{children}</div>;
 };
 
 export default Card;

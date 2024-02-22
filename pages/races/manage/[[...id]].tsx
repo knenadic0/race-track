@@ -19,30 +19,30 @@ const ManageRace: NextPageWithLayout = () => {
 	const router = useRouter();
 	const [raceData, setRaceData] = useState<Race | undefined>();
 	const isNew = !router.query['id'];
+	const now = new Date(Date.now());
+	const minStartDate = new Date(now.setDate(now.getDate() + 7)).toISOString().substring(0, 16);
 	const {
 		register,
-		// handleSubmit,
+		setValue,
+		handleSubmit,
 		// formState: { errors },
 	} = useForm();
 
 	const { raceData: race, error: notFound, isLoading } = useGetRace(router.query['id']);
 	useEffect(() => {
 		setRaceData(race);
+		if (race) {
+			setValue('title', race.title);
+			setValue('dateTime', race.dateTime.toDate().toISOString().substring(0, 16));
+			setValue('applyUntil', race.applyUntil.toDate().toISOString().substring(0, 16));
+			setValue('description', race.description);
+		}
 	}, [race]);
 
-	// eslint-disable-next-line @typescript-eslint/no-unused-vars
-	const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-		const { name, value } = e.target;
-		setRaceData((prevState) => {
-			if (!prevState) {
-				return { [name]: value } as unknown as Race;
-			}
+	// const handleRichTextValueChange = (value: string) => setValue('description', value);
 
-			return {
-				...prevState,
-				[name]: value,
-			};
-		});
+	const onFormSubmit = async (formData: object) => {
+		console.log(formData);
 	};
 
 	return (
@@ -59,7 +59,9 @@ const ManageRace: NextPageWithLayout = () => {
 			{!notFound && !isLoading && (
 				<>
 					<Card size="big" className="justify-between lg:px-8 lg:py-7">
-						<h1 className="flex h-10 items-center text-xl font-bold">{isNew ? 'Add race' : `Edit ${raceData?.title}`}</h1>
+						<h1 className="flex h-10 items-center text-xl font-bold">
+							{isNew ? 'Add race' : `Edit ${raceData ? raceData.title : ''}`}
+						</h1>
 					</Card>
 					<Card size="big" className="items-center">
 						<form className="w-full">
@@ -71,8 +73,6 @@ const ManageRace: NextPageWithLayout = () => {
 									type="text"
 									id="title"
 									{...register('title', { required: true, maxLength: 100 })}
-									// value={raceData?.title}
-									// onChange={handleInputChange}
 									className="rt-input md:w-96"
 								/>
 							</div>
@@ -83,9 +83,8 @@ const ManageRace: NextPageWithLayout = () => {
 								<input
 									type="datetime-local"
 									id="dateTime"
+									min={minStartDate}
 									{...register('dateTime', { required: true })}
-									// value={raceData?.dateTime.toDate().toISOString()}
-									// onChange={handleInputChange}
 									className="rt-input md:w-96"
 								/>
 							</div>
@@ -96,8 +95,7 @@ const ManageRace: NextPageWithLayout = () => {
 								<input
 									type="datetime-local"
 									id="applyUntil"
-									// value={userData.birthDate}
-									// onChange={handleInputChange}
+									min={minStartDate}
 									{...register('applyUntil', { required: true })}
 									className="rt-input md:w-96"
 								/>
@@ -106,10 +104,15 @@ const ManageRace: NextPageWithLayout = () => {
 								<div className="flex items-start pt-3 md:justify-end">
 									<label htmlFor="description">Description:</label>
 								</div>
-								<RichTextEditor className="rt-input quill" />
+								<RichTextEditor
+									{...register('description')}
+									value={raceData?.description || ''}
+									className="rt-input quill"
+									onChange={setValue.bind(null, 'description')}
+								/>
 							</div>
 							<div className="mt-12 flex justify-center gap-x-2 sm:gap-x-5">
-								<Button onClick={() => 0} text="Save" color={ButtonColor.Blue}>
+								<Button onClick={handleSubmit(onFormSubmit)} text="Save" color={ButtonColor.Blue}>
 									<FiSave />
 								</Button>
 								{!isNew && (
