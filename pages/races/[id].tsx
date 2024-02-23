@@ -36,7 +36,7 @@ const Race: NextPageWithLayout = () => {
 						{raceData &&
 							raceData.createdBy.id === auth.currentUser?.uid &&
 							// (new Date() <= raceData.applyUntil.toDate() && raceData.applied === 0 ? (
-							(new Date() <= raceData.applyUntil.toDate() ? (
+							(new Date() <= raceData.applyUntil ? (
 								<Button href={`/races/manage/${raceData.id}`} color={ButtonColor.Blue} text="Edit race">
 									<FiEdit />
 								</Button>

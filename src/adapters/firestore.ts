@@ -42,6 +42,7 @@ const useGetRace = (id?: string | string[]): { raceData?: RaceType; error?: Fire
 	const [error, setError] = useState<FirestoreError | undefined>(undefined);
 	const response = useGetDoc<RaceType>({
 		path: `races/${id}`,
+		parseDates: ['dateTime', 'applyUntil'],
 	});
 	const disciplines = useCollection<Discipline>({
 		path: `races/${id}/disciplines`,
@@ -94,6 +95,7 @@ const useGetRaces = (): { races?: RaceType[]; error?: FirestoreError } => {
 		path: 'races',
 		where: [['dateTime', '>', date]],
 		orderBy: [['dateTime', 'asc']],
+		parseDates: ['dateTime', 'applyUntil'],
 	});
 
 	const fetchAppliedCount = async (raceRef: DocumentReference<DocumentData>) => {

@@ -41,7 +41,7 @@ const Races: NextPageWithLayout = () => {
 		},
 		{
 			label: 'Date and time',
-			renderCell: (item: RaceNode) => dateFormat(item.dateTime.toDate(), 'dd.mm.yyyy. HH:MM'),
+			renderCell: (item: RaceNode) => dateFormat(item.dateTime, 'dd.mm.yyyy. HH:MM'),
 		},
 		{
 			label: 'Disciplines',
@@ -54,7 +54,7 @@ const Races: NextPageWithLayout = () => {
 		{
 			label: 'Applying',
 			renderCell: (item: RaceNode) =>
-				new Date() <= item.applyUntil.toDate() ? <Pill color="green" text="Open" /> : <Pill color="red" text="Closed" />,
+				new Date() <= item.applyUntil ? <Pill color="green" text="Open" /> : <Pill color="red" text="Closed" />,
 		},
 	];
 

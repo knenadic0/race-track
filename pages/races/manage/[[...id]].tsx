@@ -25,7 +25,7 @@ const ManageRace: NextPageWithLayout = () => {
 		register,
 		setValue,
 		handleSubmit,
-		// formState: { errors },
+		// formState: { errors, isDirty, isValid },
 	} = useForm();
 
 	const { raceData: race, error: notFound, isLoading } = useGetRace(router.query['id']);
@@ -33,13 +33,11 @@ const ManageRace: NextPageWithLayout = () => {
 		setRaceData(race);
 		if (race) {
 			setValue('title', race.title);
-			setValue('dateTime', race.dateTime.toDate().toISOString().substring(0, 16));
-			setValue('applyUntil', race.applyUntil.toDate().toISOString().substring(0, 16));
+			setValue('dateTime', race.dateTime.toISOString().substring(0, 16));
+			setValue('applyUntil', race.applyUntil.toISOString().substring(0, 16));
 			setValue('description', race.description);
 		}
 	}, [race]);
-
-	// const handleRichTextValueChange = (value: string) => setValue('description', value);
 
 	const onFormSubmit = async (formData: object) => {
 		console.log(formData);
@@ -72,7 +70,7 @@ const ManageRace: NextPageWithLayout = () => {
 								<input
 									type="text"
 									id="title"
-									{...register('title', { required: true, maxLength: 100 })}
+									{...register('title', { required: true, maxLength: 100, minLength: 5 })}
 									className="rt-input md:w-96"
 								/>
 							</div>
@@ -83,8 +81,7 @@ const ManageRace: NextPageWithLayout = () => {
 								<input
 									type="datetime-local"
 									id="dateTime"
-									min={minStartDate}
-									{...register('dateTime', { required: true })}
+									{...register('dateTime', { required: true, min: minStartDate })}
 									className="rt-input md:w-96"
 								/>
 							</div>
@@ -96,7 +93,7 @@ const ManageRace: NextPageWithLayout = () => {
 									type="datetime-local"
 									id="applyUntil"
 									min={minStartDate}
-									{...register('applyUntil', { required: true })}
+									{...register('applyUntil', { required: true, min: minStartDate })}
 									className="rt-input md:w-96"
 								/>
 							</div>
@@ -105,14 +102,20 @@ const ManageRace: NextPageWithLayout = () => {
 									<label htmlFor="description">Description:</label>
 								</div>
 								<RichTextEditor
-									{...register('description')}
+									{...register('description', { required: true })}
 									value={raceData?.description || ''}
 									className="rt-input quill"
 									onChange={setValue.bind(null, 'description')}
 								/>
 							</div>
+							{/* {errors.dateTime && <div>{errors.dateTime.message}</div>} */}
 							<div className="mt-12 flex justify-center gap-x-2 sm:gap-x-5">
-								<Button onClick={handleSubmit(onFormSubmit)} text="Save" color={ButtonColor.Blue}>
+								<Button
+									onClick={handleSubmit(onFormSubmit)}
+									text="Save"
+									// color={!isValid ? ButtonColor.Disabled : ButtonColor.Blue}
+									color={ButtonColor.Blue}
+								>
 									<FiSave />
 								</Button>
 								{!isNew && (
