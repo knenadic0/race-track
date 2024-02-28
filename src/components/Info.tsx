@@ -1,6 +1,7 @@
 import { Race } from '@datatypes/Race';
 import dateFormat from 'dateformat';
 import Loader, { LoaderContainer } from './Loader';
+import parse from 'html-react-parser';
 
 export type RaceProp = {
 	raceData?: Race;
@@ -36,7 +37,7 @@ const Info = ({ raceData }: RaceProp) => {
 				</div>
 			</div>
 			<hr className="my-6" />
-			<div>{raceData.description}</div>
+			<div className="html-parsed">{parse(raceData.description)}</div>
 		</>
 	);
 };

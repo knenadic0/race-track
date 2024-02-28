@@ -1,8 +1,17 @@
 import { useState, useEffect } from 'react';
-import { Race as RaceType } from '@datatypes/Race';
-import { useCollection, DocumentData as SwrDocumentData, useGetDoc } from '@tatsuokaniwa/swr-firestore';
+import { RaceForm, Race as RaceType } from '@datatypes/Race';
+import { useCollection, DocumentData as SwrDocumentData, useGetDoc, useGetDocs } from '@tatsuokaniwa/swr-firestore';
 import { Discipline } from '@datatypes/Discipline';
-import { DocumentData, DocumentReference, FirestoreError, collection, doc, getCountFromServer, setDoc } from 'firebase/firestore';
+import {
+	DocumentData,
+	DocumentReference,
+	FirestoreError,
+	Timestamp,
+	collection,
+	doc,
+	getCountFromServer,
+	setDoc,
+} from 'firebase/firestore';
 import { User } from '@datatypes/User';
 import { firestore } from './firebase';
 
@@ -44,7 +53,7 @@ const useGetRace = (id?: string | string[]): { raceData?: RaceType; error?: Fire
 		path: `races/${id}`,
 		parseDates: ['dateTime', 'applyUntil'],
 	});
-	const disciplines = useCollection<Discipline>({
+	const disciplines = useGetDocs<Discipline>({
 		path: `races/${id}/disciplines`,
 		orderBy: [['length', 'asc']],
 	});
@@ -131,4 +140,14 @@ const useGetRaces = (): { races?: RaceType[]; error?: FirestoreError } => {
 	return { races, error };
 };
 
-export { useGetRace, useSetUser, useGetDisciplines, useGetRaces, useGetUser };
+const useSetRace = (uid: string, raceData: RaceForm): Promise<void> => {
+	const raceDocRef = doc(firestore, 'races', uid);
+	const data = {
+		...raceData,
+		dateTime: Timestamp.fromDate(new Date(raceData.dateTime)),
+		applyUntil: Timestamp.fromDate(new Date(raceData.applyUntil)),
+	};
+	return setDoc(raceDocRef, data, { merge: true });
+};
+
+export { useGetRace, useSetUser, useGetDisciplines, useGetRaces, useGetUser, useSetRace };

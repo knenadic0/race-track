@@ -12,6 +12,8 @@ import Error from '@components/Error';
 import Button, { ButtonColor } from '@components/Button';
 import { useGetRace } from '@adapters/firestore';
 import Card from '@components/Card';
+import { manageRacesRoute, racesRoute } from '@constants/routes';
+import { Tooltip } from 'flowbite-react';
 
 const Race: NextPageWithLayout = () => {
 	const auth = getAuth(app);
@@ -26,7 +28,7 @@ const Race: NextPageWithLayout = () => {
 					title="Race not found"
 					message="Sorry, we couldn’t find the race you’re looking for."
 					redirectTitle="Races"
-					redirectUrl="/races"
+					redirectUrl={racesRoute}
 				/>
 			)}
 			{!error && (
@@ -36,14 +38,16 @@ const Race: NextPageWithLayout = () => {
 						{raceData &&
 							raceData.createdBy.id === auth.currentUser?.uid &&
 							// (new Date() <= raceData.applyUntil.toDate() && raceData.applied === 0 ? (
-							(new Date() <= raceData.applyUntil ? (
-								<Button href={`/races/manage/${raceData.id}`} color={ButtonColor.Blue} text="Edit race">
+							(new Date() <= raceData.dateTime ? (
+								<Button href={`${manageRacesRoute}/${raceData.id}`} color={ButtonColor.Blue} text="Edit race">
 									<FiEdit />
 								</Button>
 							) : (
-								<Button color={ButtonColor.Disabled} text="Edit race">
-									<FiEdit />
-								</Button>
+								<Tooltip content="Race cannot be edited">
+									<Button color={ButtonColor.Disabled} text="Edit race">
+										<FiEdit />
+									</Button>
+								</Tooltip>
 							))}
 					</Card>
 					<Card size="big" className="flex-col sm:pt-4 lg:pt-4">

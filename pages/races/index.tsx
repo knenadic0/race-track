@@ -14,6 +14,7 @@ import Button, { ButtonColor } from '@components/Button';
 import { useGetRaces } from '@adapters/firestore';
 import PaginatedTable from '@components/Paging';
 import Card from '@components/Card';
+import { manageRacesRoute, racesRoute } from '@constants/routes';
 
 const Races: NextPageWithLayout = () => {
 	const [data, setData] = useState<TYPES.Data<RaceNode>>({
@@ -37,7 +38,7 @@ const Races: NextPageWithLayout = () => {
 	const columns = [
 		{
 			label: 'Title',
-			renderCell: (item: RaceNode) => <Link href={`/races/${item.id}`}>{item.title}</Link>,
+			renderCell: (item: RaceNode) => <Link href={`${racesRoute}/${item.id}`}>{item.title}</Link>,
 		},
 		{
 			label: 'Date and time',
@@ -62,7 +63,7 @@ const Races: NextPageWithLayout = () => {
 		<div className="main-container">
 			<Card size="big" className="justify-between lg:px-8 lg:py-7">
 				<h1 className="flex items-center text-xl font-bold">Upcoming races</h1>
-				<Button color={ButtonColor.Blue} text="Add race" href="/races/manage">
+				<Button color={ButtonColor.Blue} text="Add race" href={manageRacesRoute}>
 					<FiPlusCircle />
 				</Button>
 			</Card>

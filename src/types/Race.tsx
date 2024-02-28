@@ -13,4 +13,18 @@ export type Race = {
 	createdBy: DocumentReference;
 };
 
+export type RaceForm = {
+	title: string;
+	dateTime: string;
+	applyUntil: string;
+	description: string;
+};
+const raceForm: RaceForm = {
+	title: '',
+	dateTime: '',
+	applyUntil: '',
+	description: '',
+};
+export const raceFormFields = Object.keys(raceForm);
+
 export type RaceNode = TYPES.TableNode & Race;

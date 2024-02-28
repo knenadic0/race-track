@@ -16,7 +16,7 @@ const Loader = ({ container, className = '' }: PropsWithStyle<LoaderProps>) => {
 	const containerClass = classNames(
 		className,
 		container == LoaderContainer.Page ? 'absolute top-1/3' : '',
-		container == LoaderContainer.Page ? 'relative mx-auto' : '',
+		container == LoaderContainer.Component ? 'relative mx-auto' : '',
 	);
 
 	return (

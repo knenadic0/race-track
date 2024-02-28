@@ -5,12 +5,13 @@ import classNames from 'classnames';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import Image from 'next/image';
+import { championshipRoute, profileRoute, racesRoute, resultsRoute } from '@constants/routes';
 
 const navigationLinks = [
-	{ name: 'Races', href: '/races', current: false, main: true },
-	{ name: 'Results', href: '/results', current: false, main: true },
-	{ name: 'Championship', href: '/championship', current: false, main: true },
-	{ name: 'Your profile', href: '/profile', current: false, main: false },
+	{ name: 'Races', href: racesRoute, current: false, main: true },
+	{ name: 'Results', href: resultsRoute, current: false, main: true },
+	{ name: 'Championship', href: championshipRoute, current: false, main: true },
+	{ name: 'Your profile', href: profileRoute, current: false, main: false },
 ];
 
 const Header = () => {
@@ -49,7 +50,7 @@ const Header = () => {
 							</div>
 							<div className="flex h-full flex-1 items-center justify-start">
 								<div className="flex flex-shrink-0 items-center">
-									<Link href="/races">
+									<Link href={racesRoute}>
 										<Image src="/assets/images/logo.jpg" alt="Race flag" height={32} width={32} />
 									</Link>
 								</div>

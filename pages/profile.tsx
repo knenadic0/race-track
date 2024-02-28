@@ -13,6 +13,7 @@ import Loader, { LoaderContainer } from '@components/Loader';
 import Button, { ButtonColor } from '@components/Button';
 import { useGetUser, useSetUser } from '@adapters/firestore';
 import Card from '@components/Card';
+import { loginRoute } from '@constants/routes';
 
 const Profile: NextPageWithLayout = () => {
 	const auth = getAuth(app);
@@ -28,7 +29,7 @@ const Profile: NextPageWithLayout = () => {
 	const logOut = () => {
 		auth.signOut();
 		Cookies.remove('user');
-		router.push('/login');
+		router.push(loginRoute);
 	};
 
 	const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
