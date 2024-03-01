@@ -43,7 +43,7 @@ const Profile: NextPageWithLayout = () => {
 	const { userInfo, error, isLoading } = useGetUser(user?.uid);
 
 	useEffect(() => {
-		if (userInfo) {
+		if (userInfo && userData.fullName === '') {
 			setUserData({
 				birthDate: userInfo.birthDate,
 				fullName: userInfo.fullName,
@@ -62,11 +62,17 @@ const Profile: NextPageWithLayout = () => {
 		e.preventDefault();
 
 		if (user) {
-			toast.promise(useSetUser(user.uid, userData), {
-				loading: 'Saving changes...',
-				success: 'Changes saved.',
-				error: 'An error occurred.',
-			});
+			toast.promise(
+				useSetUser(user.uid, userData),
+				{
+					loading: 'Saving changes...',
+					success: 'Changes saved.',
+					error: 'An error occurred.',
+				},
+				{
+					duration: 4000,
+				},
+			);
 		}
 	};
 

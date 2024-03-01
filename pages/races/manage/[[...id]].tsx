@@ -71,6 +71,9 @@ const ManageRace: NextPageWithLayout = () => {
 					},
 				)
 				.then(async function () {
+					toast('You will be redirected back to race' + (isNew ? 's' : ''), {
+						duration: 4000,
+					});
 					await wait(4000);
 					router.push(`${racesRoute}/${raceData.id}`);
 				});
