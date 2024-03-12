@@ -7,6 +7,7 @@ import {
 	DocumentReference,
 	FirestoreError,
 	Timestamp,
+	addDoc,
 	collection,
 	doc,
 	getCountFromServer,
@@ -150,4 +151,15 @@ const useSetRace = (uid: string, raceData: RaceForm): Promise<void> => {
 	return setDoc(raceDocRef, data, { merge: true });
 };
 
-export { useGetRace, useSetUser, useGetDisciplines, useGetRaces, useGetUser, useSetRace };
+const useAddRace = (raceData: RaceForm, userId: string): Promise<DocumentReference<DocumentData>> => {
+	const racesRef = collection(firestore, 'races');
+	const data = {
+		...raceData,
+		dateTime: Timestamp.fromDate(new Date(raceData.dateTime)),
+		applyUntil: Timestamp.fromDate(new Date(raceData.applyUntil)),
+		createdBy: doc(firestore, 'users', userId),
+	};
+	return addDoc(racesRef, data);
+};
+
+export { useGetRace, useSetUser, useGetDisciplines, useGetRaces, useGetUser, useSetRace, useAddRace };

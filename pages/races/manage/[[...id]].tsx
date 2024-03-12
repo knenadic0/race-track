@@ -2,7 +2,7 @@ import { useRouter } from 'next/router';
 import { NextPageWithLayout } from '../../_app';
 import { ReactElement, useState, useEffect } from 'react';
 import { getAuth } from 'firebase/auth';
-import { useForm } from 'react-hook-form';
+import { Controller, useForm } from 'react-hook-form';
 import { ErrorMessage } from '@hookform/error-message';
 import { FiArrowLeft, FiSave, FiTrash2 } from 'react-icons/fi';
 import { app } from '@adapters/firebase';
@@ -12,7 +12,7 @@ import Error from '@components/Error';
 import Loader, { LoaderContainer } from '@components/Loader';
 import Button, { ButtonColor } from '@components/Button';
 import RichTextEditor from '@components/RichTextEditor';
-import { useGetRace, useSetRace } from '@adapters/firestore';
+import { useAddRace, useGetRace, useSetRace } from '@adapters/firestore';
 import Card from '@components/Card';
 import FormErrorMessage from '@components/FormErrorMessage';
 import { racesRoute } from '@constants/routes';
@@ -25,7 +25,7 @@ const minStartDate = new Date(now.setDate(now.getDate() + 7)).toISOString().subs
 const errorMessageClass = 'col-span-2 col-start-2';
 
 const ManageRace: NextPageWithLayout = () => {
-	getAuth(app);
+	const auth = getAuth(app);
 	const router = useRouter();
 	const [raceData, setRaceData] = useState<Race>();
 	const isNew = !router.query['id'];
@@ -34,6 +34,7 @@ const ManageRace: NextPageWithLayout = () => {
 		setValue,
 		handleSubmit,
 		trigger,
+		control,
 		formState: { errors, isValid },
 	} = useForm<RaceForm>();
 
@@ -71,19 +72,37 @@ const ManageRace: NextPageWithLayout = () => {
 					},
 				)
 				.then(async function () {
-					toast('You will be redirected back to race' + (isNew ? 's' : ''), {
+					toast('You will be redirected back to race' + (isNew ? 's.' : '.'), {
 						duration: 4000,
 					});
 					await wait(4000);
 					router.push(`${racesRoute}/${raceData.id}`);
 				});
-		}
-	};
-
-	const handleRichTextValueChange = (value: string) => {
-		setValue('description', value);
-		if (raceData) {
-			raceData.description = value;
+		} else if (auth.currentUser) {
+			toast
+				.promise(
+					useAddRace(formData, auth.currentUser.uid),
+					{
+						loading: 'Saving race...',
+						success: 'Race added.',
+						error: 'An error occurred.',
+					},
+					{
+						success: {
+							duration: 4000,
+						},
+						error: {
+							duration: 4000,
+						},
+					},
+				)
+				.then(async function () {
+					toast('You will be redirected back to race' + (isNew ? 's.' : '.'), {
+						duration: 4000,
+					});
+					await wait(4000);
+					router.push(racesRoute);
+				});
 		}
 	};
 
@@ -97,7 +116,7 @@ const ManageRace: NextPageWithLayout = () => {
 					redirectUrl={racesRoute}
 				/>
 			)}
-			{!notFound && (
+			{(!notFound || isNew) && (
 				<>
 					<Card size="big" className="justify-between lg:px-8 lg:py-7">
 						<h1 className="flex h-10 items-center text-xl font-bold">
@@ -116,8 +135,8 @@ const ManageRace: NextPageWithLayout = () => {
 						</Tooltip>
 					</Card>
 					<Card size="big" className="items-center">
-						{isLoading && <Loader container={LoaderContainer.Component} />}
-						{!isLoading && (
+						{!isNew && isLoading && <Loader container={LoaderContainer.Component} />}
+						{(!isLoading || isNew) && (
 							<form className="w-full">
 								<div className="input-container input-container-wide mb-8">
 									<div className="label-container">
@@ -127,7 +146,7 @@ const ManageRace: NextPageWithLayout = () => {
 										type="text"
 										id="title"
 										{...register('title', {
-											required: true,
+											required: 'Title is required.',
 											maxLength: { value: 100, message: 'Maximum title length is 100.' },
 											minLength: { value: 5, message: 'Minimum title length is 5.' },
 										})}
@@ -143,7 +162,7 @@ const ManageRace: NextPageWithLayout = () => {
 										id="dateTime"
 										min={minStartDate}
 										{...register('dateTime', {
-											required: true,
+											required: 'Starting date is required.',
 											min: { value: minStartDate, message: 'Starting date cannot be sooner than 7 days.' },
 										})}
 										className="rt-input md:w-96"
@@ -158,8 +177,8 @@ const ManageRace: NextPageWithLayout = () => {
 										id="applyUntil"
 										min={minStartDate}
 										{...register('applyUntil', {
-											required: true,
-											min: { value: minStartDate, message: 'Applies open until cannot be sooner than 7 days.' },
+											required: 'Applies open until date is required.',
+											min: { value: minStartDate, message: 'Applies open until date cannot be sooner than 7 days.' },
 										})}
 										className="rt-input md:w-96"
 									/>
@@ -168,11 +187,14 @@ const ManageRace: NextPageWithLayout = () => {
 									<div className="flex items-start pt-3 md:justify-end">
 										<label htmlFor="description">Description:</label>
 									</div>
-									<RichTextEditor
-										{...register('description', { required: true })}
-										value={raceData?.description || ''}
-										className="rt-input quill"
-										onChange={(value: string) => handleRichTextValueChange(value)}
+									<Controller
+										name="description"
+										control={control}
+										rules={{ required: 'Description is required.' }}
+										defaultValue={raceData?.description || ''}
+										render={({ field: { onChange, value } }) => (
+											<RichTextEditor value={value} onChange={onChange} className="rt-input quill" />
+										)}
 									/>
 								</div>
 								{!isValid && (
