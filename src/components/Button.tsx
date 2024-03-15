@@ -6,6 +6,7 @@ import { MouseEventHandler, PropsWithChildren } from 'react';
 export enum ButtonColor {
 	Blue,
 	Red,
+	Neutral,
 	Disabled,
 }
 
@@ -29,6 +30,9 @@ const Button = ({ text, onClick, href, children, color }: PropsWithChildren<Butt
 			break;
 		case ButtonColor.Red:
 			colorClass = 'bg-rt-red hover:bg-rt-dark-red';
+			break;
+		case ButtonColor.Neutral:
+			colorClass = 'bg-rt-gray hover:bg-rt-dark-gray';
 			break;
 		case ButtonColor.Disabled:
 			colorClass = 'bg-rt-gray cursor-not-allowed';

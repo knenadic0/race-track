@@ -12,13 +12,14 @@ import Error from '@components/Error';
 import Loader, { LoaderContainer } from '@components/Loader';
 import Button, { ButtonColor } from '@components/Button';
 import RichTextEditor from '@components/RichTextEditor';
-import { useAddRace, useGetRace, useSetRace } from '@adapters/firestore';
+import { useAddRace, useGetRace, useRemoveRace, useUpdateRace } from '@adapters/firestore';
 import Card from '@components/Card';
 import FormErrorMessage from '@components/FormErrorMessage';
 import { racesRoute } from '@constants/routes';
 import toast from 'react-hot-toast';
 import { Tooltip } from 'flowbite-react';
 import { wait } from '@helpers/wait';
+import ConfirmModal from '@components/ConfirmModal';
 
 const now = new Date(Date.now());
 const minStartDate = new Date(now.setDate(now.getDate() + 7)).toISOString().substring(0, 16);
@@ -28,6 +29,7 @@ const ManageRace: NextPageWithLayout = () => {
 	const auth = getAuth(app);
 	const router = useRouter();
 	const [raceData, setRaceData] = useState<Race>();
+	const [isRemoveModalOpen, setIsRemoveModalOpen] = useState<boolean>(false);
 	const isNew = !router.query['id'];
 	const {
 		register,
@@ -56,7 +58,7 @@ const ManageRace: NextPageWithLayout = () => {
 		if (raceData) {
 			toast
 				.promise(
-					useSetRace(raceData.id, formData),
+					useUpdateRace(raceData.id, formData),
 					{
 						loading: 'Saving changes...',
 						success: 'Race updated.',
@@ -72,7 +74,7 @@ const ManageRace: NextPageWithLayout = () => {
 					},
 				)
 				.then(async function () {
-					toast('You will be redirected back to race' + (isNew ? 's.' : '.'), {
+					toast('You will be redirected back to race', {
 						duration: 4000,
 					});
 					await wait(4000);
@@ -97,10 +99,36 @@ const ManageRace: NextPageWithLayout = () => {
 					},
 				)
 				.then(async function () {
-					toast('You will be redirected back to race' + (isNew ? 's.' : '.'), {
+					toast('You will be redirected back to races', {
 						duration: 4000,
 					});
 					await wait(4000);
+					router.push(racesRoute);
+				});
+		}
+	};
+
+	const deleteRace = () => {
+		setIsRemoveModalOpen(false);
+		if (raceData) {
+			toast
+				.promise(
+					useRemoveRace(raceData.id),
+					{
+						loading: 'Canceling race...',
+						success: 'Race cancelled.',
+						error: 'An error occurred.',
+					},
+					{
+						success: {
+							duration: 4000,
+						},
+						error: {
+							duration: 4000,
+						},
+					},
+				)
+				.then(async function () {
 					router.push(racesRoute);
 				});
 		}
@@ -179,6 +207,10 @@ const ManageRace: NextPageWithLayout = () => {
 										{...register('applyUntil', {
 											required: 'Applies open until date is required.',
 											min: { value: minStartDate, message: 'Applies open until date cannot be sooner than 7 days.' },
+											validate: (value, formValues) =>
+												value >= formValues.dateTime
+													? 'Applies open until date cannot be after starting date & time.'
+													: true,
 										})}
 										className="rt-input md:w-96"
 									/>
@@ -216,7 +248,7 @@ const ManageRace: NextPageWithLayout = () => {
 										<FiSave />
 									</Button>
 									{!isNew && (
-										<Button onClick={() => 0} text="Delete race" color={ButtonColor.Red}>
+										<Button onClick={() => setIsRemoveModalOpen(true)} text="Cancel race" color={ButtonColor.Red}>
 											<FiTrash2 />
 										</Button>
 									)}
@@ -224,6 +256,13 @@ const ManageRace: NextPageWithLayout = () => {
 							</form>
 						)}
 					</Card>
+					<ConfirmModal
+						isOpen={isRemoveModalOpen}
+						onClose={() => setIsRemoveModalOpen(false)}
+						onConfirm={deleteRace}
+						text="Are you sure you want to cancel and delete this race?"
+						type="warning"
+					/>
 				</>
 			)}
 		</div>

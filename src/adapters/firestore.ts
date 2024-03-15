@@ -9,6 +9,7 @@ import {
 	Timestamp,
 	addDoc,
 	collection,
+	deleteDoc,
 	doc,
 	getCountFromServer,
 	setDoc,
@@ -141,7 +142,7 @@ const useGetRaces = (): { races?: RaceType[]; error?: FirestoreError } => {
 	return { races, error };
 };
 
-const useSetRace = (uid: string, raceData: RaceForm): Promise<void> => {
+const useUpdateRace = (uid: string, raceData: RaceForm): Promise<void> => {
 	const raceDocRef = doc(firestore, 'races', uid);
 	const data = {
 		...raceData,
@@ -162,4 +163,9 @@ const useAddRace = (raceData: RaceForm, userId: string): Promise<DocumentReferen
 	return addDoc(racesRef, data);
 };
 
-export { useGetRace, useSetUser, useGetDisciplines, useGetRaces, useGetUser, useSetRace, useAddRace };
+const useRemoveRace = (uid: string): Promise<void> => {
+	const raceDocRef = doc(firestore, 'races', uid);
+	return deleteDoc(raceDocRef);
+};
+
+export { useGetRace, useSetUser, useGetDisciplines, useGetRaces, useGetUser, useUpdateRace, useAddRace, useRemoveRace };

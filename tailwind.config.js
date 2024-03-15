@@ -26,6 +26,7 @@ module.exports = {
 			'rt-red': '#ef4444',
 			'rt-dark-red': '#dc2626',
 			'rt-white': colors.white,
+			'rt-dark-gray': '#77797e',
 			'rt-gray': '#9ca3af',
 			'rt-light-gray': '#e5e7eb',
 			'rt-black': colors.black,
