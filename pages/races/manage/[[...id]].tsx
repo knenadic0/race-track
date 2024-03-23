@@ -1,10 +1,10 @@
 import { useRouter } from 'next/router';
 import { NextPageWithLayout } from '../../_app';
-import { ReactElement, useState, useEffect } from 'react';
+import { ReactElement, useState, useEffect, useRef } from 'react';
 import { getAuth } from 'firebase/auth';
-import { Controller, useForm } from 'react-hook-form';
+import { Controller, useFieldArray, useForm } from 'react-hook-form';
 import { ErrorMessage } from '@hookform/error-message';
-import { FiArrowLeft, FiSave, FiTrash2 } from 'react-icons/fi';
+import { FiArrowLeft, FiPlusCircle, FiSave, FiTrash2, FiXCircle } from 'react-icons/fi';
 import { app } from '@adapters/firebase';
 import { Race, RaceForm, raceFormFields } from '@datatypes/Race';
 import Layout from '@components/Layout';
@@ -12,7 +12,7 @@ import Error from '@components/Error';
 import Loader, { LoaderContainer } from '@components/Loader';
 import Button, { ButtonColor } from '@components/Button';
 import RichTextEditor from '@components/RichTextEditor';
-import { useAddRace, useGetRace, useRemoveRace, useUpdateRace } from '@adapters/firestore';
+import { useAddRace, useGetDisciplines, useGetRace, useRemoveRace, useUpdateRace } from '@adapters/firestore';
 import Card from '@components/Card';
 import FormErrorMessage from '@components/FormErrorMessage';
 import { racesRoute } from '@constants/routes';
@@ -30,6 +30,9 @@ const ManageRace: NextPageWithLayout = () => {
 	const router = useRouter();
 	const [raceData, setRaceData] = useState<Race>();
 	const [isRemoveModalOpen, setIsRemoveModalOpen] = useState<boolean>(false);
+	const [isRemoveDisciplineModalOpen, setIsRemoveDisciplineModalOpen] = useState<boolean>(false);
+	const selectedDisciplineRef = useRef<number>();
+	const areDisciplinesSetRef = useRef<boolean>(false);
 	const isNew = !router.query['id'];
 	const {
 		register,
@@ -38,9 +41,23 @@ const ManageRace: NextPageWithLayout = () => {
 		trigger,
 		control,
 		formState: { errors, isValid },
-	} = useForm<RaceForm>();
+	} = useForm<RaceForm>({ defaultValues: { disciplines: [{ title: '', length: undefined, id: undefined }] } });
+	const {
+		fields: disciplines,
+		append,
+		remove,
+	} = useFieldArray({
+		control,
+		name: 'disciplines',
+		rules: {
+			maxLength: { value: 5, message: 'Maximum of five disciplines is allowed per race.' },
+			required: 'At least one discipline is required for a race.',
+		},
+	});
 
 	const { raceData: race, error: notFound, isLoading } = useGetRace(router.query['id']);
+	const { disciplines: disciplinesData } = useGetDisciplines(router.query['id']);
+
 	useEffect(() => {
 		if (!raceData) {
 			setRaceData(race);
@@ -53,6 +70,20 @@ const ManageRace: NextPageWithLayout = () => {
 			}
 		}
 	}, [race]);
+
+	useEffect(() => {
+		if (disciplinesData && !areDisciplinesSetRef.current) {
+			areDisciplinesSetRef.current = true;
+			disciplinesData.forEach((discipline, index) => {
+				if (index > 0) {
+					disciplines.push({ title: '', length: undefined, id: index.toString() });
+				}
+				setValue(`disciplines.${index}.title`, discipline.title);
+				setValue(`disciplines.${index}.length`, discipline.length);
+				setValue(`disciplines.${index}.id`, discipline.id);
+			});
+		}
+	}, [disciplinesData]);
 
 	const onFormSubmit = async (formData: RaceForm) => {
 		if (raceData) {
@@ -132,6 +163,16 @@ const ManageRace: NextPageWithLayout = () => {
 					router.push(racesRoute);
 				});
 		}
+	};
+
+	const preDeleteDiscipline = (index: number) => {
+		setIsRemoveDisciplineModalOpen(true);
+		selectedDisciplineRef.current = index;
+	};
+
+	const deleteDiscipline = () => {
+		setIsRemoveDisciplineModalOpen(false);
+		remove(selectedDisciplineRef.current);
 	};
 
 	return (
@@ -215,6 +256,68 @@ const ManageRace: NextPageWithLayout = () => {
 										className="rt-input md:w-96"
 									/>
 								</div>
+								<div className="input-container input-container-wide mb-8">
+									<div className="flex items-start pt-2 sm:justify-start md:justify-end">
+										<label htmlFor="disciplines">Disciplines:</label>
+									</div>
+									<div className="col-span-2">
+										<ul className="mb-2 flex flex-col gap-3">
+											{disciplines.map((discipline, index) => (
+												<li
+													key={discipline.id}
+													className="flex flex-col justify-between gap-x-3 gap-y-1 last:mb-1 sm:flex-row"
+												>
+													<input
+														{...register(`disciplines.${index}.title` as const, {
+															required: 'Discipline title is required.',
+															maxLength: { value: 100, message: 'Maximum title length is 100.' },
+															minLength: { value: 5, message: 'Minimum title length is 5.' },
+														})}
+														className="rt-input md:w-96"
+														placeholder="Discipline title"
+													/>
+													<input
+														{...register(`disciplines.${index}.length` as const, {
+															required: 'Discipline length is required.',
+															valueAsNumber: true,
+															min: { value: 0, message: 'Discipline length cannot be less than 0.' },
+															max: {
+																value: 100,
+																message: 'Discipline length cannot be greater than 100.',
+															},
+														})}
+														className="rt-input md:w-96"
+														placeholder="Discipline length (km)"
+														step={0.1}
+														type="number"
+													/>
+													<Tooltip content="Remove discipline" placement="left">
+														<div className="flex h-full">
+															<button
+																type="button"
+																onClick={() => preDeleteDiscipline(index)}
+																className="text-rt-red hover:text-rt-dark-red"
+															>
+																<FiXCircle className="h-6 w-6" />
+															</button>
+														</div>
+													</Tooltip>
+												</li>
+											))}
+										</ul>
+										<Tooltip content="Add discipline" placement="right">
+											<div className="flex h-full">
+												<button
+													type="button"
+													onClick={() => append({ title: '', length: undefined })}
+													className="text-rt-blue hover:text-rt-dark-blue"
+												>
+													<FiPlusCircle className="h-6 w-6" />
+												</button>
+											</div>
+										</Tooltip>
+									</div>
+								</div>
 								<div className="input-container input-container-wide">
 									<div className="flex items-start pt-3 md:justify-end">
 										<label htmlFor="description">Description:</label>
@@ -261,6 +364,13 @@ const ManageRace: NextPageWithLayout = () => {
 						onClose={() => setIsRemoveModalOpen(false)}
 						onConfirm={deleteRace}
 						text="Are you sure you want to cancel and delete this race?"
+						type="warning"
+					/>
+					<ConfirmModal
+						isOpen={isRemoveDisciplineModalOpen}
+						onClose={() => setIsRemoveDisciplineModalOpen(false)}
+						onConfirm={deleteDiscipline}
+						text="Are you sure you want to delete this discipline?"
 						type="warning"
 					/>
 				</>

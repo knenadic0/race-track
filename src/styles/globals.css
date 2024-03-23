@@ -49,7 +49,7 @@
 	}
 
 	.rt-input {
-		@apply col-span-2 block w-full rounded-md border-0 py-1.5 shadow-sm ring-1 ring-inset ring-rt-gray focus:ring-2 focus:ring-inset focus:ring-rt-blue;
+		@apply col-span-2 w-full rounded-md border-0 py-1.5 shadow-sm ring-1 ring-inset ring-rt-gray focus:ring-2 focus:ring-inset focus:ring-rt-blue;
 	}
 
 	.quill {

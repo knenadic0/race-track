@@ -10,7 +10,7 @@ import classNames from 'classnames';
 import Info from '@components/Info';
 import Error from '@components/Error';
 import Button, { ButtonColor } from '@components/Button';
-import { useGetRace } from '@adapters/firestore';
+import { useGetDisciplines, useGetRace } from '@adapters/firestore';
 import Card from '@components/Card';
 import { manageRacesRoute, racesRoute } from '@constants/routes';
 import { Tooltip } from 'flowbite-react';
@@ -19,7 +19,8 @@ const Race: NextPageWithLayout = () => {
 	const auth = getAuth(app);
 	const router = useRouter();
 	const { raceData, error } = useGetRace(router.query['id']);
-	const tabs = { Info: <Info raceData={raceData} />, Apply: null, Applied: null };
+	const { disciplines } = useGetDisciplines(router.query['id']);
+	const tabs = { Info: <Info raceData={raceData} disciplines={disciplines} />, Apply: null, Applied: null };
 
 	return (
 		<div className="main-container">

@@ -1,18 +1,19 @@
 import { useState, useEffect } from 'react';
 import { RaceForm, Race as RaceType } from '@datatypes/Race';
-import { useCollection, DocumentData as SwrDocumentData, useGetDoc, useGetDocs } from '@tatsuokaniwa/swr-firestore';
+import { useCollection, DocumentData as SwrDocumentData, useGetDoc } from '@tatsuokaniwa/swr-firestore';
 import { Discipline } from '@datatypes/Discipline';
 import {
 	DocumentData,
 	DocumentReference,
 	FirestoreError,
 	Timestamp,
-	addDoc,
 	collection,
-	deleteDoc,
 	doc,
 	getCountFromServer,
+	getDocs,
+	runTransaction,
 	setDoc,
+	writeBatch,
 } from 'firebase/firestore';
 import { User } from '@datatypes/User';
 import { firestore } from './firebase';
@@ -55,17 +56,10 @@ const useGetRace = (id?: string | string[]): { raceData?: RaceType; error?: Fire
 		path: `races/${id}`,
 		parseDates: ['dateTime', 'applyUntil'],
 	});
-	const disciplines = useGetDocs<Discipline>({
-		path: `races/${id}/disciplines`,
-		orderBy: [['length', 'asc']],
-	});
 
 	useEffect(() => {
 		if (response.error) {
 			setError(response.error);
-		}
-		if (response.data && disciplines) {
-			response.data.disciplines = disciplines.data;
 		}
 		if (!response.isLoading && !response.data && !response.error && !error) {
 			const err: FirestoreError = {
@@ -77,7 +71,7 @@ const useGetRace = (id?: string | string[]): { raceData?: RaceType; error?: Fire
 		}
 		setData(response.data);
 		setIsLoading(response.isLoading);
-	}, [response, disciplines]);
+	}, [response]);
 
 	return { raceData, error, isLoading };
 };
@@ -142,30 +136,68 @@ const useGetRaces = (): { races?: RaceType[]; error?: FirestoreError } => {
 	return { races, error };
 };
 
-const useUpdateRace = (uid: string, raceData: RaceForm): Promise<void> => {
+const useUpdateRace = async (uid: string, raceData: RaceForm): Promise<void> => {
+	const batch = writeBatch(firestore);
 	const raceDocRef = doc(firestore, 'races', uid);
 	const data = {
-		...raceData,
+		title: raceData.title,
+		description: raceData.description,
 		dateTime: Timestamp.fromDate(new Date(raceData.dateTime)),
 		applyUntil: Timestamp.fromDate(new Date(raceData.applyUntil)),
 	};
-	return setDoc(raceDocRef, data, { merge: true });
+	batch.set(raceDocRef, data, { merge: true });
+
+	raceData.disciplines.forEach((discipline) => {
+		const disciplinesRef = discipline.id
+			? doc(collection(raceDocRef, 'disciplines'), discipline.id)
+			: doc(collection(raceDocRef, 'disciplines'));
+		const disciplineData = {
+			title: discipline.title,
+			length: discipline.length,
+		};
+		batch.set(disciplinesRef, disciplineData);
+	});
+
+	const firestoreDisciplines = (await getDocs(collection(raceDocRef, 'disciplines'))).docs;
+	firestoreDisciplines.forEach((firestoreDiscipline) => {
+		if (!raceData.disciplines.some((x) => x.id === firestoreDiscipline.id)) {
+			batch.delete(firestoreDiscipline.ref);
+		}
+	});
+
+	return batch.commit();
 };
 
-const useAddRace = (raceData: RaceForm, userId: string): Promise<DocumentReference<DocumentData>> => {
-	const racesRef = collection(firestore, 'races');
+const useAddRace = (raceData: RaceForm, userId: string): Promise<void> => {
+	const batch = writeBatch(firestore);
+	const racesRef = doc(collection(firestore, 'races'));
 	const data = {
-		...raceData,
+		title: raceData.title,
+		description: raceData.description,
 		dateTime: Timestamp.fromDate(new Date(raceData.dateTime)),
 		applyUntil: Timestamp.fromDate(new Date(raceData.applyUntil)),
 		createdBy: doc(firestore, 'users', userId),
 	};
-	return addDoc(racesRef, data);
+	batch.set(racesRef, data);
+
+	raceData.disciplines.forEach((discipline) => {
+		const disciplinesRef = doc(collection(racesRef, 'disciplines'));
+		batch.set(disciplinesRef, discipline);
+	});
+
+	return batch.commit();
 };
 
 const useRemoveRace = (uid: string): Promise<void> => {
-	const raceDocRef = doc(firestore, 'races', uid);
-	return deleteDoc(raceDocRef);
+	const promise = runTransaction(firestore, async (transaction) => {
+		const raceDocRef = doc(firestore, 'races', uid);
+		const disciplines = await getDocs(collection(raceDocRef, 'disciplines'));
+		disciplines.forEach((discipline) => {
+			transaction.delete(discipline.ref);
+		});
+		transaction.delete(raceDocRef);
+	});
+	return promise;
 };
 
 export { useGetRace, useSetUser, useGetDisciplines, useGetRaces, useGetUser, useUpdateRace, useAddRace, useRemoveRace };

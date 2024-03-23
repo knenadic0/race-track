@@ -1,11 +1,11 @@
 import { useEffect, useState } from 'react';
 import { Disclosure } from '@headlessui/react';
-import { HiBars3, HiOutlineUserCircle, HiXMark } from 'react-icons/hi2';
 import classNames from 'classnames';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import Image from 'next/image';
 import { championshipRoute, profileRoute, racesRoute, resultsRoute } from '@constants/routes';
+import { FiMenu, FiUser, FiX } from 'react-icons/fi';
 
 const navigationLinks = [
 	{ name: 'Races', href: racesRoute, current: false, main: true },
@@ -42,9 +42,9 @@ const Header = () => {
 									<span className="absolute -inset-0.5" />
 									<span className="sr-only">Open main menu</span>
 									{open ? (
-										<HiXMark className="block h-6 w-6" aria-hidden="true" />
+										<FiX className="block h-6 w-6" aria-hidden="true" />
 									) : (
-										<HiBars3 className="block h-6 w-6" aria-hidden="true" />
+										<FiMenu className="block h-6 w-6" aria-hidden="true" />
 									)}
 								</Disclosure.Button>
 							</div>
@@ -86,7 +86,7 @@ const Header = () => {
 												href={item.href}
 											>
 												<span className="absolute -inset-1.5" />
-												<HiOutlineUserCircle
+												<FiUser
 													className={classNames('h-8 w-8', item.current ? 'stroke-rt-blue' : 'stroke-rt-black')}
 												/>
 											</Link>

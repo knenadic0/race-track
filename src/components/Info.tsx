@@ -2,12 +2,14 @@ import { Race } from '@datatypes/Race';
 import dateFormat from 'dateformat';
 import Loader, { LoaderContainer } from './Loader';
 import parse from 'html-react-parser';
+import { Discipline } from '@datatypes/Discipline';
 
 export type RaceProp = {
 	raceData?: Race;
+	disciplines?: Discipline[];
 };
 
-const Info = ({ raceData }: RaceProp) => {
+const Info = ({ raceData, disciplines }: RaceProp) => {
 	return !raceData ? (
 		<Loader container={LoaderContainer.Component} />
 	) : (
@@ -22,11 +24,11 @@ const Info = ({ raceData }: RaceProp) => {
 					</p>
 				</div>
 				<div>
-					{raceData.disciplines && raceData.disciplines.length && (
+					{disciplines && disciplines.length && (
 						<>
 							<p className="mb-1 font-bold">Disciplines:</p>
 							<ul className="list-inside list-disc">
-								{raceData.disciplines.map((discipline, idx) => (
+								{disciplines.map((discipline, idx) => (
 									<li className="list-item" key={idx}>
 										{discipline.title} ({discipline.length} km)
 									</li>

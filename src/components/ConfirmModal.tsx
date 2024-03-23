@@ -1,6 +1,6 @@
 import Button, { ButtonColor } from './Button';
 import { Modal } from 'flowbite-react';
-import { HiOutlineExclamationCircle, HiOutlineInformationCircle } from 'react-icons/hi2';
+import { FiAlertCircle, FiInfo } from 'react-icons/fi';
 
 export type ConfirmModalProps = {
 	text: string;
@@ -14,9 +14,9 @@ const ConfirmModal = ({ text, isOpen, onClose, onConfirm, type }: ConfirmModalPr
 	const yesButtonColor = type === 'info' ? ButtonColor.Blue : ButtonColor.Red;
 	const icon =
 		type === 'info' ? (
-			<HiOutlineInformationCircle className="mx-auto mb-4 h-14 w-14 text-rt-black" />
+			<FiInfo className="mx-auto mb-4 h-14 w-14 text-rt-black" />
 		) : (
-			<HiOutlineExclamationCircle className="mx-auto mb-4 h-14 w-14 text-rt-black" />
+			<FiAlertCircle className="mx-auto mb-4 h-14 w-14 text-rt-black" />
 		);
 	return (
 		<Modal show={isOpen} size="md" onClose={onClose} popup dismissible>
