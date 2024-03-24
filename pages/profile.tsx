@@ -8,23 +8,28 @@ import { ReactElement, useState, useEffect } from 'react';
 import Layout from '@components/Layout';
 import { FiSave, FiLogOut } from 'react-icons/fi';
 import toast from 'react-hot-toast';
-import { User } from '@datatypes/User';
+import { User, userFormFields } from '@datatypes/User';
 import Loader, { LoaderContainer } from '@components/Loader';
 import Button, { ButtonColor } from '@components/Button';
 import { useGetUser, useSetUser } from '@adapters/firestore';
 import Card from '@components/Card';
 import { loginRoute } from '@constants/routes';
+import { useForm } from 'react-hook-form';
+import { ErrorMessage } from '@hookform/error-message';
+import FormErrorMessage from '@components/FormErrorMessage';
 
 const Profile: NextPageWithLayout = () => {
 	const auth = getAuth(app);
 	const [user] = useAuthState(auth);
 	const router = useRouter();
-
-	const [userData, setUserData] = useState<User>({
-		fullName: '',
-		birthDate: '',
-		gender: '',
-	});
+	const [userData, setUserData] = useState<User>();
+	const {
+		register,
+		setValue,
+		handleSubmit,
+		trigger,
+		formState: { errors, isValid },
+	} = useForm<User>();
 
 	const logOut = () => {
 		auth.signOut();
@@ -32,41 +37,28 @@ const Profile: NextPageWithLayout = () => {
 		router.push(loginRoute);
 	};
 
-	const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-		const { name, value } = e.target;
-		setUserData((prevData) => ({
-			...prevData,
-			[name]: value,
-		}));
-	};
-
-	const { userInfo, isLoading } = useGetUser(user?.uid);
+	const { userInfo, isLoading, error } = useGetUser(user?.uid);
 
 	useEffect(() => {
-		if (userInfo && userData.fullName === '') {
-			setUserData({
-				birthDate: userInfo.birthDate,
-				fullName: userInfo.fullName,
-				gender: userInfo.gender,
-			});
+		if (!userData && userInfo && !error) {
+			setUserData(userInfo);
+			setValue('fullName', userInfo.fullName);
+			setValue('birthDate', userInfo.birthDate);
+			setValue('gender', userInfo.gender);
+			trigger();
 		}
-		if (!userInfo && userData.fullName === '' && !isLoading) {
-			setUserData((prevData) => ({
-				...prevData,
-				fullName: user?.displayName || '',
-			}));
+		if (!userData && !userInfo && error) {
+			setValue('fullName', user?.displayName || '');
 		}
-	}, [userInfo, isLoading]);
+	}, [userInfo, error]);
 
-	const saveChanges = async (e: React.MouseEvent<HTMLElement>) => {
-		e.preventDefault();
-
+	const onFormSubmit = async (formData: User) => {
 		if (user) {
 			toast.promise(
-				useSetUser(user.uid, userData),
+				useSetUser(user.uid, formData),
 				{
-					loading: 'Saving changes...',
-					success: 'Changes saved.',
+					loading: 'Updating profile...',
+					success: 'Profile updated.',
 					error: 'An error occurred.',
 				},
 				{
@@ -79,7 +71,7 @@ const Profile: NextPageWithLayout = () => {
 	return (
 		<div className="main-container">
 			<div className="flex w-full flex-1 flex-col items-center justify-center px-5 text-center sm:my-8 sm:w-auto">
-				{userData.fullName === '' && (isLoading || !user) ? (
+				{!userInfo && !error && (isLoading || !user) ? (
 					<Loader container={LoaderContainer.Page} />
 				) : (
 					<Card size="small" className="w-full p-6 text-left text-lg sm:w-auto">
@@ -93,9 +85,10 @@ const Profile: NextPageWithLayout = () => {
 								<input
 									type="text"
 									id="fullName"
-									name="fullName"
-									value={userData.fullName}
-									onChange={handleInputChange}
+									{...register('fullName', {
+										required: 'Name is required.',
+										maxLength: { value: 100, message: 'Maximum name length is 100.' },
+									})}
 									className="rt-input"
 								/>
 							</div>
@@ -120,10 +113,14 @@ const Profile: NextPageWithLayout = () => {
 								<input
 									type="date"
 									id="birthDate"
-									name="birthDate"
-									value={userData.birthDate}
+									{...register('birthDate', {
+										required: 'Birth date is required.',
+										max: {
+											value: new Date().toISOString().split('T')[0],
+											message: 'Birth date cannot be in future.',
+										},
+									})}
 									max={new Date().toISOString().split('T')[0]}
-									onChange={handleInputChange}
 									className="rt-input"
 								/>
 							</div>
@@ -133,11 +130,11 @@ const Profile: NextPageWithLayout = () => {
 									<div className="flex items-center gap-x-2">
 										<input
 											id="male"
-											name="gender"
 											type="radio"
+											{...register('gender', {
+												required: 'Gender is requied.',
+											})}
 											value="male"
-											onChange={handleInputChange}
-											checked={userData.gender === 'male'}
 											className="h-4 w-4 border-rt-gray text-rt-blue focus:ring-rt-blue"
 										/>
 										<label htmlFor="male" className="block">
@@ -147,11 +144,11 @@ const Profile: NextPageWithLayout = () => {
 									<div className="flex items-center gap-x-2">
 										<input
 											id="female"
-											name="gender"
 											type="radio"
 											value="female"
-											onChange={handleInputChange}
-											checked={userData.gender === 'female'}
+											{...register('gender', {
+												required: 'Gender is requied.',
+											})}
 											className="w-4border-rt-gray h-4 text-rt-blue focus:ring-rt-blue"
 										/>
 										<label htmlFor="female" className="block">
@@ -160,8 +157,22 @@ const Profile: NextPageWithLayout = () => {
 									</div>
 								</div>
 							</fieldset>
+							{!isValid && (
+								<div className="input-container mt-8">
+									{userFormFields.map((field) => (
+										<ErrorMessage
+											errors={errors}
+											name={field as keyof User}
+											key={field}
+											render={({ message }) => (
+												<FormErrorMessage message={message} className="md:col-span-2 md:col-start-2" />
+											)}
+										/>
+									))}
+								</div>
+							)}
 							<div className="mt-12 flex justify-center gap-x-2 sm:gap-x-5">
-								<Button onClick={saveChanges} color={ButtonColor.Blue} text="Save">
+								<Button onClick={handleSubmit(onFormSubmit)} color={ButtonColor.Blue} text="Save">
 									<FiSave />
 								</Button>
 								<Button onClick={logOut} color={ButtonColor.Red} text="Sign out">
