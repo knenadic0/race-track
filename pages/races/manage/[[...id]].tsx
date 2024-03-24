@@ -23,14 +23,11 @@ import ConfirmModal from '@components/ConfirmModal';
 
 const now = new Date(Date.now());
 const minStartDate = new Date(now.setDate(now.getDate() + 7)).toISOString().substring(0, 16);
-const errorMessageClass = 'col-span-2 col-start-2';
 
 const ManageRace: NextPageWithLayout = () => {
 	const auth = getAuth(app);
 	const router = useRouter();
 	const [raceData, setRaceData] = useState<Race>();
-	const [isRemoveModalOpen, setIsRemoveModalOpen] = useState<boolean>(false);
-	const [isRemoveDisciplineModalOpen, setIsRemoveDisciplineModalOpen] = useState<boolean>(false);
 	const selectedDisciplineRef = useRef<number>();
 	const areDisciplinesSetRef = useRef<boolean>(false);
 	const isNew = !router.query['id'];
@@ -140,7 +137,6 @@ const ManageRace: NextPageWithLayout = () => {
 	};
 
 	const deleteRace = () => {
-		setIsRemoveModalOpen(false);
 		if (raceData) {
 			toast
 				.promise(
@@ -163,16 +159,6 @@ const ManageRace: NextPageWithLayout = () => {
 					router.push(racesRoute);
 				});
 		}
-	};
-
-	const preDeleteDiscipline = (index: number) => {
-		setIsRemoveDisciplineModalOpen(true);
-		selectedDisciplineRef.current = index;
-	};
-
-	const deleteDiscipline = () => {
-		setIsRemoveDisciplineModalOpen(false);
-		remove(selectedDisciplineRef.current);
 	};
 
 	return (
@@ -293,13 +279,17 @@ const ManageRace: NextPageWithLayout = () => {
 													/>
 													<Tooltip content="Remove discipline" placement="left">
 														<div className="flex h-full">
-															<button
-																type="button"
-																onClick={() => preDeleteDiscipline(index)}
-																className="text-rt-red hover:text-rt-dark-red"
-															>
-																<FiXCircle className="h-6 w-6" />
-															</button>
+															<ConfirmModal
+																onConfirm={() => remove(selectedDisciplineRef.current)}
+																text="Are you sure you want to delete this discipline?"
+																type="warning"
+																buttonProps={{
+																	type: 'button',
+																	onClick: () => (selectedDisciplineRef.current = index),
+																	className: 'text-rt-red hover:text-rt-dark-red',
+																	children: <FiXCircle className="h-6 w-6" />,
+																}}
+															/>
 														</div>
 													</Tooltip>
 												</li>
@@ -340,7 +330,7 @@ const ManageRace: NextPageWithLayout = () => {
 												name={field as keyof RaceForm}
 												key={field}
 												render={({ message }) => (
-													<FormErrorMessage message={message} className={errorMessageClass} />
+													<FormErrorMessage message={message} className="md:col-span-2 md:col-start-2" />
 												)}
 											/>
 										))}
@@ -351,28 +341,17 @@ const ManageRace: NextPageWithLayout = () => {
 										<FiSave />
 									</Button>
 									{!isNew && (
-										<Button onClick={() => setIsRemoveModalOpen(true)} text="Cancel race" color={ButtonColor.Red}>
-											<FiTrash2 />
-										</Button>
+										<ConfirmModal
+											onConfirm={deleteRace}
+											text="Are you sure you want to cancel and delete this race?"
+											type="warning"
+											buttonComponentProps={{ text: 'Cancel race', color: ButtonColor.Red, children: <FiTrash2 /> }}
+										/>
 									)}
 								</div>
 							</form>
 						)}
 					</Card>
-					<ConfirmModal
-						isOpen={isRemoveModalOpen}
-						onClose={() => setIsRemoveModalOpen(false)}
-						onConfirm={deleteRace}
-						text="Are you sure you want to cancel and delete this race?"
-						type="warning"
-					/>
-					<ConfirmModal
-						isOpen={isRemoveDisciplineModalOpen}
-						onClose={() => setIsRemoveDisciplineModalOpen(false)}
-						onConfirm={deleteDiscipline}
-						text="Are you sure you want to delete this discipline?"
-						type="warning"
-					/>
 				</>
 			)}
 		</div>

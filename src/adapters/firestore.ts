@@ -45,7 +45,12 @@ const useGetUser = (id?: string): { userInfo?: User; error?: FirestoreError; isL
 
 const useSetUser = (uid: string, userData: User): Promise<void> => {
 	const userDocRef = doc(firestore, 'users', uid);
-	return setDoc(userDocRef, userData, { merge: true });
+	const data = {
+		fullName: userData.fullName,
+		birthDate: userData.birthDate,
+		gender: userData.gender,
+	};
+	return setDoc(userDocRef, data, { merge: true });
 };
 
 const useGetRace = (id?: string | string[]): { raceData?: RaceType; error?: FirestoreError; isLoading: boolean } => {

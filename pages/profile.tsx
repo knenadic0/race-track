@@ -40,7 +40,7 @@ const Profile: NextPageWithLayout = () => {
 		}));
 	};
 
-	const { userInfo, error, isLoading } = useGetUser(user?.uid);
+	const { userInfo, isLoading } = useGetUser(user?.uid);
 
 	useEffect(() => {
 		if (userInfo && userData.fullName === '') {
@@ -50,13 +50,13 @@ const Profile: NextPageWithLayout = () => {
 				gender: userInfo.gender,
 			});
 		}
-		if (!userInfo && error && !isLoading) {
+		if (!userInfo && userData.fullName === '' && !isLoading) {
 			setUserData((prevData) => ({
 				...prevData,
 				fullName: user?.displayName || '',
 			}));
 		}
-	}, [userInfo, error, isLoading]);
+	}, [userInfo, isLoading]);
 
 	const saveChanges = async (e: React.MouseEvent<HTMLElement>) => {
 		e.preventDefault();
@@ -78,12 +78,12 @@ const Profile: NextPageWithLayout = () => {
 
 	return (
 		<div className="main-container">
-			<div className="flex flex-1 flex-col items-center justify-center px-5 text-center sm:my-8">
-				{isLoading || !user ? (
+			<div className="flex w-full flex-1 flex-col items-center justify-center px-5 text-center sm:my-8 sm:w-auto">
+				{userData.fullName === '' && (isLoading || !user) ? (
 					<Loader container={LoaderContainer.Page} />
 				) : (
-					<Card size="small" className="p-6 text-left text-lg ">
-						<form>
+					<Card size="small" className="w-full p-6 text-left text-lg sm:w-auto">
+						<form className="w-full sm:w-auto">
 							<h1 className="mt-3 mb-6 text-center text-2xl font-bold">Manage profile</h1>
 							<hr />
 							<div className="input-container my-8">
@@ -97,6 +97,20 @@ const Profile: NextPageWithLayout = () => {
 									value={userData.fullName}
 									onChange={handleInputChange}
 									className="rt-input"
+								/>
+							</div>
+							<div className="input-container my-8">
+								<div className="label-container">
+									<label htmlFor="email">Email:</label>
+								</div>
+								<input
+									type="text"
+									id="email"
+									name="email"
+									value={user?.email || undefined}
+									disabled
+									readOnly
+									className="rt-input text-rt-dark-gray"
 								/>
 							</div>
 							<div className="input-container mb-8">

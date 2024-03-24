@@ -1,16 +1,24 @@
-import Button, { ButtonColor } from './Button';
+import { ExclusiveOr } from '@datatypes/ExclusiveOr';
+import Button, { ButtonColor, ButtonProps } from './Button';
 import { Modal } from 'flowbite-react';
+import { ButtonHTMLAttributes, DetailedHTMLProps, MouseEvent, PropsWithChildren, useState } from 'react';
 import { FiAlertCircle, FiInfo } from 'react-icons/fi';
 
 export type ConfirmModalProps = {
 	text: string;
-	isOpen: boolean;
-	onClose: () => void;
 	onConfirm: () => void;
 	type: 'warning' | 'info';
-};
+} & ExclusiveOr<
+	{
+		buttonProps?: DetailedHTMLProps<ButtonHTMLAttributes<HTMLButtonElement>, HTMLButtonElement>;
+	},
+	{
+		buttonComponentProps?: PropsWithChildren<ButtonProps>;
+	}
+>;
 
-const ConfirmModal = ({ text, isOpen, onClose, onConfirm, type }: ConfirmModalProps) => {
+const ConfirmModal = ({ text, onConfirm, type, buttonProps, buttonComponentProps }: ConfirmModalProps) => {
+	const [isOpen, setIsOpen] = useState<boolean>(false);
 	const yesButtonColor = type === 'info' ? ButtonColor.Blue : ButtonColor.Red;
 	const icon =
 		type === 'info' ? (
@@ -18,20 +26,47 @@ const ConfirmModal = ({ text, isOpen, onClose, onConfirm, type }: ConfirmModalPr
 		) : (
 			<FiAlertCircle className="mx-auto mb-4 h-14 w-14 text-rt-black" />
 		);
+	const onYesButtonClick = () => {
+		setIsOpen(false);
+		onConfirm();
+	};
+
+	const onButtonClick = (e: MouseEvent<HTMLButtonElement>) => {
+		setIsOpen(true);
+		if (buttonProps?.onClick) {
+			buttonProps.onClick(e);
+		}
+		if (buttonComponentProps?.onClick) {
+			buttonComponentProps.onClick(e);
+		}
+	};
+
 	return (
-		<Modal show={isOpen} size="md" onClose={onClose} popup dismissible>
-			<Modal.Header />
-			<Modal.Body>
-				<div className="text-center">
-					{icon}
-					<h3 className="mb-5 text-lg font-normal text-rt-black">{text}</h3>
-					<div className="flex justify-center gap-4">
-						<Button color={yesButtonColor} onClick={onConfirm} text="Yes" />
-						<Button color={ButtonColor.Neutral} onClick={onClose} text="No" />
+		<>
+			{buttonProps && (
+				<button onClick={onButtonClick} type="button" className={buttonProps.className}>
+					{buttonProps.children}
+				</button>
+			)}
+			{buttonComponentProps && (
+				<Button {...buttonComponentProps} onClick={onButtonClick}>
+					{buttonComponentProps.children}
+				</Button>
+			)}
+			<Modal show={isOpen} size="md" onClose={() => setIsOpen(false)} popup dismissible>
+				<Modal.Header />
+				<Modal.Body>
+					<div className="text-center">
+						{icon}
+						<h3 className="mb-5 text-lg font-normal text-rt-black">{text}</h3>
+						<div className="flex justify-center gap-4">
+							<Button color={yesButtonColor} onClick={() => onYesButtonClick()} text="Yes" />
+							<Button color={ButtonColor.Neutral} onClick={() => setIsOpen(false)} text="No" />
+						</div>
 					</div>
-				</div>
-			</Modal.Body>
-		</Modal>
+				</Modal.Body>
+			</Modal>
+		</>
 	);
 };
 
