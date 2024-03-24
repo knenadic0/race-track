@@ -165,7 +165,7 @@ const Profile: NextPageWithLayout = () => {
 											name={field as keyof User}
 											key={field}
 											render={({ message }) => (
-												<FormErrorMessage message={message} className="md:col-span-2 md:col-start-2" />
+												<FormErrorMessage message={message} className="sm:col-span-2 sm:col-start-2" />
 											)}
 										/>
 									))}
