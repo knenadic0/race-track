@@ -7,7 +7,6 @@ import { NextPageWithLayout } from './_app';
 import { ReactElement, useState, useEffect } from 'react';
 import Layout from '@components/Layout';
 import { FiSave, FiLogOut } from 'react-icons/fi';
-import toast from 'react-hot-toast';
 import { User, userFormFields } from '@datatypes/User';
 import Loader, { LoaderContainer } from '@components/Loader';
 import Button, { ButtonColor } from '@components/Button';
@@ -17,6 +16,7 @@ import { loginRoute } from '@constants/routes';
 import { useForm } from 'react-hook-form';
 import { ErrorMessage } from '@hookform/error-message';
 import FormErrorMessage from '@components/FormErrorMessage';
+import { toastPromise } from '@helpers/toast';
 
 const Profile: NextPageWithLayout = () => {
 	const auth = getAuth(app);
@@ -54,17 +54,11 @@ const Profile: NextPageWithLayout = () => {
 
 	const onFormSubmit = async (formData: User) => {
 		if (user) {
-			toast.promise(
-				useSetUser(user.uid, formData),
-				{
-					loading: 'Updating profile...',
-					success: 'Profile updated.',
-					error: 'An error occurred.',
-				},
-				{
-					duration: 4000,
-				},
-			);
+			toastPromise(useSetUser(user.uid, formData), {
+				loading: 'Updating profile...',
+				success: 'Profile updated.',
+				error: 'An error occurred.',
+			});
 		}
 	};
 

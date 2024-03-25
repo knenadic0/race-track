@@ -29,7 +29,7 @@ const useGetUser = (id?: string): { userInfo?: User; error?: FirestoreError; isL
 
 	useEffect(() => {
 		setInfo(response.data);
-		if (id && !response.data && !error) {
+		if (id && !response.data && !response.isLoading && !error) {
 			const err: FirestoreError = {
 				code: 'not-found',
 				message: 'Not found',

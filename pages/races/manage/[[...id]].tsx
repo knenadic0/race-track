@@ -20,6 +20,7 @@ import toast from 'react-hot-toast';
 import { Tooltip } from 'flowbite-react';
 import { wait } from '@helpers/wait';
 import ConfirmModal from '@components/ConfirmModal';
+import { toastPromise } from '@helpers/toast';
 
 const now = new Date(Date.now());
 const minStartDate = new Date(now.setDate(now.getDate() + 7)).toISOString().substring(0, 16);
@@ -84,80 +85,41 @@ const ManageRace: NextPageWithLayout = () => {
 
 	const onFormSubmit = async (formData: RaceForm) => {
 		if (raceData) {
-			toast
-				.promise(
-					useUpdateRace(raceData.id, formData),
-					{
-						loading: 'Saving changes...',
-						success: 'Race updated.',
-						error: 'An error occurred.',
-					},
-					{
-						success: {
-							duration: 4000,
-						},
-						error: {
-							duration: 4000,
-						},
-					},
-				)
-				.then(async function () {
-					toast('You will be redirected back to race', {
-						duration: 4000,
-					});
-					await wait(4000);
-					router.push(`${racesRoute}/${raceData.id}`);
+			toastPromise(useUpdateRace(raceData.id, formData), {
+				loading: 'Saving changes...',
+				success: 'Race updated.',
+				error: 'An error occurred.',
+			}).then(async function () {
+				toast('You will be redirected back to race', {
+					duration: 4000,
 				});
+				await wait(4000);
+				router.push(`${racesRoute}/${raceData.id}`);
+			});
 		} else if (auth.currentUser) {
-			toast
-				.promise(
-					useAddRace(formData, auth.currentUser.uid),
-					{
-						loading: 'Saving race...',
-						success: 'Race added.',
-						error: 'An error occurred.',
-					},
-					{
-						success: {
-							duration: 4000,
-						},
-						error: {
-							duration: 4000,
-						},
-					},
-				)
-				.then(async function () {
-					toast('You will be redirected back to races', {
-						duration: 4000,
-					});
-					await wait(4000);
-					router.push(racesRoute);
+			toastPromise(useAddRace(formData, auth.currentUser.uid), {
+				loading: 'Saving race...',
+				success: 'Race added.',
+				error: 'An error occurred.',
+			}).then(async function () {
+				toast('You will be redirected back to races', {
+					duration: 4000,
 				});
+				await wait(4000);
+				router.push(racesRoute);
+			});
 		}
 	};
 
 	const deleteRace = () => {
 		if (raceData) {
-			toast
-				.promise(
-					useRemoveRace(raceData.id),
-					{
-						loading: 'Canceling race...',
-						success: 'Race cancelled.',
-						error: 'An error occurred.',
-					},
-					{
-						success: {
-							duration: 4000,
-						},
-						error: {
-							duration: 4000,
-						},
-					},
-				)
-				.then(async function () {
-					router.push(racesRoute);
-				});
+			toastPromise(useRemoveRace(raceData.id), {
+				loading: 'Canceling race...',
+				success: 'Race cancelled.',
+				error: 'An error occurred.',
+			}).then(async function () {
+				router.push(racesRoute);
+			});
 		}
 	};
 
@@ -251,7 +213,7 @@ const ManageRace: NextPageWithLayout = () => {
 											{disciplines.map((discipline, index) => (
 												<li
 													key={discipline.id}
-													className="flex flex-col justify-between gap-x-3 gap-y-1 last:mb-1 sm:flex-row"
+													className="flex flex-col justify-start gap-x-3 gap-y-1 last:mb-1 sm:flex-row"
 												>
 													<input
 														{...register(`disciplines.${index}.title` as const, {
