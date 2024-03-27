@@ -3,9 +3,10 @@ import dateFormat from 'dateformat';
 import Loader, { LoaderContainer } from './Loader';
 import parse from 'html-react-parser';
 import { Discipline } from '@datatypes/Discipline';
+import { DocumentData } from '@tatsuokaniwa/swr-firestore';
 
 export type RaceProp = {
-	raceData?: Race;
+	raceData?: DocumentData<Race>;
 	disciplines?: Discipline[];
 };
 

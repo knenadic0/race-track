@@ -1,15 +1,14 @@
 import { useState, useEffect } from 'react';
 import { RaceForm, Race as RaceType } from '@datatypes/Race';
-import { useCollection, DocumentData as SwrDocumentData, useGetDoc } from '@tatsuokaniwa/swr-firestore';
+import { useCollection, DocumentData as SwrDocumentData, useGetDoc, useGetDocs, DocumentData } from '@tatsuokaniwa/swr-firestore';
 import { Discipline } from '@datatypes/Discipline';
 import {
-	DocumentData,
 	DocumentReference,
 	FirestoreError,
 	Timestamp,
 	collection,
+	deleteField,
 	doc,
-	getCountFromServer,
 	getDocs,
 	runTransaction,
 	setDoc,
@@ -17,11 +16,12 @@ import {
 } from 'firebase/firestore';
 import { User } from '@datatypes/User';
 import { firestore } from './firebase';
+import { ApplyData, ApplyForm } from '@components/Apply';
 
 const useGetUser = (id?: string): { userInfo?: User; error?: FirestoreError; isLoading: boolean } => {
-	const [userInfo, setInfo] = useState<User | undefined>(undefined);
+	const [userInfo, setInfo] = useState<User>();
 	const [isLoading, setIsLoading] = useState<boolean>(true);
-	const [error, setError] = useState<FirestoreError | undefined>(undefined);
+	const [error, setError] = useState<FirestoreError>();
 
 	const response = useGetDoc<User>({
 		path: `users/${id}`,
@@ -53,10 +53,10 @@ const useSetUser = (uid: string, userData: User): Promise<void> => {
 	return setDoc(userDocRef, data, { merge: true });
 };
 
-const useGetRace = (id?: string | string[]): { raceData?: RaceType; error?: FirestoreError; isLoading: boolean } => {
-	const [raceData, setData] = useState<RaceType | undefined>(undefined);
+const useGetRace = (id?: string | string[]): { raceData?: SwrDocumentData<RaceType>; error?: FirestoreError; isLoading: boolean } => {
+	const [raceData, setData] = useState<SwrDocumentData<RaceType>>();
 	const [isLoading, setIsLoading] = useState<boolean>(true);
-	const [error, setError] = useState<FirestoreError | undefined>(undefined);
+	const [error, setError] = useState<FirestoreError>();
 	const response = useGetDoc<RaceType>({
 		path: `races/${id}`,
 		parseDates: ['dateTime', 'applyUntil'],
@@ -82,8 +82,8 @@ const useGetRace = (id?: string | string[]): { raceData?: RaceType; error?: Fire
 };
 
 const useGetDisciplines = (id?: string | string[]): { disciplines?: Discipline[]; error?: FirestoreError } => {
-	const [disciplines, setDisciplines] = useState<Discipline[] | undefined>(undefined);
-	const [error, setError] = useState<FirestoreError | undefined>(undefined);
+	const [disciplines, setDisciplines] = useState<Discipline[]>();
+	const [error, setError] = useState<FirestoreError>();
 	const response = useCollection<Discipline>({
 		path: `races/${id}/disciplines`,
 		orderBy: [['length', 'asc']],
@@ -98,8 +98,8 @@ const useGetDisciplines = (id?: string | string[]): { disciplines?: Discipline[]
 };
 
 const useGetRaces = (): { races?: RaceType[]; error?: FirestoreError } => {
-	const [races, setRaces] = useState<RaceType[] | undefined>(undefined);
-	const [error, setError] = useState<FirestoreError | undefined>(undefined);
+	const [races, setRaces] = useState<RaceType[]>();
+	const [error, setError] = useState<FirestoreError>();
 	const [date] = useState(new Date());
 	const response = useCollection<RaceType>({
 		path: 'races',
@@ -108,37 +108,39 @@ const useGetRaces = (): { races?: RaceType[]; error?: FirestoreError } => {
 		parseDates: ['dateTime', 'applyUntil'],
 	});
 
-	const fetchAppliedCount = async (raceRef: DocumentReference<DocumentData>) => {
-		const snapshot = await getCountFromServer(collection(raceRef, 'applied'));
-		return snapshot.data().count;
-	};
-
-	const fetchDisciplines = async (raceRef: DocumentReference<DocumentData>) => {
-		const snapshot = await getCountFromServer(collection(raceRef, 'disciplines'));
-		const count = snapshot.data().count;
-		return new Array(count);
-	};
-
-	const mapRaces = async (data: SwrDocumentData<RaceType>[]) => {
-		setRaces(
-			await Promise.all(
-				data.map(async (race) => ({
-					...race,
-					applied: await fetchAppliedCount(race.ref),
-					disciplines: await fetchDisciplines(race.ref),
-				})),
-			),
-		);
-	};
-
 	useEffect(() => {
 		if (!races && response.data) {
-			mapRaces(response.data);
+			setRaces(response.data);
 		}
-		setError(response.error);
+		if (!error && response.error) {
+			setError(response.error);
+		}
 	}, [response]);
 
 	return { races, error };
+};
+
+const useAddRace = (raceData: RaceForm, userId: string): Promise<void> => {
+	const batch = writeBatch(firestore);
+	const racesRef = doc(collection(firestore, 'races'));
+	const data = {
+		title: raceData.title,
+		description: raceData.description,
+		dateTime: Timestamp.fromDate(new Date(raceData.dateTime)),
+		applyUntil: Timestamp.fromDate(new Date(raceData.applyUntil)),
+		createdBy: doc(firestore, 'users', userId),
+	};
+	batch.set(racesRef, data);
+
+	raceData.disciplines.forEach((discipline) => {
+		const disciplinesRef = doc(collection(racesRef, 'disciplines'));
+		batch.set(disciplinesRef, {
+			title: discipline.title,
+			length: discipline.length,
+		});
+	});
+
+	return batch.commit();
 };
 
 const useUpdateRace = async (uid: string, raceData: RaceForm): Promise<void> => {
@@ -173,26 +175,6 @@ const useUpdateRace = async (uid: string, raceData: RaceForm): Promise<void> => 
 	return batch.commit();
 };
 
-const useAddRace = (raceData: RaceForm, userId: string): Promise<void> => {
-	const batch = writeBatch(firestore);
-	const racesRef = doc(collection(firestore, 'races'));
-	const data = {
-		title: raceData.title,
-		description: raceData.description,
-		dateTime: Timestamp.fromDate(new Date(raceData.dateTime)),
-		applyUntil: Timestamp.fromDate(new Date(raceData.applyUntil)),
-		createdBy: doc(firestore, 'users', userId),
-	};
-	batch.set(racesRef, data);
-
-	raceData.disciplines.forEach((discipline) => {
-		const disciplinesRef = doc(collection(racesRef, 'disciplines'));
-		batch.set(disciplinesRef, discipline);
-	});
-
-	return batch.commit();
-};
-
 const useRemoveRace = (uid: string): Promise<void> => {
 	const promise = runTransaction(firestore, async (transaction) => {
 		const raceDocRef = doc(firestore, 'races', uid);
@@ -205,4 +187,102 @@ const useRemoveRace = (uid: string): Promise<void> => {
 	return promise;
 };
 
-export { useGetRace, useSetUser, useGetDisciplines, useGetRaces, useGetUser, useUpdateRace, useAddRace, useRemoveRace };
+const useApplyForRace = (raceRef: DocumentReference, applyData: ApplyForm, userId: string): Promise<void> => {
+	const promise = runTransaction(firestore, async (transaction) => {
+		const applyRef = doc(collection(doc(collection(raceRef, 'disciplines'), applyData.discipline), 'applied'), userId);
+		const data = {
+			user: doc(firestore, 'users', userId),
+			club: applyData.club,
+			shirtSize: applyData.shirtSize,
+		};
+
+		const race = await transaction.get(raceRef);
+		const applied = (race.data()?.applied || 0) + 1;
+		transaction.update(raceRef, {
+			applied: applied,
+		});
+		transaction.set(applyRef, data);
+	});
+	return promise;
+};
+
+const useUpdateApply = (oldApply: DocumentData<ApplyData>, applyData: ApplyForm): Promise<void> => {
+	const promise = runTransaction(firestore, async (transaction) => {
+		if (oldApply.ref.parent.parent?.id === applyData.discipline) {
+			transaction.update(oldApply.ref, {
+				club: applyData.club,
+				shirtSize: applyData.shirtSize,
+			});
+		} else {
+			const applyRef = doc(
+				collection(doc(collection(firestore, oldApply.ref.parent.parent!.parent.path), applyData.discipline), 'applied'),
+				oldApply.user.id,
+			);
+			const data = {
+				user: oldApply.user,
+				club: applyData.club,
+				shirtSize: applyData.shirtSize,
+			};
+			transaction.delete(oldApply.ref);
+			transaction.set(applyRef, data);
+		}
+	});
+	return promise;
+};
+
+const useGetApply = (
+	disciplines: Discipline[],
+	userId?: string,
+): { applyData?: SwrDocumentData<ApplyData>; error?: FirestoreError; isLoading: boolean } => {
+	const [applyData, setApplyData] = useState<DocumentData<ApplyData>>();
+	const [isLoading, setIsLoading] = useState<boolean>(true);
+	const [error, setError] = useState<FirestoreError>();
+
+	const response = useGetDocs<ApplyData>({
+		path: 'applied',
+		isCollectionGroup: true,
+	});
+
+	useEffect(() => {
+		if (!applyData && response.data && response.data.length && disciplines && disciplines.length && userId) {
+			setApplyData(
+				response.data.find((apply) =>
+					disciplines.some((discipline) => discipline.id === apply.ref.parent.parent?.id && apply.user.id === userId),
+				),
+			);
+		}
+		setIsLoading(response.isLoading);
+		setError(response.error);
+	}, [response]);
+
+	return { applyData, error, isLoading };
+};
+
+const useCancelApply = (applyRef: DocumentReference): Promise<void> => {
+	const promise = runTransaction(firestore, async (transaction) => {
+		const raceRef = applyRef.parent.parent!.parent.parent!;
+		const race = await transaction.get(raceRef);
+		const applied = race.data()?.applied || 1;
+		transaction.update(raceRef, {
+			applied: applied > 1 ? applied - 1 : deleteField(),
+		});
+
+		transaction.delete(applyRef);
+	});
+	return promise;
+};
+
+export {
+	useGetUser,
+	useSetUser,
+	useGetRace,
+	useGetDisciplines,
+	useGetRaces,
+	useAddRace,
+	useUpdateRace,
+	useRemoveRace,
+	useApplyForRace,
+	useUpdateApply,
+	useGetApply,
+	useCancelApply,
+};
