@@ -14,13 +14,18 @@ import { useGetDisciplines, useGetRace } from '@adapters/firestore';
 import Card from '@components/Card';
 import { manageRacesRoute, racesRoute } from '@constants/routes';
 import { Tooltip } from 'flowbite-react';
+import Apply from '@components/Apply';
 
 const Race: NextPageWithLayout = () => {
 	const auth = getAuth(app);
 	const router = useRouter();
 	const { raceData, error } = useGetRace(router.query['id']);
 	const { disciplines } = useGetDisciplines(router.query['id']);
-	const tabs = { Info: <Info raceData={raceData} disciplines={disciplines} />, Apply: null, Applied: null };
+	const tabs = {
+		Info: <Info raceData={raceData} disciplines={disciplines} />,
+		Apply: <Apply raceData={raceData} disciplines={disciplines} />,
+		Applied: null,
+	};
 
 	return (
 		<div className="main-container">
@@ -83,7 +88,7 @@ const Race: NextPageWithLayout = () => {
 	);
 };
 
-Race.getLayout = function getLayout(page: ReactElement) {
+Race.getLayout = (page: ReactElement) => {
 	const metaData = {
 		title: 'Races',
 	};

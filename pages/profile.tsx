@@ -28,7 +28,7 @@ const Profile: NextPageWithLayout = () => {
 		setValue,
 		handleSubmit,
 		trigger,
-		formState: { errors, isValid },
+		formState: { errors },
 	} = useForm<User>();
 
 	const logOut = () => {
@@ -54,7 +54,7 @@ const Profile: NextPageWithLayout = () => {
 
 	const onFormSubmit = async (formData: User) => {
 		if (user) {
-			toastPromise(useSetUser(user.uid, formData), {
+			await toastPromise(useSetUser(user.uid, formData), {
 				loading: 'Updating profile...',
 				success: 'Profile updated.',
 				error: 'An error occurred.',
@@ -151,21 +151,19 @@ const Profile: NextPageWithLayout = () => {
 									</div>
 								</div>
 							</fieldset>
-							{!isValid && (
-								<div className="input-container mt-8">
-									{userFormFields.map((field) => (
-										<ErrorMessage
-											errors={errors}
-											name={field as keyof User}
-											key={field}
-											render={({ message }) => (
-												<FormErrorMessage message={message} className="sm:col-span-2 sm:col-start-2" />
-											)}
-										/>
-									))}
-								</div>
-							)}
-							<div className="mt-12 flex justify-center gap-x-2 sm:gap-x-5">
+							<div className="input-container mt-8">
+								{userFormFields.map((field) => (
+									<ErrorMessage
+										errors={errors}
+										name={field as keyof User}
+										key={field}
+										render={({ message }) => (
+											<FormErrorMessage message={message} className="sm:col-span-2 sm:col-start-2" />
+										)}
+									/>
+								))}
+							</div>
+							<div className="mt-8 flex justify-center gap-x-2 sm:gap-x-5">
 								<Button onClick={handleSubmit(onFormSubmit)} color={ButtonColor.Blue} text="Save">
 									<FiSave />
 								</Button>
@@ -181,7 +179,7 @@ const Profile: NextPageWithLayout = () => {
 	);
 };
 
-Profile.getLayout = function getLayout(page: ReactElement) {
+Profile.getLayout = (page: ReactElement) => {
 	const metaData = {
 		title: 'Profile',
 	};

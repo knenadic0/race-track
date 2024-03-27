@@ -7,7 +7,7 @@ const NotFound: NextPageWithLayout = () => {
 	return <Error title="Page not found" message="Sorry, we couldn’t find the page you’re looking for." />;
 };
 
-NotFound.getLayout = function getLayout(page: ReactElement) {
+NotFound.getLayout = (page: ReactElement) => {
 	const metaData = {
 		title: 'Not found',
 	};

@@ -38,7 +38,7 @@ const ManageRace: NextPageWithLayout = () => {
 		handleSubmit,
 		trigger,
 		control,
-		formState: { errors, isValid },
+		formState: { errors },
 	} = useForm<RaceForm>({ defaultValues: { disciplines: [{ title: '', length: undefined, id: undefined }] } });
 	const {
 		fields: disciplines,
@@ -85,41 +85,38 @@ const ManageRace: NextPageWithLayout = () => {
 
 	const onFormSubmit = async (formData: RaceForm) => {
 		if (raceData) {
-			toastPromise(useUpdateRace(raceData.id, formData), {
+			await toastPromise(useUpdateRace(raceData.id, formData), {
 				loading: 'Saving changes...',
 				success: 'Race updated.',
 				error: 'An error occurred.',
-			}).then(async function () {
-				toast('You will be redirected back to race', {
-					duration: 4000,
-				});
-				await wait(4000);
-				router.push(`${racesRoute}/${raceData.id}`);
 			});
+			toast('You will be redirected back to race', {
+				duration: 4000,
+			});
+			await wait(4000);
+			router.push(`${racesRoute}/${raceData.id}`);
 		} else if (auth.currentUser) {
-			toastPromise(useAddRace(formData, auth.currentUser.uid), {
+			await toastPromise(useAddRace(formData, auth.currentUser.uid), {
 				loading: 'Saving race...',
 				success: 'Race added.',
 				error: 'An error occurred.',
-			}).then(async function () {
-				toast('You will be redirected back to races', {
-					duration: 4000,
-				});
-				await wait(4000);
-				router.push(racesRoute);
 			});
+			toast('You will be redirected back to races', {
+				duration: 4000,
+			});
+			await wait(4000);
+			router.push(racesRoute);
 		}
 	};
 
-	const deleteRace = () => {
+	const deleteRace = async () => {
 		if (raceData) {
-			toastPromise(useRemoveRace(raceData.id), {
+			await toastPromise(useRemoveRace(raceData.id), {
 				loading: 'Canceling race...',
 				success: 'Race cancelled.',
 				error: 'An error occurred.',
-			}).then(async function () {
-				router.push(racesRoute);
 			});
+			router.push(racesRoute);
 		}
 	};
 
@@ -277,28 +274,29 @@ const ManageRace: NextPageWithLayout = () => {
 									<Controller
 										name="description"
 										control={control}
-										rules={{ required: 'Description is required.' }}
+										rules={{
+											required: 'Description is required.',
+											minLength: { value: 5, message: 'Minimum description length is 5.' },
+										}}
 										defaultValue={raceData?.description || ''}
 										render={({ field: { onChange, value } }) => (
 											<RichTextEditor value={value} onChange={onChange} className="rt-input quill" />
 										)}
 									/>
 								</div>
-								{!isValid && (
-									<div className="input-container input-container-wide mt-8">
-										{raceFormFields.map((field) => (
-											<ErrorMessage
-												errors={errors}
-												name={field as keyof RaceForm}
-												key={field}
-												render={({ message }) => (
-													<FormErrorMessage message={message} className="md:col-span-2 md:col-start-2" />
-												)}
-											/>
-										))}
-									</div>
-								)}
-								<div className="mt-12 flex justify-center gap-x-2 sm:gap-x-5">
+								<div className="input-container input-container-wide mt-8">
+									{raceFormFields.map((field) => (
+										<ErrorMessage
+											errors={errors}
+											name={field as keyof RaceForm}
+											key={field}
+											render={({ message }) => (
+												<FormErrorMessage message={message} className="md:col-span-2 md:col-start-2" />
+											)}
+										/>
+									))}
+								</div>
+								<div className="mt-8 flex justify-center gap-x-2 sm:gap-x-5">
 									<Button onClick={handleSubmit(onFormSubmit)} text="Save" color={ButtonColor.Blue}>
 										<FiSave />
 									</Button>
@@ -320,7 +318,7 @@ const ManageRace: NextPageWithLayout = () => {
 	);
 };
 
-ManageRace.getLayout = function getLayout(page: ReactElement) {
+ManageRace.getLayout = (page: ReactElement) => {
 	const metaData = {
 		title: 'Manage race',
 	};

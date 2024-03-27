@@ -50,7 +50,7 @@ const Races: NextPageWithLayout = () => {
 		},
 		{
 			label: 'Applied',
-			renderCell: (item: RaceNode) => item.applied,
+			renderCell: (item: RaceNode) => item.applied || 0,
 		},
 		{
 			label: 'Applying',
@@ -78,7 +78,7 @@ const Races: NextPageWithLayout = () => {
 	);
 };
 
-Races.getLayout = function getLayout(page: ReactElement) {
+Races.getLayout = (page: ReactElement) => {
 	const metaData = {
 		title: 'Races',
 	};

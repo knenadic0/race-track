@@ -74,21 +74,20 @@ const Header = () => {
 									</div>
 								</div>
 							</div>
-							<div className="hidden items-center sm:static sm:inset-auto sm:ml-6 sm:flex sm:pr-0">
+							<div className="hidden h-full items-center sm:static sm:inset-auto sm:ml-6 sm:flex sm:pr-0">
 								{navigation
 									.filter((x) => !x.main)
 									.map((item) => (
-										<div key={item.name}>
+										<div key={item.name} className="flex h-full">
 											<Link
 												className={classNames(
-													'relative flex rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-rt-white focus:ring-offset-2 focus:ring-offset-rt-black',
+													'relative flex items-center border-b-3 px-2 text-sm',
+													item.current ? 'border-b-rt-blue' : ' border-b-rt-white hover:border-b-rt-gray',
 												)}
 												href={item.href}
 											>
 												<span className="absolute -inset-1.5" />
-												<FiUser
-													className={classNames('h-8 w-8', item.current ? 'stroke-rt-blue' : 'stroke-rt-black')}
-												/>
+												<FiUser className="h-8 w-8 stroke-rt-black" />
 											</Link>
 										</div>
 									))}
