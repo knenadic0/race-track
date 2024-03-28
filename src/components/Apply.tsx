@@ -13,27 +13,8 @@ import { Tooltip } from 'flowbite-react';
 import { ErrorMessage } from '@hookform/error-message';
 import FormErrorMessage from './FormErrorMessage';
 import { DocumentData } from '@tatsuokaniwa/swr-firestore';
-import { DocumentReference } from 'firebase/firestore';
 import ConfirmModal from './ConfirmModal';
-
-export enum ShirtSize {
-	XS,
-	S,
-	M,
-	L,
-	XL,
-	XXL,
-}
-
-export type ApplyForm = {
-	discipline: string;
-	club?: string;
-	shirtSize: ShirtSize;
-};
-
-export type ApplyData = ApplyForm & {
-	user: DocumentReference;
-};
+import { ApplyData, ApplyForm, ShirtSize } from '@datatypes/Apply';
 
 const defaultApplyForm: ApplyForm = {
 	discipline: '',

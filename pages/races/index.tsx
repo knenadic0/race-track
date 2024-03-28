@@ -41,7 +41,7 @@ const Races: NextPageWithLayout = () => {
 			renderCell: (item: RaceNode) => <Link href={`${racesRoute}/${item.id}`}>{item.title}</Link>,
 		},
 		{
-			label: 'Date and time',
+			label: 'Date & time',
 			renderCell: (item: RaceNode) => dateFormat(item.dateTime, 'dd.mm.yyyy. HH:MM'),
 		},
 		{
