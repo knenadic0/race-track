@@ -160,6 +160,7 @@ const useAddRace = (raceData: RaceForm, userId: string): Promise<void> => {
 		dateTime: Timestamp.fromDate(new Date(raceData.dateTime)),
 		applyUntil: Timestamp.fromDate(new Date(raceData.applyUntil)),
 		createdBy: doc(firestore, 'users', userId),
+		disciplinesCount: raceData.disciplines.length,
 	};
 	batch.set(racesRef, data);
 
@@ -182,6 +183,7 @@ const useUpdateRace = async (uid: string, raceData: RaceForm): Promise<void> => 
 		description: raceData.description,
 		dateTime: Timestamp.fromDate(new Date(raceData.dateTime)),
 		applyUntil: Timestamp.fromDate(new Date(raceData.applyUntil)),
+		disciplinesCount: raceData.disciplines.length,
 	};
 	batch.set(raceDocRef, data, { merge: true });
 

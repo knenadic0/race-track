@@ -297,10 +297,27 @@ const ManageRace: NextPageWithLayout = () => {
 									))}
 								</div>
 								<div className="mt-8 flex justify-center gap-x-2 sm:gap-x-5">
-									<Button onClick={handleSubmit(onFormSubmit)} text="Save" color={ButtonColor.Blue}>
-										<FiSave />
-									</Button>
-									{!isNew && (
+									{isNew ||
+										(raceData && new Date() <= raceData.dateTime && !raceData.applied && (
+											<Button onClick={handleSubmit(onFormSubmit)} text="Save" color={ButtonColor.Blue}>
+												<FiSave />
+											</Button>
+										))}
+									{raceData && (new Date() > raceData.dateTime || raceData.applied) && (
+										<>
+											<Tooltip content="Race cannot be edited">
+												<Button text="Save" color={ButtonColor.Disabled}>
+													<FiSave />
+												</Button>
+											</Tooltip>
+											<Tooltip content="Race cannot be canceled">
+												<Button text="Cancel race" color={ButtonColor.Disabled}>
+													<FiTrash2 />
+												</Button>
+											</Tooltip>
+										</>
+									)}
+									{!isNew && raceData && new Date() <= raceData.dateTime && !raceData.applied && (
 										<ConfirmModal
 											onConfirm={deleteRace}
 											text="Are you sure you want to cancel and delete this race?"

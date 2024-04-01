@@ -46,7 +46,7 @@ const Races: NextPageWithLayout = () => {
 		},
 		{
 			label: 'Disciplines',
-			renderCell: (item: RaceNode) => item.disciplines?.length || 0,
+			renderCell: (item: RaceNode) => item.disciplinesCount || 0,
 		},
 		{
 			label: 'Applied',

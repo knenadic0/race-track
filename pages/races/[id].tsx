@@ -43,14 +43,13 @@ const Race: NextPageWithLayout = () => {
 						<h1 className="flex h-10 items-center text-xl font-bold">{raceData && raceData.title}</h1>
 						{raceData &&
 							raceData.createdBy.id === auth.currentUser?.uid &&
-							// (new Date() <= raceData.applyUntil.toDate() && raceData.applied === 0 ? (
-							(new Date() <= raceData.dateTime ? (
+							(new Date() <= raceData.dateTime && !raceData.applied ? (
 								<Button href={`${manageRacesRoute}/${raceData.id}`} color={ButtonColor.Blue} text="Manage race">
 									<FiEdit />
 								</Button>
 							) : (
-								<Tooltip content="Race cannot be edited">
-									<Button color={ButtonColor.Disabled} text="Edit race">
+								<Tooltip content="Race cannot be managed (Someone applied)">
+									<Button color={ButtonColor.Disabled} text="Manage race">
 										<FiEdit />
 									</Button>
 								</Tooltip>

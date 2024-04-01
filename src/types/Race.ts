@@ -10,6 +10,7 @@ export type Race = {
 	disciplines?: Discipline[];
 	description: string;
 	applied: number;
+	disciplinesCount: number;
 	createdBy: DocumentReference;
 };
 
