@@ -11,9 +11,8 @@ import { useEffect, useState } from 'react';
 import { User } from '@datatypes/User';
 import { ErrorMessage } from '@hookform/error-message';
 import FormErrorMessage from './FormErrorMessage';
-import { DocumentData } from '@tatsuokaniwa/swr-firestore';
 import ConfirmModal from './ConfirmModal';
-import { ApplyData, ApplyForm, ShirtSize } from '@datatypes/Apply';
+import { ApplyForm, ShirtSize } from '@datatypes/Apply';
 import Tooltip from './Tooltip';
 
 const defaultApplyForm: ApplyForm = {
@@ -26,9 +25,8 @@ const Apply = ({ raceData, disciplines }: RaceProp) => {
 	const auth = getAuth(app);
 	const [applyButtonColor, setApplyButtonColor] = useState<ButtonColor>(ButtonColor.Disabled);
 	const [userData, setUserData] = useState<User>();
-	const [applyData, setApplyData] = useState<DocumentData<ApplyData>>();
 	const { userInfo } = useGetUser(auth.currentUser?.uid);
-	const { applyData: applyInfo } = useGetApply(disciplines || [], auth.currentUser?.uid);
+	const { applyData } = useGetApply(disciplines || [], auth.currentUser?.uid);
 	const {
 		register,
 		handleSubmit,
@@ -46,14 +44,13 @@ const Apply = ({ raceData, disciplines }: RaceProp) => {
 	}, [userInfo]);
 
 	useEffect(() => {
-		if (!applyData && applyInfo) {
-			setApplyData(applyInfo);
-			setValue('discipline', applyInfo.ref.parent.parent?.id || '');
-			setValue('club', applyInfo.club);
-			setValue('shirtSize', applyInfo.shirtSize);
+		if (applyData) {
+			setValue('discipline', applyData.ref.parent.parent?.id || '');
+			setValue('club', applyData.club);
+			setValue('shirtSize', applyData.shirtSize);
 			trigger();
 		}
-	}, [applyInfo]);
+	}, [applyData]);
 
 	const onFormSubmit = async (formData: ApplyForm) => {
 		setApplyButtonColor(ButtonColor.Disabled);
@@ -65,19 +62,13 @@ const Apply = ({ raceData, disciplines }: RaceProp) => {
 					error: 'An error occurred.',
 				});
 				setApplyButtonColor(ButtonColor.Blue);
-				setApplyData((prevState) =>
-					Object.assign({}, prevState, {
-						discipline: formData.discipline,
-						club: formData.club,
-						shirtSize: formData.shirtSize,
-					}),
-				);
 			} else {
 				await toastPromise(useApplyForRace(raceData.ref, formData, auth.currentUser.uid), {
 					loading: 'Applying...',
 					success: 'Applied for the race.',
 					error: 'An error occurred.',
 				});
+				setApplyButtonColor(ButtonColor.Blue);
 			}
 		}
 	};
@@ -89,7 +80,6 @@ const Apply = ({ raceData, disciplines }: RaceProp) => {
 				success: 'Apply cancelled.',
 				error: 'An error occurred.',
 			});
-			setApplyData(undefined);
 			reset();
 		}
 	};

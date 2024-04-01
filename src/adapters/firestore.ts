@@ -1,6 +1,13 @@
 import { useState, useEffect } from 'react';
 import { RaceForm, Race as RaceType } from '@datatypes/Race';
-import { useCollection, DocumentData as SwrDocumentData, useGetDoc, useGetDocs, DocumentData, useDoc } from '@tatsuokaniwa/swr-firestore';
+import {
+	useCollection,
+	DocumentData as SwrDocumentData,
+	useGetDoc,
+	DocumentData,
+	useDoc,
+	useCollectionGroup,
+} from '@tatsuokaniwa/swr-firestore';
 import { Discipline } from '@datatypes/Discipline';
 import {
 	DocumentReference,
@@ -263,32 +270,26 @@ const useUpdateApply = (oldApply: DocumentData<ApplyData>, applyData: ApplyForm)
 	return promise;
 };
 
-const useGetApply = (
-	disciplines: Discipline[],
-	userId?: string,
-): { applyData?: SwrDocumentData<ApplyData>; error?: FirestoreError; isLoading: boolean } => {
+const useGetApply = (disciplines: Discipline[], userId?: string): { applyData?: SwrDocumentData<ApplyData>; error?: FirestoreError } => {
 	const [applyData, setApplyData] = useState<DocumentData<ApplyData>>();
-	const [isLoading, setIsLoading] = useState<boolean>(true);
 	const [error, setError] = useState<FirestoreError>();
 
-	const response = useGetDocs<ApplyData>({
+	const response = useCollectionGroup<ApplyData>({
 		path: 'applied',
-		isCollectionGroup: true,
 	});
 
 	useEffect(() => {
-		if (!applyData && response.data && response.data.length && disciplines && disciplines.length && userId) {
+		if (response.data && response.data.length && disciplines && disciplines.length && userId) {
 			setApplyData(
 				response.data.find((apply) =>
 					disciplines.some((discipline) => discipline.id === apply.ref.parent.parent?.id && apply.user.id === userId),
 				),
 			);
 		}
-		setIsLoading(response.isLoading);
 		setError(response.error);
 	}, [response]);
 
-	return { applyData, error, isLoading };
+	return { applyData, error };
 };
 
 const useCancelApply = (applyRef: DocumentReference): Promise<void> => {
