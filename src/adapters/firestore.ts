@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { RaceForm, Race as RaceType } from '@datatypes/Race';
-import { useCollection, DocumentData as SwrDocumentData, useGetDoc, useGetDocs, DocumentData } from '@tatsuokaniwa/swr-firestore';
+import { useCollection, DocumentData as SwrDocumentData, useGetDoc, useGetDocs, DocumentData, useDoc } from '@tatsuokaniwa/swr-firestore';
 import { Discipline } from '@datatypes/Discipline';
 import {
 	DocumentReference,
@@ -11,46 +11,39 @@ import {
 	doc,
 	getDocs,
 	runTransaction,
-	setDoc,
 	writeBatch,
 } from 'firebase/firestore';
 import { User } from '@datatypes/User';
 import { firestore } from './firebase';
-import { ApplyData, ApplyForm } from '@components/Apply';
+import { ApplyData, ApplyForm } from '@datatypes/Apply';
 
-const useGetUser = (id?: string): { userInfo?: User; error?: FirestoreError; isLoading: boolean } => {
-	const [userInfo, setInfo] = useState<User>();
-	const [isLoading, setIsLoading] = useState<boolean>(true);
+const useGetUser = (id?: string): { userInfo?: SwrDocumentData<User>; error?: FirestoreError } => {
+	const [userInfo, setInfo] = useState<SwrDocumentData<User>>();
 	const [error, setError] = useState<FirestoreError>();
 
-	const response = useGetDoc<User>({
+	const response = useDoc<User>({
 		path: `users/${id}`,
 	});
 
 	useEffect(() => {
 		setInfo(response.data);
-		if (id && !response.data && !response.isLoading && !error) {
-			const err: FirestoreError = {
-				code: 'not-found',
-				message: 'Not found',
-				name: 'Not found',
-			};
-			setError(err);
-		}
-		setIsLoading(response.isLoading);
+		setError(response.error);
 	}, [response]);
 
-	return { userInfo, error, isLoading };
+	return { userInfo, error };
 };
 
 const useSetUser = (uid: string, userData: User): Promise<void> => {
-	const userDocRef = doc(firestore, 'users', uid);
-	const data = {
-		fullName: userData.fullName,
-		birthDate: userData.birthDate,
-		gender: userData.gender,
-	};
-	return setDoc(userDocRef, data, { merge: true });
+	const promise = runTransaction(firestore, async (transaction) => {
+		const userDocRef = doc(firestore, 'users', uid);
+		const data = {
+			fullName: userData.fullName,
+			birthDate: userData.birthDate,
+			gender: userData.gender,
+		};
+		transaction.set(userDocRef, data, { merge: true });
+	});
+	return promise;
 };
 
 const useGetRace = (id?: string | string[]): { raceData?: SwrDocumentData<RaceType>; error?: FirestoreError; isLoading: boolean } => {
@@ -81,27 +74,60 @@ const useGetRace = (id?: string | string[]): { raceData?: SwrDocumentData<RaceTy
 	return { raceData, error, isLoading };
 };
 
+const useGetRaceLive = (id?: string | string[]): { raceData?: SwrDocumentData<RaceType>; error?: FirestoreError } => {
+	const [timeoutError, setTimeoutError] = useState<FirestoreError | undefined>(undefined);
+	const { data: raceData, error } = useDoc<RaceType>({
+		path: `races/${id}`,
+		parseDates: ['dateTime', 'applyUntil'],
+	});
+
+	useEffect(() => {
+		const timeoutId = setTimeout(() => {
+			if (!raceData && !error) {
+				setTimeoutError({
+					code: 'not-found',
+					message: 'Not found',
+					name: 'Not found',
+				});
+			}
+		}, 3000);
+
+		return () => clearTimeout(timeoutId);
+	}, [raceData, error]);
+
+	return { raceData, error: error || timeoutError };
+};
+
 const useGetDisciplines = (id?: string | string[]): { disciplines?: Discipline[]; error?: FirestoreError } => {
-	const [disciplines, setDisciplines] = useState<Discipline[]>();
-	const [error, setError] = useState<FirestoreError>();
-	const response = useCollection<Discipline>({
+	const [timeoutError, setTimeoutError] = useState<FirestoreError | undefined>(undefined);
+
+	const { data: disciplines, error } = useCollection<Discipline>({
 		path: `races/${id}/disciplines`,
 		orderBy: [['length', 'asc']],
 	});
 
 	useEffect(() => {
-		setDisciplines(response.data);
-		setError(response.error);
-	}, [response]);
+		const timeoutId = setTimeout(() => {
+			if (!disciplines && !error) {
+				setTimeoutError({
+					code: 'not-found',
+					message: 'Not found',
+					name: 'Not found',
+				});
+			}
+		}, 3000);
 
-	return { disciplines, error };
+		return () => clearTimeout(timeoutId);
+	}, [disciplines, error]);
+
+	return { disciplines, error: error || timeoutError };
 };
 
 const useGetRaces = (): { races?: RaceType[]; error?: FirestoreError } => {
-	const [races, setRaces] = useState<RaceType[]>();
-	const [error, setError] = useState<FirestoreError>();
+	const [timeoutError, setTimeoutError] = useState<FirestoreError | undefined>(undefined);
+
 	const [date] = useState(new Date());
-	const response = useCollection<RaceType>({
+	const { data: races, error } = useCollection<RaceType>({
 		path: 'races',
 		where: [['dateTime', '>', date]],
 		orderBy: [['dateTime', 'asc']],
@@ -109,15 +135,20 @@ const useGetRaces = (): { races?: RaceType[]; error?: FirestoreError } => {
 	});
 
 	useEffect(() => {
-		if (!races && response.data) {
-			setRaces(response.data);
-		}
-		if (!error && response.error) {
-			setError(response.error);
-		}
-	}, [response]);
+		const timeoutId = setTimeout(() => {
+			if (!races && !error) {
+				setTimeoutError({
+					code: 'not-found',
+					message: 'Not found',
+					name: 'Not found',
+				});
+			}
+		}, 3000);
 
-	return { races, error };
+		return () => clearTimeout(timeoutId);
+	}, [races, error]);
+
+	return { races, error: error || timeoutError };
 };
 
 const useAddRace = (raceData: RaceForm, userId: string): Promise<void> => {
@@ -276,6 +307,7 @@ export {
 	useGetUser,
 	useSetUser,
 	useGetRace,
+	useGetRaceLive,
 	useGetDisciplines,
 	useGetRaces,
 	useAddRace,

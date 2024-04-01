@@ -9,12 +9,12 @@ import { getAuth } from 'firebase/auth';
 import { app } from '@adapters/firebase';
 import { useEffect, useState } from 'react';
 import { User } from '@datatypes/User';
-import { Tooltip } from 'flowbite-react';
 import { ErrorMessage } from '@hookform/error-message';
 import FormErrorMessage from './FormErrorMessage';
 import { DocumentData } from '@tatsuokaniwa/swr-firestore';
 import ConfirmModal from './ConfirmModal';
 import { ApplyData, ApplyForm, ShirtSize } from '@datatypes/Apply';
+import Tooltip from './Tooltip';
 
 const defaultApplyForm: ApplyForm = {
 	discipline: '',

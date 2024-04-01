@@ -17,10 +17,10 @@ import Card from '@components/Card';
 import FormErrorMessage from '@components/FormErrorMessage';
 import { racesRoute } from '@constants/routes';
 import toast from 'react-hot-toast';
-import { Tooltip } from 'flowbite-react';
 import { wait } from '@helpers/wait';
 import ConfirmModal from '@components/ConfirmModal';
 import { toastPromise } from '@helpers/toast';
+import Tooltip from '@components/Tooltip';
 
 const now = new Date(Date.now());
 const minStartDate = new Date(now.setDate(now.getDate() + 7)).toISOString().substring(0, 16);
@@ -236,7 +236,7 @@ const ManageRace: NextPageWithLayout = () => {
 														step={0.1}
 														type="number"
 													/>
-													<Tooltip content="Remove discipline" placement="left">
+													<Tooltip content="Remove discipline" placement="left" delayed>
 														<div className="flex h-full">
 															<ConfirmModal
 																onConfirm={() => remove(selectedDisciplineRef.current)}
@@ -254,7 +254,7 @@ const ManageRace: NextPageWithLayout = () => {
 												</li>
 											))}
 										</ul>
-										<Tooltip content="Add discipline" placement="right">
+										<Tooltip content="Add discipline" placement="right" delayed>
 											<div className="flex h-full">
 												<button
 													type="button"

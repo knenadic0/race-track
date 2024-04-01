@@ -17,12 +17,13 @@ import { useForm } from 'react-hook-form';
 import { ErrorMessage } from '@hookform/error-message';
 import FormErrorMessage from '@components/FormErrorMessage';
 import { toastPromise } from '@helpers/toast';
+import { DocumentData } from '@tatsuokaniwa/swr-firestore';
 
 const Profile: NextPageWithLayout = () => {
 	const auth = getAuth(app);
 	const [user] = useAuthState(auth);
 	const router = useRouter();
-	const [userData, setUserData] = useState<User>();
+	const [userData, setUserData] = useState<DocumentData<User>>();
 	const {
 		register,
 		setValue,
@@ -31,13 +32,13 @@ const Profile: NextPageWithLayout = () => {
 		formState: { errors },
 	} = useForm<User>();
 
-	const logOut = () => {
-		auth.signOut();
+	const logOut = async () => {
+		await auth.signOut();
 		Cookies.remove('user');
 		router.push(loginRoute);
 	};
 
-	const { userInfo, isLoading, error } = useGetUser(user?.uid);
+	const { userInfo, error } = useGetUser(user?.uid);
 
 	useEffect(() => {
 		if (!userData && userInfo && !error) {
@@ -47,10 +48,13 @@ const Profile: NextPageWithLayout = () => {
 			setValue('gender', userInfo.gender);
 			trigger();
 		}
-		if (!userData && !userInfo && error) {
-			setValue('fullName', user?.displayName || '');
-		}
 	}, [userInfo, error]);
+
+	useEffect(() => {
+		if (user && !userData) {
+			setValue('fullName', user.displayName || '');
+		}
+	}, [user]);
 
 	const onFormSubmit = async (formData: User) => {
 		if (user) {
@@ -65,7 +69,7 @@ const Profile: NextPageWithLayout = () => {
 	return (
 		<div className="main-container">
 			<div className="flex w-full flex-1 flex-col items-center justify-center px-5 text-center sm:my-8 sm:w-auto">
-				{!userInfo && !error && (isLoading || !user) ? (
+				{!userInfo && !error && !user ? (
 					<Loader container={LoaderContainer.Page} />
 				) : (
 					<Card size="small" className="w-full p-6 text-left text-lg sm:w-auto">
