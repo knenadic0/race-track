@@ -6,7 +6,7 @@ import Cookies from 'js-cookie';
 import { NextPageWithLayout } from './_app';
 import { ReactElement, useState, useEffect } from 'react';
 import Layout from '@components/Layout';
-import { FiSave, FiLogOut } from 'react-icons/fi';
+import { LuSave, LuLogOut } from 'react-icons/lu';
 import { User, userFormFields } from '@datatypes/User';
 import Loader, { LoaderContainer } from '@components/Loader';
 import Button, { ButtonColor } from '@components/Button';
@@ -169,10 +169,10 @@ const Profile: NextPageWithLayout = () => {
 							</div>
 							<div className="mt-8 flex justify-center gap-x-2 sm:gap-x-5">
 								<Button onClick={handleSubmit(onFormSubmit)} color={ButtonColor.Blue} text="Save">
-									<FiSave />
+									<LuSave />
 								</Button>
 								<Button onClick={logOut} color={ButtonColor.Red} text="Sign out">
-									<FiLogOut />
+									<LuLogOut />
 								</Button>
 							</div>
 						</form>

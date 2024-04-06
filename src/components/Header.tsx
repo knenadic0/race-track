@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import Image from 'next/image';
 import { championshipRoute, profileRoute, racesRoute, resultsRoute } from '@constants/routes';
-import { FiMenu, FiUser, FiX } from 'react-icons/fi';
+import { LuMenu, LuUser, LuX } from 'react-icons/lu';
 
 const navigationLinks = [
 	{ name: 'Races', href: racesRoute, current: false, main: true },
@@ -42,9 +42,9 @@ const Header = () => {
 									<span className="absolute -inset-0.5" />
 									<span className="sr-only">Open main menu</span>
 									{open ? (
-										<FiX className="block h-6 w-6" aria-hidden="true" />
+										<LuX className="block h-6 w-6" aria-hidden="true" />
 									) : (
-										<FiMenu className="block h-6 w-6" aria-hidden="true" />
+										<LuMenu className="block h-6 w-6" aria-hidden="true" />
 									)}
 								</Disclosure.Button>
 							</div>
@@ -87,7 +87,7 @@ const Header = () => {
 												href={item.href}
 											>
 												<span className="absolute -inset-1.5" />
-												<FiUser className="h-8 w-8 stroke-rt-black" />
+												<LuUser className="h-8 w-8 stroke-rt-black" />
 											</Link>
 										</div>
 									))}

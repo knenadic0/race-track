@@ -1,6 +1,6 @@
-import * as TYPES from '@table-library/react-table-library/types/table';
 import { User } from './User';
 import { Race } from './Race';
+import { TableNode } from '@table-library/react-table-library';
 
 export type Result = {
 	id: string;
@@ -12,4 +12,4 @@ export type Result = {
 	finished?: Date;
 };
 
-export type ResultNode = TYPES.TableNode & Result;
+export type ResultNode = TableNode & Result;

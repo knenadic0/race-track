@@ -6,7 +6,7 @@ type ToastProps = {
 	loading: Renderable;
 };
 
-const toastPromise = (promise: Promise<unknown>, props: ToastProps) =>
+export const toastPromise = (promise: Promise<unknown>, props: ToastProps) =>
 	toast.promise(promise, props, {
 		success: {
 			duration: 4000,
@@ -15,5 +15,3 @@ const toastPromise = (promise: Promise<unknown>, props: ToastProps) =>
 			duration: 4000,
 		},
 	});
-
-export { toastPromise };

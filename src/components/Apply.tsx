@@ -2,7 +2,7 @@ import Loader, { LoaderContainer } from './Loader';
 import { RaceProp } from './Info';
 import { useForm } from 'react-hook-form';
 import Button, { ButtonColor } from './Button';
-import { FiCheckSquare, FiXCircle } from 'react-icons/fi';
+import { LuCheckSquare, LuXSquare } from 'react-icons/lu';
 import { toastPromise } from '@helpers/toast';
 import { useApplyForRace, useCancelApply, useGetApply, useGetUser, useUpdateApply } from '@adapters/firestore';
 import { getAuth } from 'firebase/auth';
@@ -39,7 +39,9 @@ const Apply = ({ raceData, disciplines }: RaceProp) => {
 	useEffect(() => {
 		if (!userData && userInfo) {
 			setUserData(userInfo);
-			setApplyButtonColor(ButtonColor.Blue);
+			if (raceData && new Date() <= raceData.applyUntil) {
+				setApplyButtonColor(ButtonColor.Blue);
+			}
 		}
 	}, [userInfo]);
 
@@ -86,7 +88,7 @@ const Apply = ({ raceData, disciplines }: RaceProp) => {
 
 	const ApplyButton = () => (
 		<Button onClick={handleSubmit(onFormSubmit)} text={applyData ? 'Update' : 'Apply'} color={applyButtonColor}>
-			<FiCheckSquare />
+			<LuCheckSquare />
 		</Button>
 	);
 
@@ -157,7 +159,12 @@ const Apply = ({ raceData, disciplines }: RaceProp) => {
 					))}
 				</div>
 				<div className="mt-8 flex justify-center gap-x-2 sm:gap-x-5">
-					{userData && <ApplyButton />}
+					{userData && new Date() <= raceData.applyUntil && <ApplyButton />}
+					{userData && new Date() > raceData.applyUntil && (
+						<Tooltip content="Applies are closed.">
+							<ApplyButton />
+						</Tooltip>
+					)}
 					{!userData && (
 						<Tooltip content="Update profile in order to apply.">
 							<ApplyButton />
@@ -168,7 +175,7 @@ const Apply = ({ raceData, disciplines }: RaceProp) => {
 							onConfirm={cancelApply}
 							text="Are you sure you want to cancel apply for this race?"
 							type="warning"
-							buttonComponentProps={{ text: 'Cancel apply', color: ButtonColor.Red, children: <FiXCircle /> }}
+							buttonComponentProps={{ text: 'Cancel apply', color: ButtonColor.Red, children: <LuXSquare /> }}
 						/>
 					)}
 				</div>

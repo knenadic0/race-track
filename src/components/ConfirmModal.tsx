@@ -2,7 +2,7 @@ import { ExclusiveOr } from '@datatypes/ExclusiveOr';
 import Button, { ButtonColor, ButtonProps } from './Button';
 import { Modal } from 'flowbite-react';
 import { ButtonHTMLAttributes, DetailedHTMLProps, MouseEvent, PropsWithChildren, useState } from 'react';
-import { FiAlertCircle, FiInfo } from 'react-icons/fi';
+import { LuAlertCircle, LuInfo } from 'react-icons/lu';
 
 export type ConfirmModalProps = {
 	text: string;
@@ -22,9 +22,9 @@ const ConfirmModal = ({ text, onConfirm, type, buttonProps, buttonComponentProps
 	const yesButtonColor = type === 'info' ? ButtonColor.Blue : ButtonColor.Red;
 	const icon =
 		type === 'info' ? (
-			<FiInfo className="mx-auto mb-4 h-14 w-14 text-rt-black" />
+			<LuInfo className="mx-auto mb-4 h-14 w-14 text-rt-black" />
 		) : (
-			<FiAlertCircle className="mx-auto mb-4 h-14 w-14 text-rt-black" />
+			<LuAlertCircle className="mx-auto mb-4 h-14 w-14 text-rt-black" />
 		);
 	const onYesButtonClick = () => {
 		setIsOpen(false);

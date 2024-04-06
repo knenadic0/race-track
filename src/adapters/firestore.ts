@@ -22,7 +22,8 @@ import {
 } from 'firebase/firestore';
 import { User } from '@datatypes/User';
 import { firestore } from './firebase';
-import { ApplyData, ApplyForm } from '@datatypes/Apply';
+import { Applied, ApplyData, ApplyForm } from '@datatypes/Apply';
+import { calculateAge } from '@helpers/date';
 
 const useGetUser = (id?: string): { userInfo?: SwrDocumentData<User>; error?: FirestoreError } => {
 	const [userInfo, setInfo] = useState<SwrDocumentData<User>>();
@@ -229,9 +230,15 @@ const useRemoveRace = (uid: string): Promise<void> => {
 
 const useApplyForRace = (raceRef: DocumentReference, applyData: ApplyForm, userId: string): Promise<void> => {
 	const promise = runTransaction(firestore, async (transaction) => {
+		const userRef = doc(firestore, 'users', userId);
+		const user = await transaction.get(userRef);
+		const age = calculateAge(user.data()?.birthDate);
 		const applyRef = doc(collection(doc(collection(raceRef, 'disciplines'), applyData.discipline), 'applied'), userId);
 		const data = {
-			user: doc(firestore, 'users', userId),
+			user: userRef,
+			gender: user.data()?.gender,
+			age: age,
+			racer: user.data()?.fullName,
 			club: applyData.club,
 			shirtSize: applyData.shirtSize,
 		};
@@ -258,8 +265,14 @@ const useUpdateApply = (oldApply: DocumentData<ApplyData>, applyData: ApplyForm)
 				collection(doc(collection(firestore, oldApply.ref.parent.parent!.parent.path), applyData.discipline), 'applied'),
 				oldApply.user.id,
 			);
+			const userRef = doc(firestore, 'users', oldApply.user.id);
+			const user = await transaction.get(userRef);
+			const age = calculateAge(user.data()?.birthDate);
 			const data = {
-				user: oldApply.user,
+				user: userRef,
+				gender: user.data()?.gender,
+				age: age,
+				racer: user.data()?.fullName,
 				club: applyData.club,
 				shirtSize: applyData.shirtSize,
 			};
@@ -306,6 +319,31 @@ const useCancelApply = (applyRef: DocumentReference): Promise<void> => {
 	return promise;
 };
 
+const useGetApplied = (raceId?: string, disciplineId?: string): { applied?: Applied[]; error?: FirestoreError } => {
+	const [timeoutError, setTimeoutError] = useState<FirestoreError>();
+
+	const { data: applied, error } = useCollection<Applied>({
+		path: `races/${raceId}/disciplines/${disciplineId}/applied`,
+		orderBy: [['racer', 'asc']],
+	});
+
+	useEffect(() => {
+		const timeoutId = setTimeout(() => {
+			if (!applied && !error) {
+				setTimeoutError({
+					code: 'not-found',
+					message: 'Not found',
+					name: 'Not found',
+				});
+			}
+		}, 3000);
+
+		return () => clearTimeout(timeoutId);
+	}, [applied, error]);
+
+	return { applied, error: error || timeoutError };
+};
+
 export {
 	useGetUser,
 	useSetUser,
@@ -320,4 +358,5 @@ export {
 	useUpdateApply,
 	useGetApply,
 	useCancelApply,
+	useGetApplied,
 };

@@ -1,48 +1,35 @@
 import Link from 'next/link';
 import { NextPageWithLayout } from '../_app';
-import { ReactElement, useState, useEffect } from 'react';
+import { ReactElement } from 'react';
 import { app } from '@adapters/firebase';
 import Layout from '@components/Layout';
-import { FiPlusCircle } from 'react-icons/fi';
+import { LuPlusSquare } from 'react-icons/lu';
 import { RaceNode } from '@datatypes/Race';
-import * as TYPES from '@table-library/react-table-library/types/table';
 import { getAuth } from 'firebase/auth';
 import dateFormat from 'dateformat';
 import Loader, { LoaderContainer } from '@components/Loader';
 import Pill from '@components/Pill';
 import Button, { ButtonColor } from '@components/Button';
 import { useGetRaces } from '@adapters/firestore';
-import PaginatedTable from '@components/Paging';
+import DataTable from '@components/DataTable';
 import Card from '@components/Card';
 import { manageRacesRoute, racesRoute } from '@constants/routes';
+import { TableNode } from '@table-library/react-table-library';
 
 const Races: NextPageWithLayout = () => {
-	const [data, setData] = useState<TYPES.Data<RaceNode>>({
-		pageInfo: null,
-		nodes: [],
-	});
 	getAuth(app);
 	const { races } = useGetRaces();
-
-	useEffect(() => {
-		if (races) {
-			setData({
-				nodes: races.map((race) => ({
-					...race,
-					nodes: null,
-				})),
-			});
-		}
-	}, [races]);
 
 	const columns = [
 		{
 			label: 'Title',
 			renderCell: (item: RaceNode) => <Link href={`${racesRoute}/${item.id}`}>{item.title}</Link>,
+			sort: { sortKey: 'title' },
 		},
 		{
 			label: 'Date & time',
 			renderCell: (item: RaceNode) => dateFormat(item.dateTime, 'dd.mm.yyyy. HH:MM'),
+			sort: { sortKey: 'dateTime' },
 		},
 		{
 			label: 'Disciplines',
@@ -51,27 +38,46 @@ const Races: NextPageWithLayout = () => {
 		{
 			label: 'Applied',
 			renderCell: (item: RaceNode) => item.applied || 0,
+			sort: { sortKey: 'applied' },
 		},
 		{
 			label: 'Applying',
 			renderCell: (item: RaceNode) =>
 				new Date() <= item.applyUntil ? <Pill color="green" text="Open" /> : <Pill color="red" text="Closed" />,
+			sort: { sortKey: 'applying' },
 		},
 	];
+
+	const sortFns = {
+		title: (array: TableNode[]) => array.sort((a, b) => a.title.localeCompare(b.title)),
+		dateTime: (array: TableNode[]) => array.sort((a, b) => a.dateTime.getTime() - b.dateTime.getTime()),
+		applied: (array: TableNode[]) => array.sort((a, b) => a.applied - b.applied),
+		applying: (array: TableNode[]) => array.sort((a, b) => a.applyUntil.getTime() - b.applyUntil.getTime()),
+	};
 
 	return (
 		<div className="main-container">
 			<Card size="big" className="justify-between lg:px-8 lg:py-7">
 				<h1 className="flex items-center text-xl font-bold">Upcoming races</h1>
 				<Button color={ButtonColor.Blue} text="Add race" href={manageRacesRoute}>
-					<FiPlusCircle />
+					<LuPlusSquare />
 				</Button>
 			</Card>
 			<Card size="big" className="flex-col">
-				{!data.nodes.length ? (
+				{!races ? (
 					<Loader container={LoaderContainer.Component} />
 				) : (
-					<PaginatedTable columns={columns} data={data} pageSize={10} templateColumns="40% 18% repeat(3, minmax(0, 1fr))" />
+					<DataTable
+						columns={columns}
+						data={races}
+						pageSize={10}
+						sortFns={sortFns}
+						searchableFields={['title']}
+						defaultSortKey="dateTime"
+						templateColumns="minmax(220px, 3fr) minmax(200px, 2fr) repeat(3, minmax(110px, 1fr))"
+						fixedHeader
+						searchPhrase="Search races..."
+					/>
 				)}
 			</Card>
 		</div>

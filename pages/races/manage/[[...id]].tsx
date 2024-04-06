@@ -4,7 +4,7 @@ import { ReactElement, useState, useEffect, useRef } from 'react';
 import { getAuth } from 'firebase/auth';
 import { Controller, useFieldArray, useForm } from 'react-hook-form';
 import { ErrorMessage } from '@hookform/error-message';
-import { FiArrowLeft, FiPlusCircle, FiSave, FiTrash2, FiXCircle } from 'react-icons/fi';
+import { LuArrowLeftSquare, LuPlusCircle, LuSave, LuTrash2, LuXCircle } from 'react-icons/lu';
 import { app } from '@adapters/firebase';
 import { Race, RaceForm, raceFormFields } from '@datatypes/Race';
 import Layout from '@components/Layout';
@@ -139,11 +139,11 @@ const ManageRace: NextPageWithLayout = () => {
 						<Tooltip content="Discarding changes">
 							{!isNew ? (
 								<Button color={ButtonColor.Blue} href={`${racesRoute}/${raceData?.id}`} text="Back to race">
-									<FiArrowLeft />
+									<LuArrowLeftSquare />
 								</Button>
 							) : (
 								<Button color={ButtonColor.Blue} href={racesRoute} text="Back to races">
-									<FiArrowLeft />
+									<LuArrowLeftSquare />
 								</Button>
 							)}
 						</Tooltip>
@@ -246,7 +246,7 @@ const ManageRace: NextPageWithLayout = () => {
 																	type: 'button',
 																	onClick: () => (selectedDisciplineRef.current = index),
 																	className: 'text-rt-red hover:text-rt-dark-red',
-																	children: <FiXCircle className="h-6 w-6" />,
+																	children: <LuXCircle className="h-6 w-6" />,
 																}}
 															/>
 														</div>
@@ -261,7 +261,7 @@ const ManageRace: NextPageWithLayout = () => {
 													onClick={() => append({ title: '', length: undefined })}
 													className="text-rt-blue hover:text-rt-dark-blue"
 												>
-													<FiPlusCircle className="h-6 w-6" />
+													<LuPlusCircle className="h-6 w-6" />
 												</button>
 											</div>
 										</Tooltip>
@@ -297,22 +297,21 @@ const ManageRace: NextPageWithLayout = () => {
 									))}
 								</div>
 								<div className="mt-8 flex justify-center gap-x-2 sm:gap-x-5">
-									{isNew ||
-										(raceData && new Date() <= raceData.dateTime && !raceData.applied && (
-											<Button onClick={handleSubmit(onFormSubmit)} text="Save" color={ButtonColor.Blue}>
-												<FiSave />
-											</Button>
-										))}
+									{(isNew || (raceData && new Date() <= raceData.dateTime && !raceData.applied)) && (
+										<Button onClick={handleSubmit(onFormSubmit)} text="Save" color={ButtonColor.Blue}>
+											<LuSave />
+										</Button>
+									)}
 									{raceData && (new Date() > raceData.dateTime || raceData.applied) && (
 										<>
 											<Tooltip content="Race cannot be edited">
 												<Button text="Save" color={ButtonColor.Disabled}>
-													<FiSave />
+													<LuSave />
 												</Button>
 											</Tooltip>
 											<Tooltip content="Race cannot be canceled">
 												<Button text="Cancel race" color={ButtonColor.Disabled}>
-													<FiTrash2 />
+													<LuTrash2 />
 												</Button>
 											</Tooltip>
 										</>
@@ -322,7 +321,7 @@ const ManageRace: NextPageWithLayout = () => {
 											onConfirm={deleteRace}
 											text="Are you sure you want to cancel and delete this race?"
 											type="warning"
-											buttonComponentProps={{ text: 'Cancel race', color: ButtonColor.Red, children: <FiTrash2 /> }}
+											buttonComponentProps={{ text: 'Cancel race', color: ButtonColor.Red, children: <LuTrash2 /> }}
 										/>
 									)}
 								</div>

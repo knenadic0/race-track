@@ -4,7 +4,7 @@ import { ReactElement } from 'react';
 import { app } from '@adapters/firebase';
 import Layout from '@components/Layout';
 import { getAuth } from 'firebase/auth';
-import { FiEdit } from 'react-icons/fi';
+import { LuCheckSquare, LuPenSquare, LuInfo, LuList } from 'react-icons/lu';
 import Info from '@components/Info';
 import Error from '@components/Error';
 import Button, { ButtonColor } from '@components/Button';
@@ -15,17 +15,37 @@ import Apply from '@components/Apply';
 import Tooltip from '@components/Tooltip';
 import UnderlineTabs from '@components/UnderlineTabs';
 import { Tabs } from 'flowbite-react';
+import { IconType } from 'react-icons';
+import Applied from '@components/Applied';
+
+type Tab = {
+	name: string;
+	icon: IconType;
+	component: JSX.Element;
+};
 
 const Race: NextPageWithLayout = () => {
 	const auth = getAuth(app);
 	const router = useRouter();
 	const { raceData, error } = useGetRaceLive(router.query['id']);
 	const { disciplines } = useGetDisciplines(router.query['id']);
-	const tabs = {
-		Info: <Info raceData={raceData} disciplines={disciplines} />,
-		Apply: <Apply raceData={raceData} disciplines={disciplines} />,
-		Applied: null,
-	};
+	const tabs: Tab[] = [
+		{
+			name: 'Info',
+			icon: LuInfo,
+			component: <Info raceData={raceData} disciplines={disciplines} />,
+		},
+		{
+			name: 'Apply',
+			icon: LuCheckSquare,
+			component: <Apply raceData={raceData} disciplines={disciplines} />,
+		},
+		{
+			name: 'Applied',
+			icon: LuList,
+			component: <Applied raceData={raceData} disciplines={disciplines} />,
+		},
+	];
 
 	return (
 		<div className="main-container">
@@ -45,20 +65,22 @@ const Race: NextPageWithLayout = () => {
 							raceData.createdBy.id === auth.currentUser?.uid &&
 							(new Date() <= raceData.dateTime && !raceData.applied ? (
 								<Button href={`${manageRacesRoute}/${raceData.id}`} color={ButtonColor.Blue} text="Manage race">
-									<FiEdit />
+									<LuPenSquare />
 								</Button>
 							) : (
 								<Tooltip content="Race cannot be managed (Someone applied)">
 									<Button color={ButtonColor.Disabled} text="Manage race">
-										<FiEdit />
+										<LuPenSquare />
 									</Button>
 								</Tooltip>
 							))}
 					</Card>
 					<Card size="big" className="flex-col sm:pt-4 lg:pt-4">
 						<UnderlineTabs style="underline">
-							{Object.entries(tabs).map(([key, value]) => (
-								<Tabs.Item title={key}>{value}</Tabs.Item>
+							{tabs.map(({ name, icon, component }) => (
+								<Tabs.Item title={name} icon={icon}>
+									{component}
+								</Tabs.Item>
 							))}
 						</UnderlineTabs>
 					</Card>
