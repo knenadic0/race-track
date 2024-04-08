@@ -78,7 +78,7 @@ const Race: NextPageWithLayout = () => {
 					<Card size="big" className="flex-col sm:pt-4 lg:pt-4">
 						<UnderlineTabs style="underline">
 							{tabs.map(({ name, icon, component }) => (
-								<Tabs.Item title={name} icon={icon}>
+								<Tabs.Item title={name} icon={icon} key={name}>
 									{component}
 								</Tabs.Item>
 							))}

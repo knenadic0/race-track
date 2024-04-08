@@ -39,11 +39,14 @@ const Apply = ({ raceData, disciplines }: RaceProp) => {
 	useEffect(() => {
 		if (!userData && userInfo) {
 			setUserData(userInfo);
-			if (raceData && new Date() <= raceData.applyUntil) {
-				setApplyButtonColor(ButtonColor.Blue);
-			}
 		}
 	}, [userInfo]);
+
+	useEffect(() => {
+		if (userInfo && raceData && new Date() <= raceData.applyUntil) {
+			setApplyButtonColor(ButtonColor.Blue);
+		}
+	}, [userInfo, raceData]);
 
 	useEffect(() => {
 		if (applyData) {
