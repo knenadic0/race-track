@@ -1,13 +1,6 @@
 import { useState, useEffect } from 'react';
 import { RaceForm, Race as RaceType } from '@datatypes/Race';
-import {
-	useCollection,
-	DocumentData as SwrDocumentData,
-	useGetDoc,
-	DocumentData,
-	useDoc,
-	useCollectionGroup,
-} from '@tatsuokaniwa/swr-firestore';
+import { useCollection, useGetDoc, DocumentData, useDoc, useCollectionGroup } from '@tatsuokaniwa/swr-firestore';
 import { Discipline } from '@datatypes/Discipline';
 import {
 	DocumentReference,
@@ -24,13 +17,13 @@ import {
 } from 'firebase/firestore';
 import { User } from '@datatypes/User';
 import { firestore } from './firebase';
-import { Applied, ApplyData, ApplyForm } from '@datatypes/Apply';
+import { Applied, ApplyForm } from '@datatypes/Apply';
 import { calculateAge } from '@helpers/date';
 import { DocumentId, Paths, ValueOf } from '@tatsuokaniwa/swr-firestore/dist/util/type';
 import { Result } from '@datatypes/Result';
 
-const useGetUser = (id?: string): { userInfo?: SwrDocumentData<User>; error?: FirestoreError } => {
-	const [userInfo, setInfo] = useState<SwrDocumentData<User>>();
+const useGetUser = (id?: string): { userInfo?: DocumentData<User>; error?: FirestoreError } => {
+	const [userInfo, setInfo] = useState<DocumentData<User>>();
 	const [error, setError] = useState<FirestoreError>();
 
 	const response = useDoc<User>({
@@ -58,8 +51,8 @@ const useSetUser = (uid: string, userData: User): Promise<void> => {
 	return promise;
 };
 
-const useGetRace = (id?: string | string[]): { raceData?: SwrDocumentData<RaceType>; error?: FirestoreError; isLoading: boolean } => {
-	const [raceData, setData] = useState<SwrDocumentData<RaceType>>();
+const useGetRace = (id?: string | string[]): { raceData?: DocumentData<RaceType>; error?: FirestoreError; isLoading: boolean } => {
+	const [raceData, setData] = useState<DocumentData<RaceType>>();
 	const [isLoading, setIsLoading] = useState<boolean>(true);
 	const [error, setError] = useState<FirestoreError>();
 	const response = useGetDoc<RaceType>({
@@ -86,7 +79,7 @@ const useGetRace = (id?: string | string[]): { raceData?: SwrDocumentData<RaceTy
 	return { raceData, error, isLoading };
 };
 
-const useGetRaceLive = (id?: string | string[]): { raceData?: SwrDocumentData<RaceType>; error?: FirestoreError } => {
+const useGetRaceLive = (id?: string | string[]): { raceData?: DocumentData<RaceType>; error?: FirestoreError } => {
 	const [timeoutError, setTimeoutError] = useState<FirestoreError | undefined>(undefined);
 	const { data: raceData, error } = useDoc<RaceType>({
 		path: `races/${id}`,
@@ -248,7 +241,6 @@ const useApplyForRace = (raceRef: DocumentReference, applyData: ApplyForm, userI
 		const age = calculateAge(user.data()?.birthDate);
 		const applyRef = doc(collection(doc(collection(raceRef, 'disciplines'), applyData.discipline), 'applied'), userId);
 		const data = {
-			user: userRef,
 			gender: user.data()?.gender,
 			age: age,
 			racer: user.data()?.fullName,
@@ -266,7 +258,7 @@ const useApplyForRace = (raceRef: DocumentReference, applyData: ApplyForm, userI
 	return promise;
 };
 
-const useUpdateApply = (oldApply: DocumentData<ApplyData>, applyData: ApplyForm): Promise<void> => {
+const useUpdateApply = (oldApply: DocumentData<ApplyForm>, applyData: ApplyForm): Promise<void> => {
 	const promise = runTransaction(firestore, async (transaction) => {
 		if (oldApply.ref.parent.parent?.id === applyData.discipline) {
 			transaction.update(oldApply.ref, {
@@ -276,13 +268,12 @@ const useUpdateApply = (oldApply: DocumentData<ApplyData>, applyData: ApplyForm)
 		} else {
 			const applyRef = doc(
 				collection(doc(collection(firestore, oldApply.ref.parent.parent!.parent.path), applyData.discipline), 'applied'),
-				oldApply.user.id,
+				oldApply.id,
 			);
-			const userRef = doc(firestore, 'users', oldApply.user.id);
+			const userRef = doc(firestore, 'users', oldApply.id);
 			const user = await transaction.get(userRef);
 			const age = calculateAge(user.data()?.birthDate);
 			const data = {
-				user: userRef,
 				gender: user.data()?.gender,
 				age: age,
 				racer: user.data()?.fullName,
@@ -296,11 +287,11 @@ const useUpdateApply = (oldApply: DocumentData<ApplyData>, applyData: ApplyForm)
 	return promise;
 };
 
-const useGetApply = (disciplines: Discipline[], userId?: string): { applyData?: SwrDocumentData<ApplyData>; error?: FirestoreError } => {
-	const [applyData, setApplyData] = useState<DocumentData<ApplyData>>();
+const useGetApply = (disciplines: Discipline[], userId?: string): { applyData?: DocumentData<ApplyForm>; error?: FirestoreError } => {
+	const [applyData, setApplyData] = useState<DocumentData<ApplyForm>>();
 	const [error, setError] = useState<FirestoreError>();
 
-	const response = useCollectionGroup<ApplyData>({
+	const response = useCollectionGroup<ApplyForm>({
 		path: 'applied',
 	});
 
@@ -308,7 +299,7 @@ const useGetApply = (disciplines: Discipline[], userId?: string): { applyData?: 
 		if (response.data && response.data.length && disciplines && disciplines.length && userId) {
 			setApplyData(
 				response.data.find((apply) =>
-					disciplines.some((discipline) => discipline.id === apply.ref.parent.parent?.id && apply.user.id === userId),
+					disciplines.some((discipline) => discipline.id === apply.ref.parent.parent?.id && apply.id === userId),
 				),
 			);
 		}

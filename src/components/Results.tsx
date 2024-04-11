@@ -20,13 +20,11 @@ const Results = ({ raceData, disciplines }: RaceProp) => {
 			label: '#',
 			renderCell: (item: ResultType) => item.position,
 			sort: { sortKey: 'position' },
-			resize: true,
 		},
 		{
 			label: 'Racer',
 			renderCell: (item: ResultType) => item.racer,
 			sort: { sortKey: 'racer' },
-			resize: true,
 		},
 		{
 			label: 'Time',
@@ -108,7 +106,7 @@ const Results = ({ raceData, disciplines }: RaceProp) => {
 					</select>
 				)}
 			</div>
-			<div className={classNames('flex-col ', { 'lg:-mt-12': results && results.length })}>
+			<div className={classNames('flex-col ', { 'lg:-mt-12': gender && results && results.length })}>
 				{gender && results && results.length > 0 && (
 					<DataTable<ResultType>
 						columns={columns}

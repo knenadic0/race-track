@@ -1,5 +1,3 @@
-import { DocumentReference } from 'firebase/firestore';
-
 export enum ShirtSize {
 	XS,
 	S,
@@ -13,10 +11,6 @@ export type ApplyForm = {
 	discipline: string;
 	club?: string;
 	shirtSize: ShirtSize;
-};
-
-export type ApplyData = ApplyForm & {
-	user: DocumentReference;
 };
 
 export type Applied = {

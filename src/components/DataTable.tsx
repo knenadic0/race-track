@@ -8,6 +8,7 @@ import classNames from 'classnames';
 import { LuChevronDown, LuChevronUp, LuChevronsUpDown } from 'react-icons/lu';
 import { ChangeEvent, useState } from 'react';
 import Search from './Search';
+import { rtGray } from '@constants/tailwind';
 
 type DataTableProps<T> = {
 	pageSize: number;
@@ -35,6 +36,10 @@ const DataTable = <T extends Record<string, unknown>>({
 	fixedHeader = false,
 }: DataTableProps<T>) => {
 	const [searchQuery, setSearchQuery] = useState<string>('');
+	const resizableColumns = columns.map((column) => ({
+		...column,
+		resize: { resizerHighlight: rtGray, resizerWidth: 6, minWidth: 50 },
+	}));
 
 	const tableData: Data<TableNode & T> = {
 		nodes:
@@ -99,7 +104,7 @@ const DataTable = <T extends Record<string, unknown>>({
 				</div>
 			)}
 			<CompactTable
-				columns={columns}
+				columns={resizableColumns}
 				data={tableData}
 				theme={theme}
 				pagination={pagination}
