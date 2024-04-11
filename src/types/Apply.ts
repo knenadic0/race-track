@@ -1,5 +1,4 @@
 import { DocumentReference } from 'firebase/firestore';
-import { TableNode } from '@table-library/react-table-library/types/table';
 
 export enum ShirtSize {
 	XS,
@@ -27,5 +26,3 @@ export type Applied = {
 	age: number;
 	club?: string;
 };
-
-export type AppliedNode = TableNode & Applied;

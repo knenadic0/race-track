@@ -1,4 +1,12 @@
 import { CustomFlowbiteTheme, TabsProps, Tabs as FlowbiteTabs } from 'flowbite-react';
+import { IconType } from 'react-icons';
+
+export type Tab = {
+	name: string;
+	icon: IconType;
+	component: JSX.Element;
+	active?: boolean;
+};
 
 const underlineTabsTheme: CustomFlowbiteTheme['tabs'] = {
 	tablist: {

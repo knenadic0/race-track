@@ -3,27 +3,24 @@ import { NextPageWithLayout } from '../_app';
 import { ReactElement } from 'react';
 import { app } from '@adapters/firebase';
 import Layout from '@components/Layout';
-import { LuPlusSquare } from 'react-icons/lu';
-import { Race } from '@datatypes/Race';
 import { getAuth } from 'firebase/auth';
 import dateFormat from 'dateformat';
 import Loader, { LoaderContainer } from '@components/Loader';
-import Pill from '@components/Pill';
-import Button, { ButtonColor } from '@components/Button';
 import { useGetRaces } from '@adapters/firestore';
 import DataTable from '@components/DataTable';
 import Card from '@components/Card';
-import { manageRacesRoute, racesRoute } from '@constants/routes';
+import { resultsRoute } from '@constants/routes';
 import { TableNode } from '@table-library/react-table-library';
+import { Race } from '@datatypes/Race';
 
-const Races: NextPageWithLayout = () => {
+const Results: NextPageWithLayout = () => {
 	getAuth(app);
-	const { races } = useGetRaces();
+	const { races } = useGetRaces(false);
 
 	const columns = [
 		{
 			label: 'Title',
-			renderCell: (item: Race) => <Link href={`${racesRoute}/${item.id}`}>{item.title}</Link>,
+			renderCell: (item: Race) => <Link href={`${resultsRoute}/${item.id}`}>{item.title}</Link>,
 			sort: { sortKey: 'title' },
 		},
 		{
@@ -36,36 +33,24 @@ const Races: NextPageWithLayout = () => {
 			renderCell: (item: Race) => item.disciplinesCount || 0,
 		},
 		{
-			label: 'Applied',
-			renderCell: (item: Race) => item.applied || 0,
-			sort: { sortKey: 'applied' },
-		},
-		{
-			label: 'Applying',
-			renderCell: (item: Race) =>
-				new Date() <= item.applyUntil ? <Pill color="green" text="Open" /> : <Pill color="red" text="Closed" />,
-			sort: { sortKey: 'applying' },
+			label: 'Finished',
+			renderCell: (item: Race) => `${item.finished || 0}/${item.applied || 0}`,
 		},
 	];
 
 	const sortFns = {
 		title: (array: TableNode[]) => array.sort((a, b) => a.title.localeCompare(b.title)),
 		dateTime: (array: TableNode[]) => array.sort((a, b) => a.dateTime.getTime() - b.dateTime.getTime()),
-		applied: (array: TableNode[]) => array.sort((a, b) => a.applied - b.applied),
-		applying: (array: TableNode[]) => array.sort((a, b) => a.applyUntil.getTime() - b.applyUntil.getTime()),
 	};
 
 	return (
 		<div className="main-container">
-			<Card size="big" className="justify-between lg:px-8 lg:py-7">
-				<h1 className="flex items-center text-xl font-bold">Upcoming races</h1>
-				<Button color={ButtonColor.Blue} text="Add race" href={manageRacesRoute}>
-					<LuPlusSquare />
-				</Button>
+			<Card size="big" className="lg:px-8 lg:py-8">
+				<h1 className="flex h-8 items-center text-xl font-bold">Past races</h1>
 			</Card>
 			<Card size="big" className="flex-col">
 				{!races && <Loader container={LoaderContainer.Component} />}
-				{races && !races.length && <div className="my-5">No races yet.</div>}
+				{races && !races.length && <div className="my-5">No past races.</div>}
 				{races && races.length > 0 && (
 					<DataTable
 						columns={columns}
@@ -74,7 +59,8 @@ const Races: NextPageWithLayout = () => {
 						sortFns={sortFns}
 						searchableFields={['title']}
 						defaultSortKey="dateTime"
-						templateColumns="minmax(220px, 3fr) minmax(200px, 2fr) repeat(3, minmax(110px, 1fr))"
+						defaultSortReversed
+						templateColumns="minmax(220px, 3fr) minmax(200px, 2fr) repeat(2, minmax(110px, 1fr))"
 						fixedHeader
 						searchPhrase="Search races..."
 					/>
@@ -84,11 +70,11 @@ const Races: NextPageWithLayout = () => {
 	);
 };
 
-Races.getLayout = (page: ReactElement) => {
+Results.getLayout = (page: ReactElement) => {
 	const metaData = {
-		title: 'Races',
+		title: 'Past races',
 	};
 	return <Layout metaData={metaData}>{page}</Layout>;
 };
 
-export default Races;
+export default Results;

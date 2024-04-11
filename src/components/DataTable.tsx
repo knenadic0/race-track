@@ -17,6 +17,7 @@ type DataTableProps<T> = {
 	fixedHeader?: boolean;
 	sortFns?: Record<string, SortFn>;
 	defaultSortKey?: string;
+	defaultSortReversed?: boolean;
 	searchableFields?: (keyof T)[];
 	searchPhrase?: string;
 };
@@ -30,6 +31,7 @@ const DataTable = <T extends Record<string, unknown>>({
 	defaultSortKey,
 	searchableFields,
 	searchPhrase,
+	defaultSortReversed = false,
 	fixedHeader = false,
 }: DataTableProps<T>) => {
 	const [searchQuery, setSearchQuery] = useState<string>('');
@@ -58,6 +60,7 @@ const DataTable = <T extends Record<string, unknown>>({
 				{
 					state: {
 						sortKey: defaultSortKey,
+						reverse: defaultSortReversed,
 					},
 				},
 				{

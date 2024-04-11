@@ -1,5 +1,4 @@
 import { DocumentReference } from 'firebase/firestore';
-import { TableNode } from '@table-library/react-table-library/types/table';
 import { Discipline } from './Discipline';
 
 export type Race = {
@@ -10,6 +9,7 @@ export type Race = {
 	disciplines?: Discipline[];
 	description: string;
 	applied: number;
+	finished?: number;
 	disciplinesCount: number;
 	createdBy: DocumentReference;
 };
@@ -40,5 +40,3 @@ export const raceFormFields = Object.keys(raceForm)
 			.map((_, i) => [`disciplines.${i}.title`, `disciplines.${i}.length`])
 			.flat(),
 	);
-
-export type RaceNode = TableNode & Race;

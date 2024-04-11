@@ -17,13 +17,17 @@ import {
 	deleteField,
 	doc,
 	getDocs,
+	orderBy,
 	runTransaction,
+	where,
 	writeBatch,
 } from 'firebase/firestore';
 import { User } from '@datatypes/User';
 import { firestore } from './firebase';
 import { Applied, ApplyData, ApplyForm } from '@datatypes/Apply';
 import { calculateAge } from '@helpers/date';
+import { DocumentId, Paths, ValueOf } from '@tatsuokaniwa/swr-firestore/dist/util/type';
+import { Result } from '@datatypes/Result';
 
 const useGetUser = (id?: string): { userInfo?: SwrDocumentData<User>; error?: FirestoreError } => {
 	const [userInfo, setInfo] = useState<SwrDocumentData<User>>();
@@ -131,14 +135,23 @@ const useGetDisciplines = (id?: string | string[]): { disciplines?: Discipline[]
 	return { disciplines, error: error || timeoutError };
 };
 
-const useGetRaces = (): { races?: RaceType[]; error?: FirestoreError } => {
+const useGetRaces = (past: boolean = true): { races?: RaceType[]; error?: FirestoreError } => {
 	const [timeoutError, setTimeoutError] = useState<FirestoreError | undefined>(undefined);
 
 	const [date] = useState(new Date());
+	const now = new Date();
+	now.setHours(24, 0, 0, 0);
+	const [today] = useState(now);
+
+	const whereClause: [Paths<RaceType> | DocumentId, Parameters<typeof where>[1], ValueOf<RaceType> | unknown][] = past
+		? [['dateTime', '>', date]]
+		: [['dateTime', '<=', today]];
+	const orderByOrientation: Parameters<typeof orderBy>[1] = past ? 'asc' : 'desc';
+
 	const { data: races, error } = useCollection<RaceType>({
 		path: 'races',
-		where: [['dateTime', '>', date]],
-		orderBy: [['dateTime', 'asc']],
+		where: whereClause,
+		orderBy: [['dateTime', orderByOrientation]],
 		parseDates: ['dateTime', 'applyUntil'],
 	});
 
@@ -344,6 +357,32 @@ const useGetApplied = (raceId?: string, disciplineId?: string): { applied?: Appl
 	return { applied, error: error || timeoutError };
 };
 
+const useGetResults = (raceId?: string, disciplineId?: string, gender?: string): { results?: Result[]; error?: FirestoreError } => {
+	const [results, setResults] = useState<Result[]>();
+	const whereClause: [Paths<Result> | DocumentId, Parameters<typeof where>[1], ValueOf<Result> | unknown][] | undefined =
+		gender && gender !== 'both' ? [['gender', '==', gender]] : undefined;
+
+	const { data, error } = useCollection<Result>({
+		path: `races/${raceId}/disciplines/${disciplineId}/applied`,
+		where: whereClause,
+		orderBy: [['totalTime', 'asc']],
+		parseDates: ['started', 'finished'],
+	});
+
+	useEffect(() => {
+		if (data) {
+			setResults(
+				data.map((item, index) => ({
+					...item,
+					position: index + 1,
+				})),
+			);
+		}
+	}, [data]);
+
+	return { results, error };
+};
+
 export {
 	useGetUser,
 	useSetUser,
@@ -359,4 +398,5 @@ export {
 	useGetApply,
 	useCancelApply,
 	useGetApplied,
+	useGetResults,
 };

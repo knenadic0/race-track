@@ -1,15 +1,8 @@
-import { User } from './User';
-import { Race } from './Race';
-import { TableNode } from '@table-library/react-table-library';
+import { Applied } from './Apply';
 
-export type Result = {
-	id: string;
-	userId: string;
-	user: User;
-	raceId: string;
-	race: Race;
-	started: Date;
+export type Result = Applied & {
+	started?: Date;
 	finished?: Date;
+	totalTime?: number;
+	position: number;
 };
-
-export type ResultNode = TableNode & Result;
