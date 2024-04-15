@@ -87,4 +87,8 @@
 	th[data-table-library_th] {
 		@apply text-rt-black;
 	}
+
+	tr.tr.tr-body:has(td[data-row-selected='true']) {
+		@apply bg-rt-light-gray;
+	}
 }

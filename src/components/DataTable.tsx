@@ -100,7 +100,7 @@ const DataTable = <T extends Record<string, unknown>>({
 		<>
 			{searchableFields && (
 				<div className="mb-3 flex justify-end">
-					<Search onChange={(e) => onSearch(e)} searchPhrase={searchPhrase} />
+					<Search onChange={(e: ChangeEvent<HTMLInputElement>) => onSearch(e)} searchPhrase={searchPhrase} />
 				</div>
 			)}
 			<CompactTable

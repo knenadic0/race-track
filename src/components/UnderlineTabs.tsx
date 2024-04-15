@@ -14,7 +14,7 @@ const underlineTabsTheme: CustomFlowbiteTheme['tabs'] = {
 			underline: '-mb-px flex-wrap border-b border-rt-gray dark:border-rt-gray space-x-2',
 		},
 		tabitem: {
-			base: 'flex items-center justify-center p-4 font-medium first:ml-0 focus:outline-none focus:ring-1 focus:ring-rt-blue disabled:cursor-not-allowed disabled:text-rt-gray disabled:dark:text-rt-gray',
+			base: 'flex items-center justify-center p-4 font-medium first:ml-0 focus:outline-none disabled:cursor-not-allowed disabled:text-rt-gray disabled:dark:text-rt-gray',
 			styles: {
 				underline: {
 					base: 'rounded-t-sm',

@@ -9,8 +9,11 @@ import { useGetResults } from '@adapters/firestore';
 import dateFormat from 'dateformat';
 import { Result as ResultType } from '@datatypes/Result';
 import { formatMilisecondsToTime } from '@helpers/date';
+import { getAuth } from 'firebase/auth';
+import { app } from '@adapters/firebase';
 
 const Results = ({ raceData, disciplines }: RaceProp) => {
+	const auth = getAuth(app);
 	const [discipline, setDiscipline] = useState<string>();
 	const [gender, setGender] = useState<string>();
 	const { results, error } = useGetResults(raceData?.id, discipline, gender);
@@ -25,6 +28,9 @@ const Results = ({ raceData, disciplines }: RaceProp) => {
 			label: 'Racer',
 			renderCell: (item: ResultType) => item.racer,
 			sort: { sortKey: 'racer' },
+			cellProps: {
+				'data-row-selected': (item: ResultType) => item.id === auth.currentUser?.uid,
+			},
 		},
 		{
 			label: 'Time',
