@@ -9,7 +9,7 @@ import { app } from '@adapters/firebase';
 import { Race, RaceForm, raceFormFields } from '@datatypes/Race';
 import Layout from '@components/Layout';
 import Error from '@components/Error';
-import Loader, { LoaderContainer } from '@components/Loader';
+import Loader, { LoaderType } from '@components/Loader';
 import Button, { ButtonColor } from '@components/Button';
 import RichTextEditor from '@components/RichTextEditor';
 import { useAddRace, useGetDisciplines, useGetRace, useRemoveRace, useUpdateRace } from '@adapters/firestore';
@@ -53,8 +53,8 @@ const ManageRace: NextPageWithLayout = () => {
 		},
 	});
 
-	const { raceData: race, error: notFound, isLoading } = useGetRace(router.query['id']);
-	const { disciplines: disciplinesData } = useGetDisciplines(router.query['id']);
+	const { raceData: race, error: notFound, isLoading } = useGetRace(router.query['id']?.toString());
+	const { disciplines: disciplinesData } = useGetDisciplines(router.query['id']?.toString());
 
 	useEffect(() => {
 		if (!raceData) {
@@ -149,7 +149,7 @@ const ManageRace: NextPageWithLayout = () => {
 						</Tooltip>
 					</Card>
 					<Card size="big" className="items-center">
-						{!isNew && isLoading && <Loader container={LoaderContainer.Component} />}
+						{!isNew && isLoading && <Loader type={LoaderType.Skeleton} count={15} className="w-full" />}
 						{(!isLoading || isNew) && (
 							<form className="w-full">
 								<div className="input-container input-container-wide mb-8">

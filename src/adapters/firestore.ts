@@ -20,7 +20,7 @@ import { firestore } from './firebase';
 import { Applied, ApplyForm } from '@datatypes/Apply';
 import { calculateAge } from '@helpers/date';
 import { DocumentId, Paths, ValueOf } from '@tatsuokaniwa/swr-firestore/dist/util/type';
-import { Result } from '@datatypes/Result';
+import { Result, ResultRace } from '@datatypes/Result';
 
 const useGetUser = (id?: string): { userInfo?: DocumentData<User>; error?: FirestoreError } => {
 	const [userInfo, setInfo] = useState<DocumentData<User>>();
@@ -51,7 +51,7 @@ const useSetUser = (uid: string, userData: User): Promise<void> => {
 	return promise;
 };
 
-const useGetRace = (id?: string | string[]): { raceData?: DocumentData<RaceType>; error?: FirestoreError; isLoading: boolean } => {
+const useGetRace = (id?: string): { raceData?: DocumentData<RaceType>; error?: FirestoreError; isLoading: boolean } => {
 	const [raceData, setData] = useState<DocumentData<RaceType>>();
 	const [isLoading, setIsLoading] = useState<boolean>(true);
 	const [error, setError] = useState<FirestoreError>();
@@ -79,7 +79,7 @@ const useGetRace = (id?: string | string[]): { raceData?: DocumentData<RaceType>
 	return { raceData, error, isLoading };
 };
 
-const useGetRaceLive = (id?: string | string[]): { raceData?: DocumentData<RaceType>; error?: FirestoreError } => {
+const useGetRaceLive = (id?: string): { raceData?: DocumentData<RaceType>; error?: FirestoreError } => {
 	const [timeoutError, setTimeoutError] = useState<FirestoreError | undefined>(undefined);
 	const { data: raceData, error } = useDoc<RaceType>({
 		path: `races/${id}`,
@@ -103,7 +103,7 @@ const useGetRaceLive = (id?: string | string[]): { raceData?: DocumentData<RaceT
 	return { raceData, error: error || timeoutError };
 };
 
-const useGetDisciplines = (id?: string | string[]): { disciplines?: Discipline[]; error?: FirestoreError } => {
+const useGetDisciplines = (id?: string): { disciplines?: Discipline[]; error?: FirestoreError } => {
 	const [timeoutError, setTimeoutError] = useState<FirestoreError | undefined>(undefined);
 
 	const { data: disciplines, error } = useCollection<Discipline>({
@@ -128,7 +128,7 @@ const useGetDisciplines = (id?: string | string[]): { disciplines?: Discipline[]
 	return { disciplines, error: error || timeoutError };
 };
 
-const useGetRaces = (past: boolean = true): { races?: RaceType[]; error?: FirestoreError } => {
+const useGetRaces = (future: boolean = true): { races?: RaceType[]; error?: FirestoreError } => {
 	const [timeoutError, setTimeoutError] = useState<FirestoreError | undefined>(undefined);
 
 	const [date] = useState(new Date());
@@ -136,10 +136,10 @@ const useGetRaces = (past: boolean = true): { races?: RaceType[]; error?: Firest
 	now.setHours(24, 0, 0, 0);
 	const [today] = useState(now);
 
-	const whereClause: [Paths<RaceType> | DocumentId, Parameters<typeof where>[1], ValueOf<RaceType> | unknown][] = past
+	const whereClause: [Paths<RaceType> | DocumentId, Parameters<typeof where>[1], ValueOf<RaceType> | unknown][] = future
 		? [['dateTime', '>', date]]
 		: [['dateTime', '<=', today]];
-	const orderByOrientation: Parameters<typeof orderBy>[1] = past ? 'asc' : 'desc';
+	const orderByOrientation: Parameters<typeof orderBy>[1] = future ? 'asc' : 'desc';
 
 	const { data: races, error } = useCollection<RaceType>({
 		path: 'races',
@@ -239,7 +239,8 @@ const useApplyForRace = (raceRef: DocumentReference, applyData: ApplyForm, userI
 		const userRef = doc(firestore, 'users', userId);
 		const user = await transaction.get(userRef);
 		const age = calculateAge(user.data()?.birthDate);
-		const applyRef = doc(collection(doc(collection(raceRef, 'disciplines'), applyData.discipline), 'applied'), userId);
+		const disciplineRef = doc(collection(raceRef, 'disciplines'), applyData.discipline);
+		const applyRef = doc(collection(disciplineRef, 'applied'), userId);
 		const data = {
 			gender: user.data()?.gender,
 			age: age,
@@ -249,9 +250,14 @@ const useApplyForRace = (raceRef: DocumentReference, applyData: ApplyForm, userI
 		};
 
 		const race = await transaction.get(raceRef);
-		const applied = (race.data()?.applied || 0) + 1;
+		const discipline = await transaction.get(disciplineRef);
+		const raceApplied = (race.data()?.applied || 0) + 1;
+		const disciplineApplied = (discipline.data()?.applied || 0) + 1;
 		transaction.update(raceRef, {
-			applied: applied,
+			applied: raceApplied,
+		});
+		transaction.update(disciplineRef, {
+			applied: disciplineApplied,
 		});
 		transaction.set(applyRef, data);
 	});
@@ -266,11 +272,13 @@ const useUpdateApply = (oldApply: DocumentData<ApplyForm>, applyData: ApplyForm)
 				shirtSize: applyData.shirtSize,
 			});
 		} else {
-			const applyRef = doc(
-				collection(doc(collection(firestore, oldApply.ref.parent.parent!.parent.path), applyData.discipline), 'applied'),
-				oldApply.id,
-			);
+			const oldDisciplineRef = oldApply.ref.parent.parent!;
+			const newDisciplineRef = doc(collection(firestore, oldApply.ref.parent.parent!.parent.path), applyData.discipline);
+			const applyRef = doc(collection(newDisciplineRef, 'applied'), oldApply.id);
 			const userRef = doc(firestore, 'users', oldApply.id);
+
+			const oldDiscipline = await transaction.get(oldDisciplineRef);
+			const newDiscipline = await transaction.get(newDisciplineRef);
 			const user = await transaction.get(userRef);
 			const age = calculateAge(user.data()?.birthDate);
 			const data = {
@@ -280,6 +288,15 @@ const useUpdateApply = (oldApply: DocumentData<ApplyForm>, applyData: ApplyForm)
 				club: applyData.club,
 				shirtSize: applyData.shirtSize,
 			};
+
+			const oldApplied = oldDiscipline.data()?.applied || 1;
+			transaction.update(oldDisciplineRef, {
+				applied: oldApplied > 1 ? oldApplied - 1 : deleteField(),
+			});
+			const newApplied = (newDiscipline.data()?.applied || 0) + 1;
+			transaction.update(newDisciplineRef, {
+				applied: newApplied,
+			});
 			transaction.delete(oldApply.ref);
 			transaction.set(applyRef, data);
 		}
@@ -311,11 +328,17 @@ const useGetApply = (disciplines: Discipline[], userId?: string): { applyData?: 
 
 const useCancelApply = (applyRef: DocumentReference): Promise<void> => {
 	const promise = runTransaction(firestore, async (transaction) => {
-		const raceRef = applyRef.parent.parent!.parent.parent!;
+		const disciplineRef = applyRef.parent.parent!;
+		const raceRef = disciplineRef.parent.parent!;
 		const race = await transaction.get(raceRef);
+		const discipline = await transaction.get(disciplineRef);
 		const applied = race.data()?.applied || 1;
 		transaction.update(raceRef, {
 			applied: applied > 1 ? applied - 1 : deleteField(),
+		});
+		const disciplineApplied = discipline.data()?.applied || 1;
+		transaction.update(disciplineRef, {
+			applied: disciplineApplied > 1 ? disciplineApplied - 1 : deleteField(),
 		});
 
 		transaction.delete(applyRef);

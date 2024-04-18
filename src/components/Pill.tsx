@@ -2,7 +2,7 @@ import { Badge } from 'flowbite-react';
 
 export type PillProps = {
 	text: string;
-	color: 'green' | 'red';
+	color: 'green' | 'red' | 'teal';
 };
 
 const Pill = ({ text, color }: PillProps) => {

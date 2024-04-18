@@ -5,7 +5,7 @@ import { app } from '@adapters/firebase';
 import Layout from '@components/Layout';
 import { getAuth } from 'firebase/auth';
 import dateFormat from 'dateformat';
-import Loader, { LoaderContainer } from '@components/Loader';
+import Loader, { LoaderType } from '@components/Loader';
 import { useGetRaces } from '@adapters/firestore';
 import DataTable from '@components/DataTable';
 import Card from '@components/Card';
@@ -49,7 +49,7 @@ const Results: NextPageWithLayout = () => {
 				<h1 className="flex h-8 items-center text-xl font-bold">Past races</h1>
 			</Card>
 			<Card size="big" className="flex-col">
-				{!races && <Loader container={LoaderContainer.Component} />}
+				{!races && <Loader type={LoaderType.Skeleton} count={5} className="mt-12" />}
 				{races && !races.length && <div className="my-5">No past races.</div>}
 				{races && races.length > 0 && (
 					<DataTable

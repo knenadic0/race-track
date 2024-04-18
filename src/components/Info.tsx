@@ -1,6 +1,6 @@
 import { Race } from '@datatypes/Race';
 import dateFormat from 'dateformat';
-import Loader, { LoaderContainer } from './Loader';
+import Loader, { LoaderType } from './Loader';
 import parse from 'html-react-parser';
 import { Discipline } from '@datatypes/Discipline';
 import { DocumentData } from '@tatsuokaniwa/swr-firestore';
@@ -12,7 +12,7 @@ export type RaceProp = {
 
 const Info = ({ raceData, disciplines }: RaceProp) => {
 	return !raceData ? (
-		<Loader container={LoaderContainer.Component} />
+		<Loader type={LoaderType.Skeleton} count={10} />
 	) : (
 		<>
 			<div className="grid grid-cols-1 gap-x-4 md:grid-cols-2">

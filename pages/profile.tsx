@@ -8,7 +8,7 @@ import { ReactElement, useState, useEffect } from 'react';
 import Layout from '@components/Layout';
 import { LuSave, LuLogOut } from 'react-icons/lu';
 import { User, userFormFields } from '@datatypes/User';
-import Loader, { LoaderContainer } from '@components/Loader';
+import Loader, { LoaderType } from '@components/Loader';
 import Button, { ButtonColor } from '@components/Button';
 import { useGetUser, useSetUser } from '@adapters/firestore';
 import Card from '@components/Card';
@@ -70,7 +70,7 @@ const Profile: NextPageWithLayout = () => {
 		<div className="main-container">
 			<div className="flex w-full flex-1 flex-col items-center justify-center px-5 text-center sm:my-8 sm:w-auto">
 				{!userInfo && !error && !user ? (
-					<Loader container={LoaderContainer.Page} />
+					<Loader type={LoaderType.Circle} />
 				) : (
 					<Card size="small" className="w-full p-6 text-left text-lg sm:w-auto">
 						<form className="w-full sm:w-auto">

@@ -1,4 +1,4 @@
-import Loader, { LoaderContainer } from './Loader';
+import Loader, { LoaderType } from './Loader';
 import { RaceProp } from './Info';
 import { useForm } from 'react-hook-form';
 import Button, { ButtonColor } from './Button';
@@ -96,7 +96,7 @@ const Apply = ({ raceData, disciplines }: RaceProp) => {
 	);
 
 	return !raceData || !disciplines ? (
-		<Loader container={LoaderContainer.Component} />
+		<Loader type={LoaderType.Skeleton} count={5} />
 	) : (
 		<div className="grid grid-cols-1 gap-x-4">
 			<form className="w-full">

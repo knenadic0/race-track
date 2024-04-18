@@ -7,7 +7,7 @@ import { LuPlusSquare } from 'react-icons/lu';
 import { Race } from '@datatypes/Race';
 import { getAuth } from 'firebase/auth';
 import dateFormat from 'dateformat';
-import Loader, { LoaderContainer } from '@components/Loader';
+import Loader, { LoaderType } from '@components/Loader';
 import Pill from '@components/Pill';
 import Button, { ButtonColor } from '@components/Button';
 import { useGetRaces } from '@adapters/firestore';
@@ -64,7 +64,7 @@ const Races: NextPageWithLayout = () => {
 				</Button>
 			</Card>
 			<Card size="big" className="flex-col">
-				{!races && <Loader container={LoaderContainer.Component} />}
+				{!races && <Loader type={LoaderType.Skeleton} count={5} className="mt-12" />}
 				{races && !races.length && <div className="my-5">No races yet.</div>}
 				{races && races.length > 0 && (
 					<DataTable

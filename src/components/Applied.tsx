@@ -1,4 +1,4 @@
-import Loader, { LoaderContainer } from './Loader';
+import Loader, { LoaderType } from './Loader';
 import { RaceProp } from './Info';
 import DataTable from './DataTable';
 import { useState } from 'react';
@@ -7,6 +7,7 @@ import { TableNode } from '@table-library/react-table-library';
 import classNames from 'classnames';
 import { Column } from '@table-library/react-table-library/types/compact';
 import { Applied as AppliedType } from '@datatypes/Apply';
+import Pill from './Pill';
 
 const Applied = ({ raceData, disciplines }: RaceProp) => {
 	const [discipline, setDiscipline] = useState<string>();
@@ -25,7 +26,8 @@ const Applied = ({ raceData, disciplines }: RaceProp) => {
 		},
 		{
 			label: 'Gender',
-			renderCell: (item: AppliedType) => item.gender,
+			renderCell: (item: AppliedType) =>
+				item.gender === 'male' ? <Pill color="teal" text="Male" /> : <Pill color="red" text="Female" />,
 			sort: { sortKey: 'gender' },
 		},
 		{
@@ -45,7 +47,7 @@ const Applied = ({ raceData, disciplines }: RaceProp) => {
 	return (raceData && !raceData.applied) || error ? (
 		<div className="my-5">No applies yet.</div>
 	) : !disciplines ? (
-		<Loader container={LoaderContainer.Component} />
+		<Loader type={LoaderType.Skeleton} count={5} />
 	) : (
 		<>
 			<div className="my-3 w-full sm:w-96">

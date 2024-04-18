@@ -17,8 +17,8 @@ import { getAuth } from 'firebase/auth';
 const PastRace: NextPageWithLayout = () => {
 	getAuth(app);
 	const router = useRouter();
-	const { raceData, error } = useGetRaceLive(router.query['id']);
-	const { disciplines } = useGetDisciplines(router.query['id']);
+	const { raceData, error } = useGetRaceLive(router.query['id']?.toString());
+	const { disciplines } = useGetDisciplines(router.query['id']?.toString());
 	const tabs: Tab[] = [
 		{
 			name: 'Info',
@@ -28,7 +28,9 @@ const PastRace: NextPageWithLayout = () => {
 		{
 			name: 'Results',
 			icon: LuListOrdered,
-			component: <Results raceData={raceData} disciplines={disciplines} />,
+			component: (
+				<Results raceData={raceData} disciplines={disciplines} selectedDiscipline={router.query['discipline']?.toString()} />
+			),
 			active: true,
 		},
 	];

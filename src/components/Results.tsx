@@ -1,4 +1,4 @@
-import Loader, { LoaderContainer } from './Loader';
+import Loader, { LoaderType } from './Loader';
 import { RaceProp } from './Info';
 import DataTable from './DataTable';
 import { useState } from 'react';
@@ -11,11 +11,16 @@ import { Result as ResultType } from '@datatypes/Result';
 import { formatMilisecondsToTime } from '@helpers/date';
 import { getAuth } from 'firebase/auth';
 import { app } from '@adapters/firebase';
+import Pill from './Pill';
 
-const Results = ({ raceData, disciplines }: RaceProp) => {
+export type ResultProp = RaceProp & {
+	selectedDiscipline?: string;
+};
+
+const Results = ({ raceData, disciplines, selectedDiscipline }: ResultProp) => {
 	const auth = getAuth(app);
-	const [discipline, setDiscipline] = useState<string>();
-	const [gender, setGender] = useState<string>();
+	const [discipline, setDiscipline] = useState<string | undefined>(selectedDiscipline);
+	const [gender, setGender] = useState<string | undefined>(selectedDiscipline ? 'both' : undefined);
 	const { results, error } = useGetResults(raceData?.id, discipline, gender);
 
 	const columns: Column<ResultType>[] = [
@@ -43,7 +48,8 @@ const Results = ({ raceData, disciplines }: RaceProp) => {
 		},
 		{
 			label: 'Gender',
-			renderCell: (item: ResultType) => item.gender,
+			renderCell: (item: ResultType) =>
+				item.gender === 'male' ? <Pill color="teal" text="Male" /> : <Pill color="red" text="Female" />,
 			sort: { sortKey: 'gender' },
 		},
 		{
@@ -59,6 +65,7 @@ const Results = ({ raceData, disciplines }: RaceProp) => {
 		{
 			label: 'Finished',
 			renderCell: (item: ResultType) => dateFormat(item.finished, 'HH:MM:ss.L'),
+			sort: { sortKey: 'finished' },
 		},
 	];
 
@@ -69,12 +76,13 @@ const Results = ({ raceData, disciplines }: RaceProp) => {
 		gender: (array: TableNode[]) => array.sort((a, b) => a.gender.localeCompare(b.gender)),
 		age: (array: TableNode[]) => array.sort((a, b) => a.age - b.age),
 		started: (array: TableNode[]) => array.sort((a, b) => a.started.getTime() - b.started.getTime()),
+		finished: (array: TableNode[]) => array.sort((a, b) => a.finished.getTime() - b.finished.getTime()),
 	};
 
 	return error ? (
 		<div className="my-5">{error.message}</div>
 	) : !disciplines ? (
-		<Loader container={LoaderContainer.Component} />
+		<Loader type={LoaderType.Skeleton} count={2} />
 	) : (
 		<>
 			<div className="my-3 flex flex-col gap-y-3 gap-x-4 md:flex-row">
@@ -82,7 +90,7 @@ const Results = ({ raceData, disciplines }: RaceProp) => {
 					className="rt-input w-full sm:w-80"
 					onChange={(e) => setDiscipline(e.target.value)}
 					placeholder="Select discipline"
-					defaultValue={0}
+					defaultValue={discipline || 0}
 				>
 					{disciplines
 						.map((discipline) => (
@@ -101,7 +109,7 @@ const Results = ({ raceData, disciplines }: RaceProp) => {
 						className="rt-input w-full sm:w-72"
 						onChange={(e) => setGender(e.target.value)}
 						placeholder="Select gender"
-						defaultValue={0}
+						defaultValue={gender || 0}
 					>
 						<option disabled value={0} hidden>
 							Select gender
