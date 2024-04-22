@@ -1,7 +1,7 @@
 import Loader, { LoaderType } from './Loader';
 import { RaceProp } from './Info';
 import DataTable from './DataTable';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { TableNode } from '@table-library/react-table-library';
 import classNames from 'classnames';
 import { Column } from '@table-library/react-table-library/types/compact';
@@ -22,6 +22,13 @@ const Results = ({ raceData, disciplines, selectedDiscipline }: ResultProp) => {
 	const [discipline, setDiscipline] = useState<string | undefined>(selectedDiscipline);
 	const [gender, setGender] = useState<string | undefined>(selectedDiscipline ? 'both' : undefined);
 	const { results, error } = useGetResults(raceData?.id, discipline, gender);
+
+	useEffect(() => {
+		if (selectedDiscipline && !discipline) {
+			setDiscipline(selectedDiscipline);
+			setGender('both');
+		}
+	}, [selectedDiscipline]);
 
 	const columns: Column<ResultType>[] = [
 		{

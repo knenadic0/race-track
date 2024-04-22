@@ -21,6 +21,7 @@ import { Applied, ApplyForm } from '@datatypes/Apply';
 import { calculateAge } from '@helpers/date';
 import { DocumentId, Paths, ValueOf } from '@tatsuokaniwa/swr-firestore/dist/util/type';
 import { Result, ResultRace } from '@datatypes/Result';
+import { sortResults } from '@helpers/sort';
 
 const useGetUser = (id?: string): { userInfo?: DocumentData<User>; error?: FirestoreError } => {
 	const [userInfo, setInfo] = useState<DocumentData<User>>();
@@ -379,23 +380,63 @@ const useGetResults = (raceId?: string, disciplineId?: string, gender?: string):
 	const { data, error } = useCollection<Result>({
 		path: `races/${raceId}/disciplines/${disciplineId}/applied`,
 		where: whereClause,
+		orderBy: [['totalTime', 'asc']],
 		parseDates: ['started', 'finished'],
 	});
 
 	useEffect(() => {
 		if (data) {
 			setResults(
-				data
-					.sort((a, b) => (a.totalTime > 0 ? a.totalTime - b.totalTime : b.totalTime))
-					.map((item, index) => ({
-						...item,
-						position: index + 1,
-					})),
+				data.sort(sortResults).map((item, index) => ({
+					...item,
+					position:
+						(gender && gender != 'both' ? item.genderPosition : item.position) || item.finished ? index + 1 : item.position,
+				})),
 			);
 		}
 	}, [data]);
 
 	return { results, error };
+};
+
+const useGetMyRaces = (userId?: string): { results?: ResultRace[]; error?: FirestoreError } => {
+	const [results, setResults] = useState<ResultRace[]>();
+	const { data: races, error: racesError } = useCollection<RaceType>({
+		path: 'races',
+		parseDates: ['dateTime', 'applyUntil'],
+	});
+	const { data: resultsData, error } = useCollectionGroup<Result>({
+		path: 'applied',
+	});
+	const { data: disciplines, error: disciplinesError } = useCollectionGroup<Discipline>({
+		path: 'disciplines',
+	});
+
+	useEffect(() => {
+		if (resultsData && races && disciplines) {
+			setResults(
+				resultsData
+					.filter((x) => x.id === userId)
+					.map((item) => {
+						const race = races.find((race) => race.id === item.ref.parent.parent!.parent.parent!.id);
+						const discipline = disciplines.find((discipline) => discipline.id === item.ref.parent.parent!.id);
+						return {
+							raceId: race?.id || '',
+							dateTime: race?.dateTime || new Date(),
+							race: race?.title || '',
+							disciplineId: discipline?.id || '',
+							discipline: discipline?.title || '',
+							applied: discipline?.applied || 0,
+							position: item.position,
+							genderPosition: item.genderPosition,
+							started: item.started,
+						};
+					}),
+			);
+		}
+	}, [resultsData, races, disciplines]);
+
+	return { results, error: error || racesError || disciplinesError };
 };
 
 export {
@@ -414,4 +455,5 @@ export {
 	useCancelApply,
 	useGetApplied,
 	useGetResults,
+	useGetMyRaces,
 };

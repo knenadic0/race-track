@@ -5,6 +5,7 @@ export type Result = Applied & {
 	finished?: Date;
 	totalTime?: number;
 	position: number;
+	genderPosition: number;
 };
 
 export type ResultRace = {
@@ -13,6 +14,8 @@ export type ResultRace = {
 	disciplineId: string;
 	discipline: string;
 	dateTime: Date;
+	started?: Date;
 	applied: number;
 	position: number;
+	genderPosition: number;
 };
