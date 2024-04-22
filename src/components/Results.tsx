@@ -11,7 +11,7 @@ import { Result as ResultType } from '@datatypes/Result';
 import { formatMilisecondsToTime } from '@helpers/date';
 import { getAuth } from 'firebase/auth';
 import { app } from '@adapters/firebase';
-import Pill from './Pill';
+import Pill, { DNFPill, DNSPill } from './Pill';
 
 export type ResultProp = RaceProp & {
 	selectedDiscipline?: string;
@@ -39,7 +39,8 @@ const Results = ({ raceData, disciplines, selectedDiscipline }: ResultProp) => {
 		},
 		{
 			label: 'Time',
-			renderCell: (item: ResultType) => formatMilisecondsToTime(item.totalTime || 0),
+			renderCell: (item: ResultType) =>
+				item.totalTime && item.totalTime > 0 ? formatMilisecondsToTime(item.totalTime) : <DNFPill />,
 		},
 		{
 			label: 'Club',
@@ -59,12 +60,12 @@ const Results = ({ raceData, disciplines, selectedDiscipline }: ResultProp) => {
 		},
 		{
 			label: 'Started',
-			renderCell: (item: ResultType) => dateFormat(item.started, 'HH:MM:ss.L'),
+			renderCell: (item: ResultType) => (item.started ? dateFormat(item.started, 'HH:MM:ss.L') : <DNSPill />),
 			sort: { sortKey: 'started' },
 		},
 		{
 			label: 'Finished',
-			renderCell: (item: ResultType) => dateFormat(item.finished, 'HH:MM:ss.L'),
+			renderCell: (item: ResultType) => (item.finished ? dateFormat(item.finished, 'HH:MM:ss.L') : <DNFPill />),
 			sort: { sortKey: 'finished' },
 		},
 	];

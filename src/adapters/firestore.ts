@@ -379,17 +379,18 @@ const useGetResults = (raceId?: string, disciplineId?: string, gender?: string):
 	const { data, error } = useCollection<Result>({
 		path: `races/${raceId}/disciplines/${disciplineId}/applied`,
 		where: whereClause,
-		orderBy: [['totalTime', 'asc']],
 		parseDates: ['started', 'finished'],
 	});
 
 	useEffect(() => {
 		if (data) {
 			setResults(
-				data.map((item, index) => ({
-					...item,
-					position: index + 1,
-				})),
+				data
+					.sort((a, b) => (a.totalTime > 0 ? a.totalTime - b.totalTime : b.totalTime))
+					.map((item, index) => ({
+						...item,
+						position: index + 1,
+					})),
 			);
 		}
 	}, [data]);

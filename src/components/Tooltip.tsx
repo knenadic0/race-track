@@ -16,17 +16,15 @@ const darkTooltipTheme: CustomFlowbiteTheme['tooltip'] = {
 	},
 };
 
-const Tooltip = ({ content, className, placement, children, delayed = false }: TooltipProps) => {
-	return (
-		<FlowbiteTooltip
-			content={content}
-			placement={placement}
-			theme={darkTooltipTheme}
-			className={classNames(className, { 'delay-200': delayed })}
-		>
-			{children}
-		</FlowbiteTooltip>
-	);
-};
+const Tooltip = ({ content, className, placement, children, delayed = false }: TooltipProps) => (
+	<FlowbiteTooltip
+		content={content}
+		placement={placement}
+		theme={darkTooltipTheme}
+		className={classNames(className, { 'delay-200': delayed })}
+	>
+		{children}
+	</FlowbiteTooltip>
+);
 
 export default Tooltip;

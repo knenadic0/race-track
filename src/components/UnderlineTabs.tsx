@@ -28,12 +28,10 @@ const underlineTabsTheme: CustomFlowbiteTheme['tabs'] = {
 	},
 };
 
-const UnderlineTabs = ({ children }: TabsProps) => {
-	return (
-		<FlowbiteTabs style="underline" theme={underlineTabsTheme}>
-			{children}
-		</FlowbiteTabs>
-	);
-};
+const UnderlineTabs = ({ children }: TabsProps) => (
+	<FlowbiteTabs style="underline" theme={underlineTabsTheme}>
+		{children}
+	</FlowbiteTabs>
+);
 
 export default UnderlineTabs;

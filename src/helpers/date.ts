@@ -17,9 +17,9 @@ export const calculateAge = (dateOfBirth: string): number => {
 	return age;
 };
 
-export const formatMilisecondsToTime = (milliseconds: number): string => {
+export const formatMilisecondsToTime = (milliseconds?: number): string => {
 	// Handle potential negative or zero milliseconds
-	if (milliseconds <= 0) {
+	if (!milliseconds || milliseconds <= 0) {
 		return '00:00:00.00';
 	}
 

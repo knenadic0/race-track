@@ -9,33 +9,31 @@ type LayoutProps = {
 	metaData: MetaTagsProps;
 };
 
-const Layout = ({ children, metaData }: LayoutProps) => {
-	return (
-		<>
-			<Metatags {...metaData} />
-			<style global jsx>{`
-				body {
-					overflow-y: scroll;
-				}
-			`}</style>
-			<div>
-				<Toaster
-					position="bottom-right"
-					reverseOrder={false}
-					toastOptions={{
-						style: {
-							borderRadius: '10px',
-							background: '#333',
-							color: '#fff',
-						},
-					}}
-				/>
-			</div>
-			<Header />
-			<main className="full-h-layout">{children}</main>
-			<Footer />
-		</>
-	);
-};
+const Layout = ({ children, metaData }: LayoutProps) => (
+	<>
+		<Metatags {...metaData} />
+		<style global jsx>{`
+			body {
+				overflow-y: scroll;
+			}
+		`}</style>
+		<div>
+			<Toaster
+				position="bottom-right"
+				reverseOrder={false}
+				toastOptions={{
+					style: {
+						borderRadius: '10px',
+						background: '#333',
+						color: '#fff',
+					},
+				}}
+			/>
+		</div>
+		<Header />
+		<main className="full-h-layout">{children}</main>
+		<Footer />
+	</>
+);
 
 export default Layout;

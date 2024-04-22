@@ -4,13 +4,13 @@ import classNames from 'classnames';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import Image from 'next/image';
-import { championshipRoute, profileRoute, racesRoute, resultsRoute } from '@constants/routes';
+import { myRacesRoute, profileRoute, racesRoute, resultsRoute } from '@constants/routes';
 import { LuMenu, LuUser, LuX } from 'react-icons/lu';
 
 const navigationLinks = [
 	{ name: 'Races', href: racesRoute, current: false, main: true },
 	{ name: 'Results', href: resultsRoute, current: false, main: true },
-	{ name: 'Championship', href: championshipRoute, current: false, main: true },
+	{ name: 'My races', href: myRacesRoute, current: false, main: true },
 	{ name: 'Your profile', href: profileRoute, current: false, main: false },
 ];
 
