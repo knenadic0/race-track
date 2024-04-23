@@ -47,7 +47,7 @@ const PastRace: NextPageWithLayout = () => {
 			)}
 			{!error && (
 				<>
-					<Card size="big" className="items-center justify-between lg:px-8 lg:py-7">
+					<Card size="big" className="lg:px-8 lg:py-8">
 						<h1 className="flex h-8 items-center text-xl font-bold">{raceData && raceData.title}</h1>
 					</Card>
 					<Card size="big" className="flex-col sm:pt-4 lg:pt-4">

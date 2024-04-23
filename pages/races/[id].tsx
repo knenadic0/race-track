@@ -16,12 +16,13 @@ import Tooltip from '@components/Tooltip';
 import UnderlineTabs, { Tab } from '@components/UnderlineTabs';
 import { Tabs } from 'flowbite-react';
 import Applied from '@components/Applied';
+import classNames from 'classnames';
 
 const Race: NextPageWithLayout = () => {
 	const auth = getAuth(app);
 	const router = useRouter();
-	const { raceData, error } = useGetRaceLive(router.query['id']);
-	const { disciplines } = useGetDisciplines(router.query['id']);
+	const { raceData, error } = useGetRaceLive(router.query['id']?.toString());
+	const { disciplines } = useGetDisciplines(router.query['id']?.toString());
 	const tabs: Tab[] = [
 		{
 			name: 'Info',
@@ -52,7 +53,13 @@ const Race: NextPageWithLayout = () => {
 			)}
 			{!error && (
 				<>
-					<Card size="big" className="items-center justify-between lg:px-8 lg:py-7">
+					<Card
+						size="big"
+						className={classNames('items-center justify-between lg:px-8', {
+							'lg:py-7': raceData && raceData.createdBy.id === auth.currentUser?.uid,
+							'lg:py-8': !raceData || raceData.createdBy.id !== auth.currentUser?.uid,
+						})}
+					>
 						<h1 className="flex h-8 items-center text-xl font-bold">{raceData && raceData.title}</h1>
 						{raceData &&
 							raceData.createdBy.id === auth.currentUser?.uid &&

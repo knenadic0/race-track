@@ -132,8 +132,8 @@ const ManageRace: NextPageWithLayout = () => {
 			)}
 			{(!notFound || isNew) && (
 				<>
-					<Card size="big" className="justify-between lg:px-8 lg:py-7">
-						<h1 className="flex h-10 items-center text-xl font-bold">
+					<Card size="big" className="items-center justify-between lg:px-8 lg:py-7">
+						<h1 className="flex h-8 items-center text-xl font-bold">
 							{isNew ? 'Add race' : `Edit ${raceData ? raceData.title : ''}`}
 						</h1>
 						<Tooltip content="Discarding changes">

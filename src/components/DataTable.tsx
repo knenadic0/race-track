@@ -6,7 +6,7 @@ import { SortFn, SortToggleType, useSort } from '@table-library/react-table-libr
 import { getTheme } from '@table-library/react-table-library/mantine';
 import classNames from 'classnames';
 import { LuChevronDown, LuChevronUp, LuChevronsUpDown } from 'react-icons/lu';
-import { ChangeEvent, useState } from 'react';
+import { ChangeEvent, useEffect, useState } from 'react';
 import Search from './Search';
 import { rtGray } from '@constants/tailwind';
 
@@ -58,6 +58,13 @@ const DataTable = <T extends Record<string, unknown>>({
 			size: pageSize,
 		},
 	});
+
+	useEffect(() => {
+		const currentMin = pagination.state.page * pageSize + 1;
+		if (tableData.nodes.length < currentMin && pagination.state.page !== 0) {
+			pagination.fns.onSetPage(0);
+		}
+	}, [tableData]);
 
 	const sort = sortFns
 		? useSort(

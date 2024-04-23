@@ -57,8 +57,8 @@ const Races: NextPageWithLayout = () => {
 
 	return (
 		<div className="main-container">
-			<Card size="big" className="justify-between lg:px-8 lg:py-7">
-				<h1 className="flex items-center text-xl font-bold">Upcoming races</h1>
+			<Card size="big" className="items-center justify-between lg:px-8 lg:py-7">
+				<h1 className="flex h-8 items-center text-xl font-bold">Upcoming races</h1>
 				<Button color={ButtonColor.Blue} text="Add race" href={manageRacesRoute}>
 					<LuPlusSquare />
 				</Button>
