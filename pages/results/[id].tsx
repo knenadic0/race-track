@@ -11,11 +11,8 @@ import { racesRoute } from '@constants/routes';
 import UnderlineTabs, { Tab } from '@components/UnderlineTabs';
 import { Tabs } from 'flowbite-react';
 import Results from '@components/Results';
-import { app } from '@adapters/firebase';
-import { getAuth } from 'firebase/auth';
 
 const PastRace: NextPageWithLayout = () => {
-	getAuth(app);
 	const router = useRouter();
 	const { raceData, error } = useGetRaceLive(router.query['id']?.toString());
 	const { disciplines } = useGetDisciplines(router.query['id']?.toString());

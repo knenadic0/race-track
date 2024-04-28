@@ -1,9 +1,7 @@
 import Link from 'next/link';
 import { NextPageWithLayout } from '../_app';
 import { ReactElement } from 'react';
-import { app } from '@adapters/firebase';
 import Layout from '@components/Layout';
-import { getAuth } from 'firebase/auth';
 import dateFormat from 'dateformat';
 import Loader, { LoaderType } from '@components/Loader';
 import { useGetRaces } from '@adapters/firestore';
@@ -14,7 +12,6 @@ import { TableNode } from '@table-library/react-table-library';
 import { Race } from '@datatypes/Race';
 
 const Results: NextPageWithLayout = () => {
-	getAuth(app);
 	const { races } = useGetRaces(false);
 
 	const columns = [
@@ -49,7 +46,7 @@ const Results: NextPageWithLayout = () => {
 				<h1 className="flex h-8 items-center text-xl font-bold">Past races</h1>
 			</Card>
 			<Card size="big" className="flex-col">
-				{!races && <Loader type={LoaderType.Skeleton} count={5} className="mt-12" />}
+				{!races && <Loader type={LoaderType.Skeleton} count={5} height={48} className="mt-12" />}
 				{races && !races.length && <div className="my-5">No past races.</div>}
 				{races && races.length > 0 && (
 					<DataTable

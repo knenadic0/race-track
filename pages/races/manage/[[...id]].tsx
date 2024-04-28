@@ -1,11 +1,9 @@
 import { useRouter } from 'next/router';
 import { NextPageWithLayout } from '../../_app';
 import { ReactElement, useState, useEffect, useRef } from 'react';
-import { getAuth } from 'firebase/auth';
 import { Controller, useFieldArray, useForm } from 'react-hook-form';
 import { ErrorMessage } from '@hookform/error-message';
 import { LuArrowLeftSquare, LuPlusCircle, LuSave, LuTrash2, LuXCircle } from 'react-icons/lu';
-import { app } from '@adapters/firebase';
 import { Race, RaceForm, raceFormFields } from '@datatypes/Race';
 import Layout from '@components/Layout';
 import Error from '@components/Error';
@@ -21,12 +19,13 @@ import { wait } from '@helpers/wait';
 import ConfirmModal from '@components/ConfirmModal';
 import { toastPromise } from '@helpers/toast';
 import Tooltip from '@components/Tooltip';
+import { useAuth } from '@contexts/auth';
 
 const now = new Date(Date.now());
 const minStartDate = new Date(now.setDate(now.getDate() + 7)).toISOString().substring(0, 16);
 
 const ManageRace: NextPageWithLayout = () => {
-	const auth = getAuth(app);
+	const { user } = useAuth();
 	const router = useRouter();
 	const [raceData, setRaceData] = useState<Race>();
 	const selectedDisciplineRef = useRef<number>();
@@ -95,8 +94,8 @@ const ManageRace: NextPageWithLayout = () => {
 			});
 			await wait(4000);
 			router.push(`${racesRoute}/${raceData.id}`);
-		} else if (auth.currentUser) {
-			await toastPromise(useAddRace(formData, auth.currentUser.uid), {
+		} else if (user) {
+			await toastPromise(useAddRace(formData, user.uid), {
 				loading: 'Saving race...',
 				success: 'Race added.',
 				error: 'An error occurred.',
@@ -150,7 +149,7 @@ const ManageRace: NextPageWithLayout = () => {
 					</Card>
 					<Card size="big" className="items-center">
 						{!isNew && isLoading && <Loader type={LoaderType.Skeleton} count={15} className="w-full" />}
-						{(!isLoading || isNew) && (
+						{(!isLoading || isNew) && user && (
 							<form className="w-full">
 								<div className="input-container input-container-wide mb-8">
 									<div className="label-container">
@@ -340,5 +339,7 @@ ManageRace.getLayout = (page: ReactElement) => {
 	};
 	return <Layout metaData={metaData}>{page}</Layout>;
 };
+
+ManageRace.isProtected = true;
 
 export default ManageRace;

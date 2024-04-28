@@ -3,6 +3,7 @@ import Footer from './Footer';
 import Header from './Header';
 import { Toaster } from 'react-hot-toast';
 import Metatags, { MetaTagsProps } from './Metatags';
+import { AuthProvider } from '@contexts/auth';
 
 type LayoutProps = {
 	children: ReactNode;
@@ -10,7 +11,7 @@ type LayoutProps = {
 };
 
 const Layout = ({ children, metaData }: LayoutProps) => (
-	<>
+	<AuthProvider>
 		<Metatags {...metaData} />
 		<style global jsx>{`
 			body {
@@ -33,7 +34,7 @@ const Layout = ({ children, metaData }: LayoutProps) => (
 		<Header />
 		<main className="full-h-layout">{children}</main>
 		<Footer />
-	</>
+	</AuthProvider>
 );
 
 export default Layout;

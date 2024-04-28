@@ -5,8 +5,6 @@ import Button, { ButtonColor } from './Button';
 import { LuCheckSquare, LuXSquare } from 'react-icons/lu';
 import { toastPromise } from '@helpers/toast';
 import { useApplyForRace, useCancelApply, useGetApply, useGetUser, useUpdateApply } from '@adapters/firestore';
-import { getAuth } from 'firebase/auth';
-import { app } from '@adapters/firebase';
 import { useEffect, useState } from 'react';
 import { User } from '@datatypes/User';
 import { ErrorMessage } from '@hookform/error-message';
@@ -14,6 +12,7 @@ import FormErrorMessage from './FormErrorMessage';
 import ConfirmModal from './ConfirmModal';
 import { ApplyForm, ShirtSize } from '@datatypes/Apply';
 import Tooltip from './Tooltip';
+import { useAuth } from '@contexts/auth';
 
 const defaultApplyForm: ApplyForm = {
 	discipline: '',
@@ -22,11 +21,11 @@ const defaultApplyForm: ApplyForm = {
 };
 
 const Apply = ({ raceData, disciplines }: RaceProp) => {
-	const auth = getAuth(app);
+	const { user } = useAuth();
 	const [applyButtonColor, setApplyButtonColor] = useState<ButtonColor>(ButtonColor.Disabled);
 	const [userData, setUserData] = useState<User>();
-	const { userInfo } = useGetUser(auth.currentUser?.uid);
-	const { applyData } = useGetApply(disciplines || [], auth.currentUser?.uid);
+	const { userInfo } = useGetUser(user?.uid);
+	const { applyData } = useGetApply(disciplines || [], user?.uid);
 	const {
 		register,
 		handleSubmit,
@@ -59,7 +58,7 @@ const Apply = ({ raceData, disciplines }: RaceProp) => {
 
 	const onFormSubmit = async (formData: ApplyForm) => {
 		setApplyButtonColor(ButtonColor.Disabled);
-		if (raceData && auth.currentUser) {
+		if (raceData && user) {
 			if (applyData) {
 				await toastPromise(useUpdateApply(applyData, formData), {
 					loading: 'Updating...',
@@ -68,7 +67,7 @@ const Apply = ({ raceData, disciplines }: RaceProp) => {
 				});
 				setApplyButtonColor(ButtonColor.Blue);
 			} else {
-				await toastPromise(useApplyForRace(raceData.ref, formData, auth.currentUser.uid), {
+				await toastPromise(useApplyForRace(raceData.ref, formData, user.uid), {
 					loading: 'Applying...',
 					success: 'Applied for the race.',
 					error: 'An error occurred.',

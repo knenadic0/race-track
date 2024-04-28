@@ -13,9 +13,10 @@ export enum LoaderType {
 export type LoaderProps = {
 	type: LoaderType;
 	count?: number;
+	height?: number;
 };
 
-const Loader = ({ type, count, className = '' }: PropsWithStyle<LoaderProps>) => {
+const Loader = ({ type, count, height, className = '' }: PropsWithStyle<LoaderProps>) => {
 	const containerClass = classNames(
 		className,
 		{ 'absolute top-1/3': type == LoaderType.Circle },
@@ -25,7 +26,7 @@ const Loader = ({ type, count, className = '' }: PropsWithStyle<LoaderProps>) =>
 	return (
 		<div className={containerClass}>
 			{type == LoaderType.Skeleton ? (
-				<Skeleton count={count} highlightColor={rtLightGray} containerClassName="w-full" />
+				<Skeleton count={count} highlightColor={rtLightGray} height={height} containerClassName="w-full" />
 			) : (
 				<Puff
 					height="60"

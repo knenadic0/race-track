@@ -1,8 +1,3 @@
-import { useAuthState } from 'react-firebase-hooks/auth';
-import { getAuth } from 'firebase/auth';
-import { app } from '@adapters/firebase';
-import { useRouter } from 'next/router';
-import Cookies from 'js-cookie';
 import { NextPageWithLayout } from './_app';
 import { ReactElement, useState, useEffect } from 'react';
 import Layout from '@components/Layout';
@@ -12,17 +7,15 @@ import Loader, { LoaderType } from '@components/Loader';
 import Button, { ButtonColor } from '@components/Button';
 import { useGetUser, useSetUser } from '@adapters/firestore';
 import Card from '@components/Card';
-import { loginRoute } from '@constants/routes';
 import { useForm } from 'react-hook-form';
 import { ErrorMessage } from '@hookform/error-message';
 import FormErrorMessage from '@components/FormErrorMessage';
 import { toastPromise } from '@helpers/toast';
 import { DocumentData } from '@tatsuokaniwa/swr-firestore';
+import { useAuth } from '@contexts/auth';
 
 const Profile: NextPageWithLayout = () => {
-	const auth = getAuth(app);
-	const [user] = useAuthState(auth);
-	const router = useRouter();
+	const { user, logout } = useAuth();
 	const [userData, setUserData] = useState<DocumentData<User>>();
 	const {
 		register,
@@ -31,12 +24,6 @@ const Profile: NextPageWithLayout = () => {
 		trigger,
 		formState: { errors },
 	} = useForm<User>();
-
-	const logOut = async () => {
-		await auth.signOut();
-		Cookies.remove('user');
-		router.push(loginRoute);
-	};
 
 	const { userInfo, error } = useGetUser(user?.uid);
 
@@ -69,7 +56,7 @@ const Profile: NextPageWithLayout = () => {
 	return (
 		<div className="main-container">
 			<div className="flex w-full flex-1 flex-col items-center justify-center px-5 text-center sm:my-8 sm:w-auto">
-				{!userInfo && !error && !user ? (
+				{(!userInfo && !error && !user) || !user ? (
 					<Loader type={LoaderType.Circle} />
 				) : (
 					<Card size="small" className="w-full p-6 text-left text-lg sm:w-auto">
@@ -171,7 +158,7 @@ const Profile: NextPageWithLayout = () => {
 								<Button onClick={handleSubmit(onFormSubmit)} color={ButtonColor.Blue} text="Save">
 									<LuSave />
 								</Button>
-								<Button onClick={logOut} color={ButtonColor.Red} text="Sign out">
+								<Button onClick={logout} color={ButtonColor.Red} text="Sign out">
 									<LuLogOut />
 								</Button>
 							</div>
@@ -189,5 +176,7 @@ Profile.getLayout = (page: ReactElement) => {
 	};
 	return <Layout metaData={metaData}>{page}</Layout>;
 };
+
+Profile.isProtected = true;
 
 export default Profile;

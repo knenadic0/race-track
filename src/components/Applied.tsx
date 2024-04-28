@@ -47,7 +47,7 @@ const Applied = ({ raceData, disciplines }: RaceProp) => {
 	return (raceData && !raceData.applied) || error ? (
 		<div className="my-5">No applies yet.</div>
 	) : !disciplines ? (
-		<Loader type={LoaderType.Skeleton} count={5} />
+		<Loader type={LoaderType.Skeleton} count={5} height={48} />
 	) : (
 		<>
 			<div className="my-3 w-full sm:w-96">

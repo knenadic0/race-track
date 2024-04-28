@@ -9,7 +9,9 @@
 			"@helpers/*": ["./src/helpers/*"],
 			"@constants/*": ["./src/constants/*"],
 			"@datatypes/*": ["./src/types/*"],
-			"@adapters/*": ["./src/adapters/*"]
+			"@adapters/*": ["./src/adapters/*"],
+			"@contexts/*": ["./src/contexts/*"],
+			"@styles/*": ["./src/styles/*"]
 		},
 		"target": "esnext",
 		"module": "commonjs",

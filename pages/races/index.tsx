@@ -1,11 +1,9 @@
 import Link from 'next/link';
 import { NextPageWithLayout } from '../_app';
 import { ReactElement } from 'react';
-import { app } from '@adapters/firebase';
 import Layout from '@components/Layout';
 import { LuPlusSquare } from 'react-icons/lu';
 import { Race } from '@datatypes/Race';
-import { getAuth } from 'firebase/auth';
 import dateFormat from 'dateformat';
 import Loader, { LoaderType } from '@components/Loader';
 import Pill from '@components/Pill';
@@ -15,9 +13,11 @@ import DataTable from '@components/DataTable';
 import Card from '@components/Card';
 import { manageRacesRoute, racesRoute } from '@constants/routes';
 import { TableNode } from '@table-library/react-table-library';
+import classNames from 'classnames';
+import { useAuth } from '@contexts/auth';
 
 const Races: NextPageWithLayout = () => {
-	getAuth(app);
+	const { user } = useAuth();
 	const { races } = useGetRaces();
 
 	const columns = [
@@ -57,14 +57,16 @@ const Races: NextPageWithLayout = () => {
 
 	return (
 		<div className="main-container">
-			<Card size="big" className="items-center justify-between lg:px-8 lg:py-7">
+			<Card size="big" className={classNames('items-center justify-between', { 'lg:px-8': !user, 'lg:py-7': user })}>
 				<h1 className="flex h-8 items-center text-xl font-bold">Upcoming races</h1>
-				<Button color={ButtonColor.Blue} text="Add race" href={manageRacesRoute}>
-					<LuPlusSquare />
-				</Button>
+				{user && (
+					<Button color={ButtonColor.Blue} text="Add race" href={manageRacesRoute}>
+						<LuPlusSquare />
+					</Button>
+				)}
 			</Card>
 			<Card size="big" className="flex-col">
-				{!races && <Loader type={LoaderType.Skeleton} count={5} className="mt-12" />}
+				{!races && <Loader type={LoaderType.Skeleton} count={5} height={48} className="mt-12" />}
 				{races && !races.length && <div className="my-5">No races yet.</div>}
 				{races && races.length > 0 && (
 					<DataTable

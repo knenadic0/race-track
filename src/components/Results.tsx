@@ -9,16 +9,15 @@ import { useGetResults } from '@adapters/firestore';
 import dateFormat from 'dateformat';
 import { Result as ResultType } from '@datatypes/Result';
 import { formatMilisecondsToTime } from '@helpers/date';
-import { getAuth } from 'firebase/auth';
-import { app } from '@adapters/firebase';
 import Pill, { DNFPill, DNSPill } from './Pill';
+import { useAuth } from '@contexts/auth';
 
 export type ResultProp = RaceProp & {
 	selectedDiscipline?: string;
 };
 
 const Results = ({ raceData, disciplines, selectedDiscipline }: ResultProp) => {
-	const auth = getAuth(app);
+	const { user } = useAuth();
 	const [discipline, setDiscipline] = useState<string | undefined>(selectedDiscipline);
 	const [gender, setGender] = useState<string | undefined>(selectedDiscipline ? 'both' : undefined);
 	const { results, error } = useGetResults(raceData?.id, discipline, gender);
@@ -41,7 +40,7 @@ const Results = ({ raceData, disciplines, selectedDiscipline }: ResultProp) => {
 			renderCell: (item: ResultType) => item.racer,
 			sort: { sortKey: 'racer' },
 			cellProps: {
-				'data-row-selected': (item: ResultType) => item.id === auth.currentUser?.uid,
+				'data-row-selected': (item: ResultType) => item.id === user?.uid,
 			},
 		},
 		{

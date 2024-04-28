@@ -1,8 +1,6 @@
 import Link from 'next/link';
 import { ReactElement } from 'react';
-import { app } from '@adapters/firebase';
 import Layout from '@components/Layout';
-import { getAuth } from 'firebase/auth';
 import dateFormat from 'dateformat';
 import Loader, { LoaderType } from '@components/Loader';
 import { useGetMyRaces } from '@adapters/firestore';
@@ -13,10 +11,11 @@ import { TableNode } from '@table-library/react-table-library';
 import { NextPageWithLayout } from './_app';
 import { ResultRace } from '@datatypes/Result';
 import { DNFPill, DNSPill } from '@components/Pill';
+import { useAuth } from '@contexts/auth';
 
 const MyRaces: NextPageWithLayout = () => {
-	const auth = getAuth(app);
-	const { results } = useGetMyRaces(auth.currentUser?.uid);
+	const { user } = useAuth();
+	const { results } = useGetMyRaces(user?.uid);
 
 	const columns = [
 		{
@@ -68,7 +67,7 @@ const MyRaces: NextPageWithLayout = () => {
 				<h1 className="flex h-8 items-center text-xl font-bold">My races</h1>
 			</Card>
 			<Card size="big" className="flex-col">
-				{!results && <Loader type={LoaderType.Skeleton} count={5} className="mt-12" />}
+				{!results && <Loader type={LoaderType.Skeleton} count={5} height={48} className="mt-12" />}
 				{results && !results.length && <div className="my-5">No races yet.</div>}
 				{results && results.length > 0 && (
 					<DataTable
@@ -94,5 +93,7 @@ MyRaces.getLayout = (page: ReactElement) => {
 	};
 	return <Layout metaData={metaData}>{page}</Layout>;
 };
+
+MyRaces.isProtected = true;
 
 export default MyRaces;

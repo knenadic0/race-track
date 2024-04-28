@@ -4,18 +4,20 @@ import classNames from 'classnames';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import Image from 'next/image';
-import { myRacesRoute, profileRoute, racesRoute, resultsRoute } from '@constants/routes';
+import { loginRoute, myRacesRoute, profileRoute, racesRoute, resultsRoute } from '@constants/routes';
 import { LuMenu, LuUser, LuX } from 'react-icons/lu';
-
-const navigationLinks = [
-	{ name: 'Races', href: racesRoute, current: false, main: true },
-	{ name: 'Results', href: resultsRoute, current: false, main: true },
-	{ name: 'My races', href: myRacesRoute, current: false, main: true },
-	{ name: 'Your profile', href: profileRoute, current: false, main: false },
-];
+import { useAuth } from '@contexts/auth';
 
 const Header = () => {
 	const pathname = usePathname();
+	const { user } = useAuth();
+
+	const navigationLinks = [
+		{ name: 'Races', href: racesRoute, current: false, main: true, visible: true },
+		{ name: 'Results', href: resultsRoute, current: false, main: true, visible: true },
+		{ name: 'My races', href: myRacesRoute, current: false, main: true, visible: user },
+		{ name: 'Your profile', href: user ? profileRoute : loginRoute, current: false, main: false, visible: true },
+	];
 	const [navigation, setNavigation] = useState(navigationLinks);
 
 	useEffect(() => {
@@ -29,7 +31,7 @@ const Header = () => {
 				}),
 			);
 		}
-	}, [pathname]);
+	}, [pathname, user]);
 
 	return (
 		<Disclosure as="nav" className="bg-white">
@@ -57,7 +59,7 @@ const Header = () => {
 								<div className="hidden h-full sm:ml-6 sm:block">
 									<div className="flex h-full space-x-4">
 										{navigation
-											.filter((x) => x.main)
+											.filter((x) => x.visible && x.main)
 											.map((item) => (
 												<Link
 													key={item.name}
@@ -76,7 +78,7 @@ const Header = () => {
 							</div>
 							<div className="hidden h-full items-center sm:static sm:inset-auto sm:ml-6 sm:flex sm:pr-0">
 								{navigation
-									.filter((x) => !x.main)
+									.filter((x) => x.visible && !x.main)
 									.map((item) => (
 										<div key={item.name} className="flex h-full">
 											<Link
@@ -99,7 +101,7 @@ const Header = () => {
 						<div className="pb-1">
 							<hr />
 							{navigation
-								.filter((x) => x.main)
+								.filter((x) => x.visible && x.main)
 								.map((item) => (
 									<Disclosure.Button
 										key={item.name}
@@ -116,7 +118,7 @@ const Header = () => {
 								))}
 							<hr />
 							{navigation
-								.filter((x) => !x.main)
+								.filter((x) => x.visible && !x.main)
 								.map((item) => (
 									<Disclosure.Button
 										key={item.name}
