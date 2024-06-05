@@ -14,8 +14,6 @@ import { useAddRace, useGetDisciplines, useGetRace, useRemoveRace, useUpdateRace
 import Card from '@components/Card';
 import FormErrorMessage from '@components/FormErrorMessage';
 import { racesRoute } from '@constants/routes';
-import toast from 'react-hot-toast';
-import { wait } from '@helpers/wait';
 import ConfirmModal from '@components/ConfirmModal';
 import { toastPromise } from '@helpers/toast';
 import Tooltip from '@components/Tooltip';
@@ -52,7 +50,7 @@ const ManageRace: NextPageWithLayout = () => {
 		},
 	});
 
-	const { raceData: race, error: notFound, isLoading } = useGetRace(router.query['id']?.toString());
+	const { raceData: race, error: notFound, isLoading } = useGetRace(router.query['id']?.toString(), user?.uid);
 	const { disciplines: disciplinesData } = useGetDisciplines(router.query['id']?.toString());
 
 	useEffect(() => {
@@ -89,22 +87,12 @@ const ManageRace: NextPageWithLayout = () => {
 				success: 'Race updated.',
 				error: 'An error occurred.',
 			});
-			toast('You will be redirected back to race', {
-				duration: 4000,
-			});
-			await wait(4000);
-			router.push(`${racesRoute}/${raceData.id}`);
 		} else if (user) {
 			await toastPromise(useAddRace(formData, user.uid), {
 				loading: 'Saving race...',
 				success: 'Race added.',
 				error: 'An error occurred.',
 			});
-			toast('You will be redirected back to races', {
-				duration: 4000,
-			});
-			await wait(4000);
-			router.push(racesRoute);
 		}
 	};
 

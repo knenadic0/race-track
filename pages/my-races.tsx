@@ -77,6 +77,7 @@ const MyRaces: NextPageWithLayout = () => {
 						sortFns={sortFns}
 						searchableFields={['race', 'discipline', 'position']}
 						defaultSortKey="dateTime"
+						defaultSortReversed
 						templateColumns="minmax(220px, 3fr) minmax(220px, 3fr) minmax(200px, 2fr) repeat(3, minmax(110px, 1fr))"
 						fixedHeader
 						searchPhrase="Search races..."

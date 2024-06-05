@@ -23,11 +23,11 @@ const Results = ({ raceData, disciplines, selectedDiscipline }: ResultProp) => {
 	const { results, error } = useGetResults(raceData?.id, discipline, gender);
 
 	useEffect(() => {
-		if (selectedDiscipline && !discipline) {
+		if (selectedDiscipline && !discipline && disciplines && disciplines.some((x) => x.id === selectedDiscipline)) {
 			setDiscipline(selectedDiscipline);
 			setGender('both');
 		}
-	}, [selectedDiscipline]);
+	}, [selectedDiscipline, disciplines]);
 
 	const columns: Column<ResultType>[] = [
 		{

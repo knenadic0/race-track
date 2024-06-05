@@ -52,7 +52,7 @@ const useSetUser = (uid: string, userData: User): Promise<void> => {
 	return promise;
 };
 
-const useGetRace = (id?: string): { raceData?: DocumentData<RaceType>; error?: FirestoreError; isLoading: boolean } => {
+const useGetRace = (id?: string, userId?: string): { raceData?: DocumentData<RaceType>; error?: FirestoreError; isLoading: boolean } => {
 	const [raceData, setData] = useState<DocumentData<RaceType>>();
 	const [isLoading, setIsLoading] = useState<boolean>(true);
 	const [error, setError] = useState<FirestoreError>();
@@ -73,7 +73,20 @@ const useGetRace = (id?: string): { raceData?: DocumentData<RaceType>; error?: F
 			};
 			setError(err);
 		}
-		setData(response.data);
+		if (response.data && userId) {
+			if (response.data.createdBy.id === userId) {
+				setData(response.data);
+			} else {
+				const err: FirestoreError = {
+					code: 'not-found',
+					message: 'Not found',
+					name: 'Not found',
+				};
+				setError(err);
+			}
+		} else {
+			setData(response.data);
+		}
 		setIsLoading(response.isLoading);
 	}, [response]);
 

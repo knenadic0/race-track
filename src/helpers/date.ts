@@ -18,18 +18,15 @@ export const calculateAge = (dateOfBirth: string): number => {
 };
 
 export const formatMilisecondsToTime = (milliseconds?: number): string => {
-	// Handle potential negative or zero milliseconds
 	if (!milliseconds || milliseconds <= 0) {
 		return '00:00:00.00';
 	}
 
-	// Calculate hours, minutes, seconds, and milliseconds
 	const hours = Math.floor(milliseconds / (1000 * 60 * 60));
 	const minutes = Math.floor((milliseconds % (1000 * 60 * 60)) / (1000 * 60));
 	const seconds = Math.floor((milliseconds % (1000 * 60)) / 1000);
 	const remainingMilliseconds = (milliseconds % 1000) / 10;
 
-	// Format the output with leading zeros
 	const formattedHours = hours.toString().padStart(2, '0');
 	const formattedMinutes = minutes.toString().padStart(2, '0');
 	const formattedSeconds = seconds.toString().padStart(2, '0');
